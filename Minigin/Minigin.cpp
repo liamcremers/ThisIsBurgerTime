@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <iostream>
+#include <thread>
 
 #if WIN32
 #define WIN32_LEAN_AND_MEAN 
@@ -15,6 +16,7 @@
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
+#include "EngineTime.h"
 
 SDL_Window* g_window{};
 
@@ -101,16 +103,42 @@ void dae::Minigin::Run(const std::function<void()>& load)
 {
 	load();
 #ifndef __EMSCRIPTEN__
-	while (!m_quit)
-		RunOneFrame();
+	GameLoop();
 #else
 	emscripten_set_main_loop_arg(&LoopCallback, this, 0, true);
 #endif
 }
 
-void dae::Minigin::RunOneFrame()
+void dae::Minigin::GameLoop()
 {
-	m_quit = !InputManager::GetInstance().ProcessInput();
-	SceneManager::GetInstance().Update();
-	Renderer::GetInstance().Render();
+	using namespace std::chrono;
+	using clock = high_resolution_clock;
+	constexpr int ms_per_frame = 16; //16 for 60 fps, 33 for 30 fps
+	auto last_time = clock::now();
+	float lag = 0.0f;
+	bool do_continue = true; // Make sure this is declared inside the function
+
+	while (do_continue && !m_quit)
+	{
+		auto current_time = clock::now();
+		float delta_time = std::chrono::duration<float>(current_time - last_time).count();
+		EngineTime::GetInstance().Update();
+		last_time = current_time;
+		lag += delta_time;
+
+		do_continue = InputManager::GetInstance().ProcessInput();
+
+		while (lag >= EngineTime::GetInstance().GetFixedTimeStep())
+		{
+			SceneManager::GetInstance().FixedUpdate();
+			lag -= EngineTime::GetInstance().GetFixedTimeStep();
+		}
+
+		SceneManager::GetInstance().Update();
+		Renderer::GetInstance().Render();
+
+		const auto sleepTime = std::chrono::duration<float>(current_time + milliseconds(ms_per_frame) - high_resolution_clock::now());
+		std::this_thread::sleep_for(sleepTime);
+	}
 }
+

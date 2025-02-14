@@ -1,17 +1,19 @@
 #pragma once
+#include "BaseComponent.h"
+#include "GameObject.h"
 #include <string>
 #include <memory>
-#include "GameObject.h"
-#include "TransformComponent.h"
 
 namespace dae
 {
 	class Font;
 	class Texture2D;
 	//TODO: rewrite as a component
-	class TextComponent final : public GameObject
+	class TextComponent final : public BaseComponent
 	{
 	public:
+		TextComponent(GameObject* parent, const std::string& text, std::shared_ptr<Font> font);
+
 		void Update() override;
 		void Render() const override;
 
@@ -19,7 +21,6 @@ namespace dae
 
 		void SetPosition(const float x, const float y);
 
-		TextComponent(const std::string& text, std::shared_ptr<Font> font);
 		virtual ~TextComponent() = default;
 		TextComponent(const TextComponent& other) = delete;
 		TextComponent(TextComponent&& other) = delete;
@@ -31,5 +32,6 @@ namespace dae
 		//TODO: TransformComponent m_transform{};
 		std::shared_ptr<Font> m_font;
 		std::shared_ptr<Texture2D> m_textTexture;
+
 	};
 }

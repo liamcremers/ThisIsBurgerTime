@@ -10,7 +10,13 @@ dae::GameObject::GameObject(const std::string& Name) : m_Name(Name)
 	AddComponent<TransformComponent>();
 }
 
-void dae::GameObject::Update() {}
+void dae::GameObject::Update()
+{
+	for (auto& comp : m_pComponents)
+	{
+		comp->Update();
+	}
+}
 
 void dae::GameObject::FixedUpdate()
 {}

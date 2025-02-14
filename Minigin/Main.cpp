@@ -11,13 +11,12 @@
 #include "ResourceManager.h"
 #include "Scene.h"
 
-#include "TextObject.h"
-#include "RenderComponent.h"
+#include "ComponentsHeader.h"
 
 #include <filesystem>
 namespace fs = std::filesystem;
 
-void load()
+static void load()
 {
 	auto& scene = dae::SceneManager::GetInstance().CreateScene("Demo");
 
@@ -26,16 +25,22 @@ void load()
 	meshRenderer->SetTexture("background.tga");
 	scene.Add(std::move(go));
 
-	go = std::make_unique <dae::GameObject>();
+	go = std::make_unique<dae::GameObject>();
 	meshRenderer = go->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("logo.tga");
 	go->SetPosition(216, 180);
 	scene.Add(std::move(go));
 
 	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
-	auto to = std::make_unique <dae::TextComponent>("Programming 4 Assignment", font);
-	to->SetPosition(80, 20);
-	scene.Add(std::move(to));
+	go = std::make_unique<dae::GameObject>();
+	go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
+	go->SetPosition(80, 20);
+	scene.Add(std::move(go));
+
+   go = std::make_unique<dae::GameObject>();
+   go->AddComponent<dae::FPSComponent>();
+   go->SetPosition(10, 10);
+   scene.Add(std::move(go));
 }
 
 int main(int, char* [])
