@@ -8,10 +8,11 @@
 #endif
 
 #include "Minigin.h"
-#include "SceneManager.h"
 #include "ResourceManager.h"
-#include "TextObject.h"
 #include "Scene.h"
+
+#include "TextObject.h"
+#include "RenderComponent.h"
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -20,30 +21,33 @@ void load()
 {
 	auto& scene = dae::SceneManager::GetInstance().CreateScene("Demo");
 
-	auto go = std::make_shared<dae::GameObject>();
-	go->SetTexture("background.tga");
-	scene.Add(go);
+	auto go = std::make_unique<dae::GameObject>();
+	auto meshRenderer = go->AddComponent<dae::RenderComponent>();
+	meshRenderer->SetTexture("background.tga");
+	scene.Add(std::move(go));
 
-	go = std::make_shared<dae::GameObject>();
-	go->SetTexture("logo.tga");
+	go = std::make_unique <dae::GameObject>();
+	meshRenderer = go->AddComponent<dae::RenderComponent>();
+	meshRenderer->SetTexture("logo.tga");
 	go->SetPosition(216, 180);
-	scene.Add(go);
+	scene.Add(std::move(go));
 
 	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
-	auto to = std::make_shared<dae::TextObject>("Programming 4 Assignment", font);
+	auto to = std::make_unique <dae::TextComponent>("Programming 4 Assignment", font);
 	to->SetPosition(80, 20);
-	scene.Add(to);
+	scene.Add(std::move(to));
 }
 
-int main(int, char*[]) {
+int main(int, char* [])
+{
 #if __EMSCRIPTEN__
 	fs::path data_location = "";
 #else
 	fs::path data_location = "./Data/";
-	if(!fs::exists(data_location))
+	if (!fs::exists(data_location))
 		data_location = "../Data/";
 #endif
 	dae::Minigin engine(data_location);
 	engine.Run(load);
-    return 0;
+	return 0;
 }

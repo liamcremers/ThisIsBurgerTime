@@ -3,9 +3,6 @@ project(Minigin)
 
 if(EMSCRIPTEN)
   message("Using Emscripten!")
-endif()
-
-if(EMSCRIPTEN)
   set(TARGET_NAME minigin_web)
   set(TARGET_PARAM )
 else()
@@ -13,32 +10,15 @@ else()
   set(TARGET_PARAM WIN32)
 endif()
 
-# list source files here
-add_executable(${TARGET_NAME} ${TARGET_PARAM}
-  Minigin/Font.cpp
-  Minigin/Font.h
-  Minigin/GameObject.cpp
-  Minigin/GameObject.h
-  Minigin/InputManager.cpp
-  Minigin/InputManager.h
-  Minigin/Main.cpp
-  Minigin/Minigin.cpp
-  Minigin/Minigin.h
-  Minigin/Renderer.cpp
-  Minigin/Renderer.h
-  Minigin/ResourceManager.cpp
-  Minigin/ResourceManager.h
-  Minigin/Scene.cpp
-  Minigin/Scene.h
-  Minigin/SceneManager.cpp
-  Minigin/SceneManager.h
-  Minigin/TextObject.cpp
-  Minigin/TextObject.h
-  Minigin/Texture2D.cpp
-  Minigin/Texture2D.h
-  Minigin/Transform.cpp
-  Minigin/Transform.h
-)
+# Automatically gather all .cpp files in the Minigin folder
+file(GLOB MINIGIN_SOURCES "Minigin/*.cpp")
+
+# Add executable using the gathered files
+add_executable(${TARGET_NAME} ${TARGET_PARAM} ${MINIGIN_SOURCES})
+
+# Group files under the "Components" section
+file(GLOB COMPONENTS_SOURCES "Minigin/*Component.cpp")
+source_group(TREE ${CMAKE_SOURCE_DIR}/Minigin PREFIX "Components" FILES ${COMPONENTS_SOURCES})
 
 # enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
@@ -53,7 +33,6 @@ FetchContent_Declare(
   DOWNLOAD_NO_PROGRESS ON
   DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
 )
-
 FetchContent_GetProperties(glm)
 if(NOT glm_POPULATED)
   FetchContent_Populate(glm)
@@ -71,13 +50,13 @@ if (WIN32)
   if(NOT SDL2_POPULATED)
     FetchContent_Populate(SDL2)
     set(SDL2_INCLUDE_DIR ${sdl2_SOURCE_DIR}/include)
-  if (${CMAKE_SIZEOF_VOID_P} MATCHES 8)
-    set(SDL2_LIBRARIES "${sdl2_SOURCE_DIR}/lib/x64/SDL2.lib;${sdl2_SOURCE_DIR}/lib/x64/SDL2main.lib")
-    set(SDL2_LIBRARY_DLL "${sdl2_SOURCE_DIR}/lib/x64/SDL2.dll")
-  else()
-    set(SDL2_LIBRARIES "${sdl2_SOURCE_DIR}/lib/x86/SDL2.lib;${sdl2_SOURCE_DIR}/lib/x86/SDL2main.lib")
-    set(SDL2_LIBRARY_DLL "${sdl2_SOURCE_DIR}/lib/x86/SDL2.dll")
-  endif()
+    if (${CMAKE_SIZEOF_VOID_P} MATCHES 8)
+      set(SDL2_LIBRARIES "${sdl2_SOURCE_DIR}/lib/x64/SDL2.lib;${sdl2_SOURCE_DIR}/lib/x64/SDL2main.lib")
+      set(SDL2_LIBRARY_DLL "${sdl2_SOURCE_DIR}/lib/x64/SDL2.dll")
+    else()
+      set(SDL2_LIBRARIES "${sdl2_SOURCE_DIR}/lib/x86/SDL2.lib;${sdl2_SOURCE_DIR}/lib/x86/SDL2main.lib")
+      set(SDL2_LIBRARY_DLL "${sdl2_SOURCE_DIR}/lib/x86/SDL2.dll")
+    endif()
   endif()
 
   # add SDL2_image
@@ -91,13 +70,13 @@ if (WIN32)
   if(NOT SDL2_image_POPULATED)
     FetchContent_Populate(SDL2_image)
     set(SDL2_IMAGE_INCLUDE_DIR ${sdl2_image_SOURCE_DIR}/include)
-  if (${CMAKE_SIZEOF_VOID_P} MATCHES 8)
-    set(SDL2_IMAGE_LIBRARIES "${sdl2_image_SOURCE_DIR}/lib/x64/SDL2_image.lib")
-    set(SDL2_IMAGE_LIBRARY_DLL "${sdl2_image_SOURCE_DIR}/lib/x64/SDL2_image.dll")
-  else()
-    set(SDL2_IMAGE_LIBRARIES "${sdl2_image_SOURCE_DIR}/lib/x86/SDL2_image.lib")
-    set(SDL2_IMAGE_LIBRARY_DLL "${sdl2_image_SOURCE_DIR}/lib/x86/SDL2_image.dll")
-  endif()
+    if (${CMAKE_SIZEOF_VOID_P} MATCHES 8)
+      set(SDL2_IMAGE_LIBRARIES "${sdl2_image_SOURCE_DIR}/lib/x64/SDL2_image.lib")
+      set(SDL2_IMAGE_LIBRARY_DLL "${sdl2_image_SOURCE_DIR}/lib/x64/SDL2_image.dll")
+    else()
+      set(SDL2_IMAGE_LIBRARIES "${sdl2_image_SOURCE_DIR}/lib/x86/SDL2_image.lib")
+      set(SDL2_IMAGE_LIBRARY_DLL "${sdl2_image_SOURCE_DIR}/lib/x86/SDL2_image.dll")
+    endif()
   endif()
 
   # add SDL2_ttf
@@ -111,13 +90,13 @@ if (WIN32)
   if(NOT sdl2_ttf_POPULATED)
     FetchContent_Populate(SDL2_ttf)
     set(SDL2_TTF_INCLUDE_DIR ${sdl2_ttf_SOURCE_DIR}/include)
-  if (${CMAKE_SIZEOF_VOID_P} MATCHES 8)
-    set(SDL2_TTF_LIBRARIES ${sdl2_ttf_SOURCE_DIR}/lib/x64/SDL2_ttf.lib)
-    set(SDL2_TTF_LIBRARY_DLL "${sdl2_ttf_SOURCE_DIR}/lib/x64/SDL2_ttf.dll")
-  else()
-    set(SDL2_TTF_LIBRARIES ${sdl2_ttf_SOURCE_DIR}/lib/x86/SDL2_ttf.lib)
-    set(SDL2_TTF_LIBRARY_DLL "${sdl2_ttf_SOURCE_DIR}/lib/x86/SDL2_ttf.dll")
-  endif()
+    if (${CMAKE_SIZEOF_VOID_P} MATCHES 8)
+      set(SDL2_TTF_LIBRARIES ${sdl2_ttf_SOURCE_DIR}/lib/x64/SDL2_ttf.lib)
+      set(SDL2_TTF_LIBRARY_DLL "${sdl2_ttf_SOURCE_DIR}/lib/x64/SDL2_ttf.dll")
+    else()
+      set(SDL2_TTF_LIBRARIES ${sdl2_ttf_SOURCE_DIR}/lib/x86/SDL2_ttf.lib)
+      set(SDL2_TTF_LIBRARY_DLL "${sdl2_ttf_SOURCE_DIR}/lib/x86/SDL2_ttf.dll")
+    endif()
   endif()
 
   find_package(VLD CONFIG)
@@ -206,7 +185,6 @@ if(EMSCRIPTEN)
   )
 
   # Have emscripten generate a html page too.
-  set(CMAKE_EXECUTABLE_SUFFIX ".html")
   
 elseif(WIN32)
   set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${TARGET_NAME}>")
