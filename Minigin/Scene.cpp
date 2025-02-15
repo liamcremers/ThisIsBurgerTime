@@ -4,20 +4,6 @@ using namespace dae;
 
 unsigned int Scene::m_idCounter = 0;
 
-std::vector<GameObject*> dae::Scene::GetObjects(std::string name)
-{
-	std::vector<GameObject*> objectsWithName;
-	for (const auto& object : m_objects)
-	{
-		if (object->GetName() == name)
-		{
-			objectsWithName.push_back(object.get());
-		}
-	}
-	return objectsWithName;
-}
-
-
 Scene::Scene(const std::string& name) : m_name(name) {}
 
 Scene::~Scene() = default;

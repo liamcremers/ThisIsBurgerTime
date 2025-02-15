@@ -33,17 +33,6 @@ void dae::SceneManager::LateUpdate()
 	}
 }
 
-void dae::SceneManager::MarkDeleteAllScenes()
-{
-	for (auto& scene : m_scenes)
-	{
-		for (auto& go : scene->GetObjects("fps"))
-		{
-			go->MarkForDelete();
-		}
-	}
-}
-
 dae::Scene& dae::SceneManager::CreateScene(const std::string& name)
 {
 	const auto& scene = std::shared_ptr<Scene>(new Scene(name));

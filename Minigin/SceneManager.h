@@ -16,9 +16,6 @@ namespace dae
 		void Update();
 		void Render();
 		void LateUpdate();
-
-		//TODO: markdeleteallscenes function remove later!!
-		void MarkDeleteAllScenes();
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
