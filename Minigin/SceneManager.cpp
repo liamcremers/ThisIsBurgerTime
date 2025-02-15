@@ -3,7 +3,7 @@
 
 void dae::SceneManager::Update()
 {
-	for(auto& scene : m_scenes)
+	for (auto& scene : m_scenes)
 	{
 		scene->Update();
 	}
@@ -22,6 +22,25 @@ void dae::SceneManager::Render()
 	for (const auto& scene : m_scenes)
 	{
 		scene->Render();
+	}
+}
+
+void dae::SceneManager::LateUpdate()
+{
+	for (auto& scene : m_scenes)
+	{
+		scene->LateUpdate();
+	}
+}
+
+void dae::SceneManager::MarkDeleteAllScenes()
+{
+	for (auto& scene : m_scenes)
+	{
+		for (auto& go : scene->GetObjects("fps"))
+		{
+			go->MarkForDelete();
+		}
 	}
 }
 

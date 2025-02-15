@@ -12,9 +12,13 @@ namespace dae
 	public:
 		Scene& CreateScene(const std::string& name);
 
-		void Update();
 		void FixedUpdate();
+		void Update();
 		void Render();
+		void LateUpdate();
+
+		//TODO: markdeleteallscenes function remove later!!
+		void MarkDeleteAllScenes();
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;

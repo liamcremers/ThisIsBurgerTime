@@ -6,11 +6,13 @@
 
 #include <string>
 #include <glm.hpp>
-#include <string>
 #include <memory>
 #include <vector>
 #include <optional>
 #include <algorithm>
+#include <concepts>
+#include <ranges>
+
 namespace dae
 {
 	template<typename CompT>
@@ -18,18 +20,16 @@ namespace dae
 
 	class Texture2D;
 
-	class GameObject /*final*/
+	class GameObject final
 	{
 	public:
-		GameObject();
-		//GameObject() = delete;
-		GameObject(const std::string& Name);
+		GameObject(const std::string& Name = {});
 
 		virtual ~GameObject() = default;
-		GameObject(const GameObject& other) = delete;
-		GameObject(GameObject&& other) = delete;
-		GameObject& operator=(const GameObject& other) = delete;
-		GameObject& operator=(GameObject&& other) = delete;
+		GameObject(const GameObject&) = delete;
+		GameObject(GameObject&&) = delete;
+		GameObject& operator=(const GameObject&) = delete;
+		GameObject& operator=(GameObject&&) = delete;
 
 		// Core functions
 		virtual void Update();
@@ -40,32 +40,31 @@ namespace dae
 		// Parent & Children
 		void SetParent(GameObject* pParent);
 
-		[[nodiscard]] GameObject* GetParent() const;
-		[[nodiscard]] size_t GetChildCount() const;
-		[[nodiscard]] GameObject* GetChildAt(size_t idx) const;
+		[[nodiscard]] GameObject* GetParent() const { return m_pParent.get(); }
+		[[nodiscard]] size_t GetChildCount() const { return m_pChildren.size(); }
+		[[nodiscard]] GameObject* GetChildAt(size_t idx) const { return m_pChildren.at(idx).get(); }
 
 		// Object state management
 		void MarkForDelete();
-
-		[[nodiscard]] bool IsMarkedForDelete() const;
-		[[nodiscard]] bool HasNoComponents() const;
+		[[nodiscard]] auto IsMarkedForDelete() const -> bool { return m_MarkedForDelete; }
+		[[nodiscard]] auto HasNoComponents() const -> bool { return m_pComponents.empty(); }
 
 		// Position management
 		void SetPosition(const glm::vec2& pos) const;
-		void SetPosition(const float x,const float y) const;
+		void SetPosition(const float x, const float y) const;
 
 		[[nodiscard]] const glm::vec2& GetPosition() const;
-		[[nodiscard]] const std::string& GetName() const;
+		[[nodiscard]] const std::string& GetName() const { return m_Name; }
 
+		// Component management
 		template<Component CompT, typename... Args>
-		CompT* AddComponent(const Args&... args)
+		auto AddComponent(Args&&... args) -> CompT*
 		{
 			if (HasComponent<CompT>())
-			{
 				RemoveComponent<CompT>();
-			}
-			auto component = std::make_unique<CompT>(this, args...);
-			CompT* componentPtr = component.get();
+
+			auto component = std::make_unique<CompT>(this, std::forward<Args>(args)...);
+			auto* componentPtr = component.get();
 			m_pComponents.emplace_back(std::move(component));
 			return componentPtr;
 		}
@@ -73,57 +72,43 @@ namespace dae
 		template<Component CompT>
 		void RemoveComponent()
 		{
-			auto pcomp{ GetComponent<CompT>() };
-			auto it = std::find_if(m_pComponents.begin(), m_pComponents.end(), [&](const auto& pComp)
-								   {
-									   return pComp.get() == pcomp;
-								   });
-			if (it != m_pComponents.end())
-			{
-				m_pComponents.erase(it);
-			}
+			std::erase_if(m_pComponents, [](const auto& pComp)
+						  {
+							  return dynamic_cast<CompT*>(pComp.get()) != nullptr;
+						  });
 		}
 
-		template <Component CompT>
-		constexpr [[nodiscard]] bool HasComponent() const
+		template<Component CompT>
+		[[nodiscard]] constexpr bool HasComponent() const
 		{
-			return std::any_of(m_pComponents.begin(), m_pComponents.end(), [](const auto& pComp)
-							   {
-								   return dynamic_cast<CompT*>(pComp.get()) != nullptr;
-							   });
+			return std::ranges::any_of(m_pComponents, [](const auto& pComp)
+									   {
+										   return dynamic_cast<CompT*>(pComp.get()) != nullptr;
+									   });
 		}
 
-		template <Component CompT>
-		constexpr CompT* GetComponent() const
+		template<Component CompT>
+		[[nodiscard]] constexpr auto GetComponent() const -> CompT*
 		{
-			for (const auto& pComp : m_pComponents)
-			{
-				if (auto component = dynamic_cast<CompT*>(pComp.get()))
-				{
-					return component;
-				}
-			}
-			return nullptr;
+			auto it = std::ranges::find_if(m_pComponents, [](const auto& pComp)
+										   {
+											   return dynamic_cast<CompT*>(pComp.get()) != nullptr;
+										   });
+			return (it != m_pComponents.end()) ? dynamic_cast<CompT*>(it->get()) : nullptr;
 		}
 
-		template <Component CompT>
-		std::optional<CompT*> TryGetComponent() const
+		template<Component CompT>
+		[[nodiscard]] auto TryGetComponent() const -> std::optional<CompT*>
 		{
-			for (const auto& pComp : m_pComponents)
-			{
-				if (auto component = dynamic_cast<CompT*>(pComp.get()))
-				{
-					return component;
-				}
-			}
+			if (auto* comp = GetComponent<CompT>())
+				return comp;
 			return std::nullopt;
-		}
-	private:
-		std::shared_ptr<GameObject> m_pParent{};
-		std::vector<std::unique_ptr<GameObject>> m_pChildren{};
-		std::vector<std::unique_ptr<BaseComponent>> m_pComponents{};
+		}	private:
+			std::shared_ptr<GameObject> m_pParent{};
+			std::vector<std::unique_ptr<GameObject>> m_pChildren{};
+			std::vector<std::unique_ptr<BaseComponent>> m_pComponents{};
 
-		const std::string m_Name{};
-		bool m_MarkedForDelete{};
+			std::string m_Name{};
+			bool m_MarkedForDelete{};
 	};
 }

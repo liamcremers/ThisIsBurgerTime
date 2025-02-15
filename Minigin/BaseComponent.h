@@ -9,7 +9,9 @@ namespace dae
         virtual ~BaseComponent() = default;
 
         virtual void Update() = 0;
+        virtual void FixedUpdate() = 0;
         virtual void Render() const = 0;
+        virtual void LateUpdate() = 0;
 
 		virtual [[nodiscard]] GameObject* GetGameObject() const { return m_ParentGameObjectPtr; }
 	private:

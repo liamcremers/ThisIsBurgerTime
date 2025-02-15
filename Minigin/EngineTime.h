@@ -18,6 +18,7 @@ namespace dae
         float GetDeltaTime() const { return m_DeltaTime; }
         float GetFixedTimeStep() const { return m_FixedTimeStep; }
         float GetFPS() const { return 1.0f / m_DeltaTime; }
+        auto GetLastTime() const { return m_LastTime; }
 
     private:
         EngineTime() : m_LastTime(std::chrono::high_resolution_clock::now()), m_DeltaTime(0.0f), m_FixedTimeStep(1.0f / 60.0f) {}

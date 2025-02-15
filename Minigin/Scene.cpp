@@ -4,6 +4,20 @@ using namespace dae;
 
 unsigned int Scene::m_idCounter = 0;
 
+std::vector<GameObject*> dae::Scene::GetObjects(std::string name)
+{
+	std::vector<GameObject*> objectsWithName;
+	for (const auto& object : m_objects)
+	{
+		if (object->GetName() == name)
+		{
+			objectsWithName.push_back(object.get());
+		}
+	}
+	return objectsWithName;
+}
+
+
 Scene::Scene(const std::string& name) : m_name(name) {}
 
 Scene::~Scene() = default;
@@ -25,7 +39,7 @@ void Scene::RemoveAll()
 
 void Scene::Update()
 {
-	for(auto& object : m_objects)
+	for (auto& object : m_objects)
 	{
 		object->Update();
 	}
@@ -33,7 +47,7 @@ void Scene::Update()
 
 void dae::Scene::FixedUpdate()
 {
-	for (const auto& object : m_objects)
+	for (auto& object : m_objects)
 	{
 		object->FixedUpdate();
 	}
@@ -41,9 +55,20 @@ void dae::Scene::FixedUpdate()
 
 void Scene::Render() const
 {
-	for (const auto& object : m_objects)
+	for (auto& object : m_objects)
 	{
 		object->Render();
 	}
+}
+
+void dae::Scene::LateUpdate()
+{
+	for (auto& object : m_objects)
+		object->LateUpdate();
+
+	std::erase_if(m_objects, [](const std::unique_ptr<GameObject>& object)
+				  {
+					  return object->IsMarkedForDelete();
+				  });
 }
 

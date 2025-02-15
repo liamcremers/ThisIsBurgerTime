@@ -59,17 +59,17 @@ void PrintSDLVersion()
 	LogSDLVersion("We linked against SDL_image version ", version);
 
 	SDL_TTF_VERSION(&version)
-	LogSDLVersion("We compiled against SDL_ttf version ", version);
+		LogSDLVersion("We compiled against SDL_ttf version ", version);
 
 	version = *TTF_Linked_Version();
 	LogSDLVersion("We linked against SDL_ttf version ", version);
 }
 
-dae::Minigin::Minigin(const std::filesystem::path &dataPath)
+dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 {
 	PrintSDLVersion();
-	
-	if (SDL_Init(SDL_INIT_VIDEO) != 0) 
+
+	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		throw std::runtime_error(std::string("SDL_Init Error: ") + SDL_GetError());
 	}
@@ -82,7 +82,7 @@ dae::Minigin::Minigin(const std::filesystem::path &dataPath)
 		480,
 		SDL_WINDOW_OPENGL
 	);
-	if (g_window == nullptr) 
+	if (g_window == nullptr)
 	{
 		throw std::runtime_error(std::string("SDL_CreateWindow Error: ") + SDL_GetError());
 	}
@@ -113,31 +113,28 @@ void dae::Minigin::GameLoop()
 {
 	using namespace std::chrono;
 	using clock = high_resolution_clock;
-	constexpr int ms_per_frame = 16; //16 for 60 fps, 33 for 30 fps
-	auto last_time = clock::now();
-	float lag = 0.0f;
-	bool do_continue = true; // Make sure this is declared inside the function
-
-	while (do_continue && !m_quit)
+	while (m_continue)
 	{
-		auto current_time = clock::now();
-		float delta_time = std::chrono::duration<float>(current_time - last_time).count();
-		EngineTime::GetInstance().Update();
-		last_time = current_time;
-		lag += delta_time;
+		auto& engineTime = EngineTime::GetInstance();
+		auto& sceneManager = SceneManager::GetInstance();
 
-		do_continue = InputManager::GetInstance().ProcessInput();
+		engineTime.Update();
+		m_lag += engineTime.GetDeltaTime();
 
-		while (lag >= EngineTime::GetInstance().GetFixedTimeStep())
+		m_continue = InputManager::GetInstance().ProcessInput();
+
+		while (m_lag >= engineTime.GetFixedTimeStep())
 		{
-			SceneManager::GetInstance().FixedUpdate();
-			lag -= EngineTime::GetInstance().GetFixedTimeStep();
+			sceneManager.FixedUpdate();
+			m_lag -= engineTime.GetFixedTimeStep();
 		}
 
-		SceneManager::GetInstance().Update();
+		sceneManager.Update();
 		Renderer::GetInstance().Render();
 
-		const auto sleepTime = std::chrono::duration<float>(current_time + milliseconds(ms_per_frame) - high_resolution_clock::now());
+		sceneManager.LateUpdate();
+
+		const auto sleepTime = std::chrono::duration<float>(engineTime.GetLastTime() + milliseconds(m_msPerFrame) - high_resolution_clock::now());
 		std::this_thread::sleep_for(sleepTime);
 	}
 }

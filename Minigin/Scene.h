@@ -16,6 +16,7 @@ namespace dae
 		void Update();
 		void FixedUpdate();
 		void Render() const;
+		void LateUpdate();
 
 		~Scene();
 		Scene(const Scene& other) = delete;
@@ -23,6 +24,8 @@ namespace dae
 		Scene& operator=(const Scene& other) = delete;
 		Scene& operator=(Scene&& other) = delete;
 
+		// remove this later get all gameobjects
+		[[nodiscard]] std::vector<GameObject*> GetObjects(std::string name);
 	private:
 		explicit Scene(const std::string& name);
 

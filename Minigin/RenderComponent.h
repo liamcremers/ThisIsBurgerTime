@@ -11,13 +11,14 @@ namespace dae
 	{
 	public:
 		RenderComponent(GameObject* parent) :BaseComponent(parent) {}
+		void Render() const override;
 
 		void SetTexture(const std::string& filename);
 	private:
 		std::shared_ptr<Texture2D> m_texture{};
 
-		// Inherited via BaseComponent
-		void Update() override;
-		void Render() const override;
+		void Update() override {};
+		void FixedUpdate() override {};
+		void LateUpdate() override {};
 	};
 }

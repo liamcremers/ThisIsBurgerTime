@@ -12,7 +12,7 @@ bool dae::InputManager::ProcessInput()
 			
 		}
 		if (e.type == SDL_MOUSEBUTTONDOWN) {
-			
+			SceneManager::GetInstance().MarkDeleteAllScenes();
 		}
 		// etc...
 	}

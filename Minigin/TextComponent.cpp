@@ -50,5 +50,3 @@ void dae::TextComponent::SetPosition(const float x, const float y)
 {
 	GetGameObject()->SetPosition(x, y);
 }
-
-

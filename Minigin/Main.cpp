@@ -37,7 +37,7 @@ static void load()
 	go->SetPosition(80, 20);
 	scene.Add(std::move(go));
 
-   go = std::make_unique<dae::GameObject>();
+   go = std::make_unique<dae::GameObject>("fps");
    go->AddComponent<dae::FPSComponent>();
    go->SetPosition(10, 10);
    scene.Add(std::move(go));

@@ -9,8 +9,6 @@
 
 namespace dae
 {
-	//TODO: rewrite as a component
-	//maybe glm::vec2 can take two floats as parameters
 	class TransformComponent final : public BaseComponent
 	{
 	public:
@@ -20,12 +18,12 @@ namespace dae
 
 		const glm::vec2& GetPosition() const { return m_Position; }
 		void SetPosition(const glm::vec2& pos) { m_Position = pos; }
-		void SetPosition(float x, float y) { m_Position = { x, y }; }
 	private:
 		glm::vec2 m_Position{};
 
-		// Inherited via BaseComponent
-		void Update() override;
-		void Render() const override;
+		void Update() override {};
+		void Render() const override {};
+		void FixedUpdate() override {};
+		void LateUpdate() override {};
 	};
 }

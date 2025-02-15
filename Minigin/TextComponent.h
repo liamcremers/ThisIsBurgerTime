@@ -8,7 +8,6 @@ namespace dae
 {
 	class Font;
 	class Texture2D;
-	//TODO: rewrite as a component
 	class TextComponent final : public BaseComponent
 	{
 	public:
@@ -29,9 +28,10 @@ namespace dae
 	private:
 		bool m_needsUpdate;
 		std::string m_text;
-		//TODO: TransformComponent m_transform{};
 		std::shared_ptr<Font> m_font;
 		std::shared_ptr<Texture2D> m_textTexture;
 
+		void FixedUpdate() override {};
+		void LateUpdate() override {};
 	};
 }
