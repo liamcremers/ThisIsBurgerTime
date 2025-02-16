@@ -49,18 +49,3 @@ void dae::GameObject::MarkForDelete()
 		child->MarkForDelete();
 	}
 }
-
-void dae::GameObject::SetPosition(const glm::vec2& pos) const
-{
-	GetComponent<TransformComponent>()->SetPosition(pos);
-}
-
-void dae::GameObject::SetPosition(const float x, const float y) const
-{
-	GetComponent<TransformComponent>()->SetPosition({ x, y });
-}
-
-const glm::vec2& dae::GameObject::GetPosition() const
-{
-	return GetComponent<TransformComponent>()->GetPosition();
-}

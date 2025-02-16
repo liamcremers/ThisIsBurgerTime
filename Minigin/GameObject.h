@@ -49,11 +49,6 @@ namespace dae
 		[[nodiscard]] auto IsMarkedForDelete() const -> bool { return m_MarkedForDelete; }
 		[[nodiscard]] auto HasNoComponents() const -> bool { return m_pComponents.empty(); }
 
-		// Position management
-		void SetPosition(const glm::vec2& pos) const;
-		void SetPosition(const float x, const float y) const;
-
-		[[nodiscard]] const glm::vec2& GetPosition() const;
 		[[nodiscard]] const std::string& GetName() const { return m_Name; }
 
 		// Component management
@@ -103,12 +98,14 @@ namespace dae
 			if (auto* comp = GetComponent<CompT>())
 				return comp;
 			return std::nullopt;
-		}	private:
-			std::shared_ptr<GameObject> m_pParent{};
-			std::vector<std::unique_ptr<GameObject>> m_pChildren{};
-			std::vector<std::unique_ptr<BaseComponent>> m_pComponents{};
+		}
 
-			std::string m_Name{};
-			bool m_MarkedForDelete{};
+	private:
+		std::shared_ptr<GameObject> m_pParent{};
+		std::vector<std::unique_ptr<GameObject>> m_pChildren{};
+		std::vector<std::unique_ptr<BaseComponent>> m_pComponents{};
+
+		std::string m_Name{};
+		bool m_MarkedForDelete{};
 	};
 }

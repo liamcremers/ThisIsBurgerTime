@@ -28,19 +28,19 @@ static void load()
 	go = std::make_unique<dae::GameObject>();
 	meshRenderer = go->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("logo.tga");
-	go->SetPosition(216, 180);
+	go->GetComponent<dae::TransformComponent>()->SetPosition({ 216.0f, 180.0f });
 	scene.Add(std::move(go));
 
 	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 	go = std::make_unique<dae::GameObject>();
 	go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
-	go->SetPosition(80, 20);
+	go->GetComponent<dae::TransformComponent>()->SetPosition({ 80.0f, 20.0f });
 	scene.Add(std::move(go));
 
-   go = std::make_unique<dae::GameObject>("fps");
-   go->AddComponent<dae::FPSComponent>();
-   go->SetPosition(10, 10);
-   scene.Add(std::move(go));
+	go = std::make_unique<dae::GameObject>("fps");
+	go->AddComponent<dae::FPSComponent>();
+	go->GetComponent<dae::TransformComponent>()->SetPosition({10.0f, 10.0f});
+	scene.Add(std::move(go));
 }
 
 int main(int, char* [])

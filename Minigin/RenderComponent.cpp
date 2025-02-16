@@ -10,6 +10,6 @@ void dae::RenderComponent::Render() const
 	if (m_texture == nullptr)
 		return;
 
-	const auto& pos{ this->GetGameObject()->GetPosition() };
+	const auto& pos{ GetGameObject()->GetComponent<TransformComponent>()->GetPosition() };
 	Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
 }

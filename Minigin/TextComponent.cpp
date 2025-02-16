@@ -34,7 +34,7 @@ void dae::TextComponent::Render() const
 {
 	if (m_textTexture != nullptr)
 	{
-		const auto& pos = GetGameObject()->GetPosition();
+		const auto& pos = GetGameObject()->GetComponent<TransformComponent>()->GetPosition();
 		Renderer::GetInstance().RenderTexture(*m_textTexture, pos.x, pos.y);
 	}
 }
@@ -48,5 +48,5 @@ void dae::TextComponent::SetText(const std::string& text)
 
 void dae::TextComponent::SetPosition(const float x, const float y)
 {
-	GetGameObject()->SetPosition(x, y);
+	GetGameObject()->GetComponent<TransformComponent>()->SetPosition({ x, y });
 }

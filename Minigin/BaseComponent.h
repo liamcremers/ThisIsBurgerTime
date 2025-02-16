@@ -2,19 +2,17 @@
 namespace dae
 {
 	class GameObject;
-    class BaseComponent
-    {
-    public:
-        BaseComponent(GameObject* parent) : m_ParentGameObjectPtr(parent) {}
-        virtual ~BaseComponent() = default;
-
-        virtual void Update() = 0;
-        virtual void FixedUpdate() = 0;
-        virtual void Render() const = 0;
-        virtual void LateUpdate() = 0;
+	class BaseComponent
+	{
+	public:
+		BaseComponent(GameObject* parent) : m_ParentGameObjectPtr(parent) {}
+		virtual void Update() {};
+		virtual void FixedUpdate() {};
+		virtual void Render() const {};
+		virtual void LateUpdate() {};
 
 		virtual [[nodiscard]] GameObject* GetGameObject() const { return m_ParentGameObjectPtr; }
 	private:
-        GameObject* m_ParentGameObjectPtr{};
-    };
+		GameObject* m_ParentGameObjectPtr{};
+	};
 }
