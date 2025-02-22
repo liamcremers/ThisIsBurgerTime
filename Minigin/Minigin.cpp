@@ -123,16 +123,14 @@ void dae::Minigin::GameLoop()
 
 		m_continue = InputManager::GetInstance().ProcessInput();
 
+		sceneManager.Update();
 		while (m_lag >= engineTime.GetFixedTimeStep())
 		{
 			sceneManager.FixedUpdate();
 			m_lag -= engineTime.GetFixedTimeStep();
 		}
-
-		sceneManager.Update();
-		Renderer::GetInstance().Render();
-
 		sceneManager.LateUpdate();
+		Renderer::GetInstance().Render();
 
 		const auto sleepTime = std::chrono::duration<float>(engineTime.GetLastTime() + milliseconds(m_msPerFrame) - high_resolution_clock::now());
 		std::this_thread::sleep_for(sleepTime);

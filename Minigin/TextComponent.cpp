@@ -1,11 +1,14 @@
+#include "TextComponent.h"
+
 #include <stdexcept>
 #include <SDL_ttf.h>
-#include "TextComponent.h"
+
+#include "GameObject.h"
 #include "Renderer.h"
 #include "Font.h"
 #include "Texture2D.h"
 
-dae::TextComponent::TextComponent(GameObject* parent, const std::string& text, std::shared_ptr<Font> font)
+dae::TextComponent::TextComponent(GameObject& parent, const std::string& text, std::shared_ptr<Font> font)
 	:BaseComponent(parent), m_needsUpdate(true), m_text(text), m_font(std::move(font)), m_textTexture(nullptr)
 {}
 
@@ -34,7 +37,7 @@ void dae::TextComponent::Render() const
 {
 	if (m_textTexture != nullptr)
 	{
-		const auto& pos = GetGameObject()->GetComponent<TransformComponent>()->GetPosition();
+		const auto& pos = GetGameObject()->GetComponent<TransformComponent>()->GetWorldPosition();
 		Renderer::GetInstance().RenderTexture(*m_textTexture, pos.x, pos.y);
 	}
 }
@@ -48,5 +51,5 @@ void dae::TextComponent::SetText(const std::string& text)
 
 void dae::TextComponent::SetPosition(const float x, const float y)
 {
-	GetGameObject()->GetComponent<TransformComponent>()->SetPosition({ x, y });
+	GetGameObject()->GetComponent<TransformComponent>()->SetWorldPosition({ x, y });
 }

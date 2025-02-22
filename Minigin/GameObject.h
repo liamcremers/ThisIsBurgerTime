@@ -11,6 +11,7 @@
 #include <optional>
 #include <algorithm>
 #include <concepts>
+#include <functional>
 #include <ranges>
 
 namespace dae
@@ -25,24 +26,34 @@ namespace dae
 	public:
 		GameObject(const std::string& Name = {});
 
-		virtual ~GameObject() = default;
 		GameObject(const GameObject&) = delete;
 		GameObject(GameObject&&) = delete;
 		GameObject& operator=(const GameObject&) = delete;
 		GameObject& operator=(GameObject&&) = delete;
 
 		// Core functions
-		virtual void Update();
-		virtual void FixedUpdate();
-		virtual void LateUpdate();
-		virtual void Render() const;
+		void Update();
+		void FixedUpdate();
+		void LateUpdate();
+		void Render() const;
 
 		// Parent & Children
-		void SetParent(GameObject* pParent);
+		void SetParent(GameObject* pParent, bool keepWorldPosition = false);
+		bool IsChild(GameObject* pChild) const
+		{
+			return std::ranges::count(m_pChildren, pChild) > 0;
+		}
 
-		[[nodiscard]] GameObject* GetParent() const { return m_pParent.get(); }
+		[[nodiscard]] GameObject* GetParent() const { return m_pParent; }
 		[[nodiscard]] size_t GetChildCount() const { return m_pChildren.size(); }
-		[[nodiscard]] GameObject* GetChildAt(size_t idx) const { return m_pChildren.at(idx).get(); }
+		[[nodiscard]] GameObject* GetChildAt(size_t idx) const { return m_pChildren.at(idx); }
+
+		[[nodiscard]] const glm::vec2& GetWorldPosition() const;
+		[[nodiscard]] const glm::vec2& GetLocalPosition() const;
+		void UpdateWorldPosition();
+		void SetLocalPosition(const glm::vec2& position) const;
+		void SetPositionDirty();
+
 
 		// Object state management
 		void MarkForDelete();
@@ -58,7 +69,7 @@ namespace dae
 			if (HasComponent<CompT>())
 				RemoveComponent<CompT>();
 
-			auto component = std::make_unique<CompT>(this, std::forward<Args>(args)...);
+			auto component = std::make_unique<CompT>(*this, std::forward<Args>(args)...);
 			auto* componentPtr = component.get();
 			m_pComponents.emplace_back(std::move(component));
 			return componentPtr;
@@ -101,11 +112,18 @@ namespace dae
 		}
 
 	private:
-		std::shared_ptr<GameObject> m_pParent{};
-		std::vector<std::unique_ptr<GameObject>> m_pChildren{};
+		GameObject* m_pParent{};
+		std::vector<GameObject*> m_pChildren{};
 		std::vector<std::unique_ptr<BaseComponent>> m_pComponents{};
 
 		std::string m_Name{};
 		bool m_MarkedForDelete{};
+		bool m_KeepWorldPosition{};
+		bool m_PositionDirty{};
+
+		TransformComponent* m_pTransform{ nullptr };
+
+		void RemoveChild(GameObject* pChild);
+		void AddChild(GameObject* pChild);
 	};
 }

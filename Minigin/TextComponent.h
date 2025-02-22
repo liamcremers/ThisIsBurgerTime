@@ -1,6 +1,5 @@
 #pragma once
 #include "BaseComponent.h"
-#include "GameObject.h"
 #include <string>
 #include <memory>
 
@@ -11,7 +10,7 @@ namespace dae
 	class TextComponent final : public BaseComponent
 	{
 	public:
-		TextComponent(GameObject* parent, const std::string& text, std::shared_ptr<Font> font);
+		TextComponent(GameObject& parent, const std::string& text, std::shared_ptr<Font> font);
 
 		void Update() override;
 		void Render() const override;

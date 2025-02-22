@@ -1,4 +1,5 @@
 #include "RenderComponent.h"
+#include "GameObject.h"
 
 void dae::RenderComponent::SetTexture(const std::string& filename)
 {
@@ -10,6 +11,6 @@ void dae::RenderComponent::Render() const
 	if (m_texture == nullptr)
 		return;
 
-	const auto& pos{ GetGameObject()->GetComponent<TransformComponent>()->GetPosition() };
+	const auto& pos{ GetGameObject()->GetComponent<TransformComponent>()->GetWorldPosition() };
 	Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
 }

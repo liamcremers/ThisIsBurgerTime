@@ -1,6 +1,7 @@
 #include "FPSComponent.h"
+#include "GameObject.h"
 
-dae::FPSComponent::FPSComponent(GameObject* parent)
+dae::FPSComponent::FPSComponent(GameObject& parent)
 	: BaseComponent(parent)
 {
 	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 14);

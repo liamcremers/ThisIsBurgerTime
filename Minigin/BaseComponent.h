@@ -5,14 +5,21 @@ namespace dae
 	class BaseComponent
 	{
 	public:
-		BaseComponent(GameObject* parent) : m_ParentGameObjectPtr(parent) {}
+		virtual ~BaseComponent() = default;
+		BaseComponent(const BaseComponent& other) = delete;
+		BaseComponent(BaseComponent&& other) = delete;
+		BaseComponent& operator=(const BaseComponent& other) = delete;
+		BaseComponent& operator=(BaseComponent&& other) = delete;
+
 		virtual void Update() {};
 		virtual void FixedUpdate() {};
 		virtual void Render() const {};
 		virtual void LateUpdate() {};
-
-		virtual [[nodiscard]] GameObject* GetGameObject() const { return m_ParentGameObjectPtr; }
+	protected:
+		BaseComponent(GameObject& owner) : m_pOwner(&owner) {}
+		virtual [[nodiscard]] GameObject* GetGameObject() const { return m_pOwner; }
 	private:
-		GameObject* m_ParentGameObjectPtr{};
+		GameObject* m_pOwner;
+		// TODO: question? GameObject& possible fix?
 	};
 }
