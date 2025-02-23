@@ -39,19 +39,16 @@ namespace dae
 
 		// Parent & Children
 		void SetParent(GameObject* pParent, bool keepWorldPosition = false);
-		bool IsChild(GameObject* pChild) const
-		{
-			return std::ranges::count(m_pChildren, pChild) > 0;
-		}
-
+		void DetechFromParent() { SetParent(nullptr); }
+		[[nodiscard]] bool IsChild(GameObject* pChild) const;
 		[[nodiscard]] GameObject* GetParent() const { return m_pParent; }
 		[[nodiscard]] size_t GetChildCount() const { return m_pChildren.size(); }
 		[[nodiscard]] GameObject* GetChildAt(size_t idx) const { return m_pChildren.at(idx); }
 
-		[[nodiscard]] const glm::vec2& GetWorldPosition() const;
+		[[nodiscard]] const glm::vec2& GetWorldPosition();
 		[[nodiscard]] const glm::vec2& GetLocalPosition() const;
 		void UpdateWorldPosition();
-		void SetLocalPosition(const glm::vec2& position) const;
+		void SetLocalPosition(const glm::vec2& position);
 		void SetPositionDirty();
 
 

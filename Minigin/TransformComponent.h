@@ -23,10 +23,5 @@ namespace dae
 		glm::vec2 m_Position{};
 		glm::vec2 m_WorldPosition{};
 		glm::vec2 m_LocalPosition{};
-
-		void Update() override {};
-		void Render() const override {};
-		void FixedUpdate() override {};
-		void LateUpdate() override {};
 	};
 }

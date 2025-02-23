@@ -16,7 +16,7 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-static void load()
+static void load(int windowWidth, int windowHeight)
 {
 	auto& scene = dae::SceneManager::GetInstance().CreateScene("Demo");
 
@@ -37,10 +37,23 @@ static void load()
 	go->GetComponent<dae::TransformComponent>()->SetWorldPosition({ 80.0f, 20.0f });
 	scene.Add(std::move(go));
 
-	go = std::make_unique<dae::GameObject>("fps");
-	go->AddComponent<dae::FPSComponent>();
-	go->GetComponent<dae::TransformComponent>()->SetWorldPosition({10.0f, 10.0f});
-	scene.Add(std::move(go));
+	auto parent = std::make_unique<dae::GameObject>("parent");
+	glm::vec2 pos = { windowHeight / 2.0f, windowWidth / 2.0f };
+	meshRenderer = parent->AddComponent<dae::RenderComponent>();
+	meshRenderer->SetTexture("ChefPeterPepperF.png");
+	parent->GetComponent<dae::TransformComponent>()->SetWorldPosition({ pos });
+	parent->AddComponent<dae::RotatorComponent>(40);
+	//moved after adding children
+
+	auto child = std::make_unique<dae::GameObject>("child");
+	meshRenderer = child->AddComponent<dae::RenderComponent>();
+	meshRenderer->SetTexture("ChefPeterPepperB.png");
+	child->GetComponent<dae::TransformComponent>()->SetLocalPosition(glm::vec2{ 20.0f, 20.0f });
+	child->AddComponent<dae::RotatorComponent>(40, false);
+	child->SetParent(parent.get());
+
+	scene.Add(std::move(parent));
+	scene.Add(std::move(child));
 }
 
 int main(int, char* [])
@@ -53,6 +66,6 @@ int main(int, char* [])
 		data_location = "../Data/";
 #endif
 	dae::Minigin engine(data_location);
-	engine.Run(load);
+	engine.Run([&engine]() { load(engine.GetWindowWidth(), engine.GetWindowHeight()); });
 	return 0;
 }

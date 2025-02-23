@@ -9,15 +9,11 @@ namespace dae
 	class RenderComponent final : public BaseComponent
 	{
 	public:
-		RenderComponent(GameObject& parent) :BaseComponent(parent) {}
-		void Render() const override;
+		RenderComponent(GameObject& parent);
 
+		void Render() const override;
 		void SetTexture(const std::string& filename);
 	private:
 		std::shared_ptr<Texture2D> m_texture{};
-
-		void Update() override {};
-		void FixedUpdate() override {};
-		void LateUpdate() override {};
 	};
 }

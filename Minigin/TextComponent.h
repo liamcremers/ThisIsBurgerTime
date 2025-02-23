@@ -29,8 +29,5 @@ namespace dae
 		std::string m_text;
 		std::shared_ptr<Font> m_font;
 		std::shared_ptr<Texture2D> m_textTexture;
-
-		void FixedUpdate() override {};
-		void LateUpdate() override {};
 	};
 }
