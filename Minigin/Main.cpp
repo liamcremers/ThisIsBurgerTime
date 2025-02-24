@@ -42,15 +42,15 @@ static void load(int windowWidth, int windowHeight)
 	meshRenderer = parent->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("ChefPeterPepperF.png");
 	parent->GetComponent<dae::TransformComponent>()->SetWorldPosition({ pos });
-	parent->AddComponent<dae::RotatorComponent>(40);
+	parent->AddComponent<dae::RotatorComponent>(40, true, pos);
 	//moved after adding children
 
 	auto child = std::make_unique<dae::GameObject>("child");
+	glm::vec2 newpos = pos + glm::vec2{ 20,20 };
 	meshRenderer = child->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("ChefPeterPepperB.png");
-	child->GetComponent<dae::TransformComponent>()->SetLocalPosition(glm::vec2{ 20.0f, 20.0f });
+	child->SetParent(parent.get(), false);
 	child->AddComponent<dae::RotatorComponent>(40, false);
-	child->SetParent(parent.get());
 
 	scene.Add(std::move(parent));
 	scene.Add(std::move(child));

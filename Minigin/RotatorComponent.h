@@ -8,7 +8,7 @@ namespace dae
 	class RotatorComponent final : public BaseComponent
 	{
 	public:
-		RotatorComponent(GameObject& owner, int radius, bool clockwise = true);
+		RotatorComponent(GameObject& owner, int radius, bool clockwise = true, glm::vec2 pos = glm::vec2{});
 		void Update() override;
 	private:
 		glm::vec2 m_Origin;

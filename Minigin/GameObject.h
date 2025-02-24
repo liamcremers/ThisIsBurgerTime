@@ -42,8 +42,6 @@ namespace dae
 		void DetechFromParent() { SetParent(nullptr); }
 		[[nodiscard]] bool IsChild(GameObject* pChild) const;
 		[[nodiscard]] GameObject* GetParent() const { return m_pParent; }
-		[[nodiscard]] size_t GetChildCount() const { return m_pChildren.size(); }
-		[[nodiscard]] GameObject* GetChildAt(size_t idx) const { return m_pChildren.at(idx); }
 
 		[[nodiscard]] const glm::vec2& GetWorldPosition();
 		[[nodiscard]] const glm::vec2& GetLocalPosition() const;
@@ -115,7 +113,6 @@ namespace dae
 
 		std::string m_Name{};
 		bool m_MarkedForDelete{};
-		bool m_KeepWorldPosition{};
 		bool m_PositionDirty{};
 
 		TransformComponent* m_pTransform{ nullptr };

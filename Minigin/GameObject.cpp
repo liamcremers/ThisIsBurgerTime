@@ -31,16 +31,20 @@ void dae::GameObject::Render() const { for (auto& comp : m_pComponents) comp->Re
 
 void dae::GameObject::SetParent(GameObject* pParent, bool keepWorldPosition)
 {
-	m_KeepWorldPosition = keepWorldPosition;
 	if (pParent == this || pParent == m_pParent || IsChild(pParent))
 		return;
 
+	if (pParent == nullptr)
+		SetLocalPosition(GetWorldPosition());
+	else
+	{
+		if (keepWorldPosition)
+			SetLocalPosition(GetWorldPosition() - pParent->GetWorldPosition());
+	}
 
 	if (m_pParent) m_pParent->RemoveChild(this);
 	m_pParent = pParent;
 	if (pParent) pParent->AddChild(this);
-	SetPositionDirty();
-	UpdateWorldPosition();
 }
 
 bool dae::GameObject::IsChild(GameObject* pChild) const
@@ -60,9 +64,9 @@ void dae::GameObject::UpdateWorldPosition()
 	if (m_PositionDirty)
 	{
 		if (m_pParent)
-			m_pTransform->SetWorldPosition(m_pParent->GetWorldPosition() + GetLocalPosition());
+			m_pTransform->SetWorldPosition(m_pParent->GetWorldPosition() + m_pTransform->GetLocalPosition());
 		else
-			m_pTransform->SetWorldPosition(GetLocalPosition());
+			m_pTransform->SetWorldPosition(m_pTransform->GetLocalPosition());
 
 		OutputDebugStringA((m_Name + " " + std::to_string(m_pTransform->GetWorldPosition().x) + " " + std::to_string(m_pTransform->GetWorldPosition().y) + "\n").c_str());
 
