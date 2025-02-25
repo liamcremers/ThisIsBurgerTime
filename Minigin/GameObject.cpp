@@ -9,8 +9,6 @@ dae::GameObject::GameObject(const std::string& Name)
 
 void dae::GameObject::Update()
 {
-	UpdateWorldPosition();
-
 	for (auto& comp : m_pComponents)
 		comp->Update();
 }

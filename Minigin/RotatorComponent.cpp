@@ -1,6 +1,7 @@
 #include "RotatorComponent.h"  
 #include "GameObject.h"
 
+//TODO: consider removing pos and just always rotate around the center of a parent
 dae::RotatorComponent::RotatorComponent(GameObject& owner, int radius, bool clockwise, glm::vec2 pos)
 	:BaseComponent(owner),
 	m_Origin{ pos },

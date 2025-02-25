@@ -49,11 +49,17 @@ static void load(int windowWidth, int windowHeight)
 	glm::vec2 newpos = pos + glm::vec2{ 20,20 };
 	meshRenderer = child->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("ChefPeterPepperB.png");
+	child->GetComponent<dae::TransformComponent>()->SetWorldPosition({ newpos });
 	child->SetParent(parent.get(), false);
 	child->AddComponent<dae::RotatorComponent>(40, false);
 
 	scene.Add(std::move(parent));
 	scene.Add(std::move(child));
+
+	go = std::make_unique<dae::GameObject>("fps");
+	go->AddComponent<dae::FPSComponent>();
+	go->GetComponent<dae::TransformComponent>()->SetWorldPosition({ 10.0f, 10.0f });
+	scene.Add(std::move(go));
 }
 
 int main(int, char* [])
