@@ -100,26 +100,27 @@ if(WIN32)
 
   find_package(VLD CONFIG)
 
-   set(IMGUI_FILES  
-   ${imgui_SOURCE_DIR}/imconfig.h  
-   ${imgui_SOURCE_DIR}/imgui_demo.cpp  
-   ${imgui_SOURCE_DIR}/imgui_draw.cpp  
-   ${imgui_SOURCE_DIR}/imgui_internal.h  
-   ${imgui_SOURCE_DIR}/imstb_rectpack.h  
-   ${imgui_SOURCE_DIR}/imstb_textedit.h  
-   ${imgui_SOURCE_DIR}/imstb_truetype.h  
-   ${imgui_SOURCE_DIR}/imgui_tables.cpp  
-   ${imgui_SOURCE_DIR}/imgui.cpp  
-   ${imgui_SOURCE_DIR}/imgui_widgets.cpp  
-   ${imgui_SOURCE_DIR}/imgui.h  
+      set(IMGUI_SRC  
+      ${imgui_SOURCE_DIR}/imconfig.h  
+      ${imgui_SOURCE_DIR}/imgui_demo.cpp  
+      ${imgui_SOURCE_DIR}/imgui_draw.cpp  
+      ${imgui_SOURCE_DIR}/imgui_internal.h  
+      ${imgui_SOURCE_DIR}/imstb_rectpack.h  
+      ${imgui_SOURCE_DIR}/imstb_textedit.h  
+      ${imgui_SOURCE_DIR}/imstb_truetype.h  
+      ${imgui_SOURCE_DIR}/imgui_tables.cpp  
+      ${imgui_SOURCE_DIR}/imgui.cpp  
+      ${imgui_SOURCE_DIR}/imgui_widgets.cpp  
+      ${imgui_SOURCE_DIR}/imgui.h  
+   
+      # Backends  
+      ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.h  
+      ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp  
+      ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer2.cpp  
+      ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+)  
 
-   # Backends  
-   ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.h  
-   ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp  
-   ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer2.cpp  
- )  
-
- add_library(ImGui STATIC ${IMGUI_FILES})  
+ add_library(ImGui STATIC ${IMGUI_SRC})  
  target_include_directories(ImGui PUBLIC ${imgui_SOURCE_DIR} ${SDL2_INCLUDE_DIR})  
  target_link_libraries(ImGui PRIVATE ${SDL2_LIBRARIES})  
 
@@ -192,6 +193,13 @@ target_compile_options(${TARGET_NAME} PRIVATE
   $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
   $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>
 )
+
+# Link with OpenGL
+target_link_libraries(${TARGET_NAME} PUBLIC opengl32)
+
+# Add OpenGL  
+find_package(OpenGL REQUIRED)  
+target_link_libraries(${TARGET_NAME} PUBLIC OpenGL::GL)
 
 if(EMSCRIPTEN)
   set(EMSCRIPTEN_COMPILE_FLAGS "${EMSCRIPTEN_LINK_FLAGS} -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_TTF=2 -g")

@@ -38,6 +38,8 @@ void dae::GameObject::SetParent(GameObject* pParent, bool keepWorldPosition)
 	{
 		if (keepWorldPosition)
 			SetLocalPosition(GetWorldPosition() - pParent->GetWorldPosition());
+		else
+			SetPositionDirty();
 	}
 
 	if (m_pParent) m_pParent->RemoveChild(this);
@@ -45,9 +47,9 @@ void dae::GameObject::SetParent(GameObject* pParent, bool keepWorldPosition)
 	if (pParent) pParent->AddChild(this);
 }
 
-bool dae::GameObject::IsChild(GameObject* pChild) const
+constexpr bool dae::GameObject::IsChild(const GameObject* pChild) const
 {
-	return std::ranges::count(m_pChildren, pChild) > 0;
+	return std::find(m_pChildren.begin(), m_pChildren.end(), pChild) != m_pChildren.end();
 }
 
 const glm::vec2& dae::GameObject::GetWorldPosition()

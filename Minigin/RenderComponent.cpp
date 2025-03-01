@@ -15,6 +15,6 @@ void dae::RenderComponent::Render() const
 	if (m_texture == nullptr)
 		return;
 
-	const auto& pos{ GetOwner()->GetWorldPosition()};
+	const auto& pos{ GetOwner().GetWorldPosition()};
 	Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
 }

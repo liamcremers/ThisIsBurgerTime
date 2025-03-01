@@ -3,14 +3,16 @@
 #include <string>
 #include <memory>
 
+#include "Font.h"
+#include "Texture2D.h"
+#include "TransformComponent.h"
+
 namespace dae
 {
-	class Font;
-	class Texture2D;
 	class TextComponent final : public BaseComponent
 	{
 	public:
-		TextComponent(GameObject& parent, const std::string& text, std::shared_ptr<Font> font);
+		TextComponent(GameObject& parent, const std::string& text, Font& font);
 
 		void Update() override;
 		void Render() const override;
@@ -27,7 +29,8 @@ namespace dae
 	private:
 		bool m_needsUpdate;
 		std::string m_text;
-		std::shared_ptr<Font> m_font;
-		std::shared_ptr<Texture2D> m_textTexture;
+		Font& m_font;
+		std::unique_ptr<Texture2D> m_textTexture;
+		TransformComponent* m_pTransform{ nullptr };
 	};
 }

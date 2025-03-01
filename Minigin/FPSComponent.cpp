@@ -1,14 +1,23 @@
 #include "FPSComponent.h"
 #include "GameObject.h"
 
-dae::FPSComponent::FPSComponent(GameObject& parent)
-	: BaseComponent(parent)
-{
-	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 14);
-	GetOwner()->AddComponent<TextComponent>("FPS: ",font);
-}
+dae::FPSComponent::FPSComponent(GameObject& parent, Font& font)
+	: BaseComponent(parent),
+	m_pFont{ font },
+	m_pTextComponent{ parent.AddComponent<TextComponent>("FPS: ", font) }
+{}
 
 void dae::FPSComponent::Update()
 {
-	GetOwner()->GetComponent<TextComponent>()->SetText("FPS: " + std::to_string(int(1.f / dae::EngineTime::GetInstance().GetDeltaTime())));
+	static int frameCount = 0;
+	static float elapsedTime = 0.0f;
+	frameCount++;
+	elapsedTime += EngineTime::GetInstance().GetDeltaTime();
+	if (elapsedTime >= 1.0f)
+	{
+		int fps = static_cast<int>(frameCount / elapsedTime);
+		m_pTextComponent->SetText("FPS: " + std::to_string(fps));
+		frameCount = 0;
+		elapsedTime = 0.0f;
+	}
 }

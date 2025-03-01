@@ -40,7 +40,7 @@ namespace dae
 		// Parent & Children
 		void SetParent(GameObject* pParent, bool keepWorldPosition = false);
 		void DetechFromParent() { SetParent(nullptr); }
-		[[nodiscard]] bool IsChild(GameObject* pChild) const;
+		[[nodiscard]] constexpr bool IsChild(const GameObject* pChild) const;
 		[[nodiscard]] GameObject* GetParent() const { return m_pParent; }
 
 		[[nodiscard]] const glm::vec2& GetWorldPosition();
@@ -63,6 +63,7 @@ namespace dae
 		{
 			if (HasComponent<CompT>())
 				RemoveComponent<CompT>();
+			//static_assert(HasComponent<CompT>());
 
 			auto component = std::make_unique<CompT>(*this, std::forward<Args>(args)...);
 			auto* componentPtr = component.get();
