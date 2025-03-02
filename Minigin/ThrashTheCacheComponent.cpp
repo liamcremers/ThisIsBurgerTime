@@ -2,8 +2,6 @@
 #include "imgui.h"
 #include "imgui_plot.h"
 #include <iostream>
-#define NOMINMAX
-#include <Windows.h>
 
 dae::ThrashTheCacheComponent::ThrashTheCacheComponent(GameObject& owner, int windowWidth, int windowHeight)
 	: BaseComponent(owner),
@@ -37,7 +35,7 @@ void dae::ThrashTheCacheComponent::RenderExercise1Window()
 	ImGui::SetWindowSize(ImVec2(static_cast<float>(m_HalfWindowWidth), static_cast<float>(m_WindowHeight)), ImGuiCond_FirstUseEver);
 
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.6f);
-	ImGui::SliderInt("", &m_SamplesExercise1, 1, 100);
+	ImGui::SliderInt(" ", &m_SamplesExercise1, 1, 100);
 	ImGui::PopItemWidth();
 	ImGui::SameLine();
 	if (ImGui::Button("-")) m_SamplesExercise1 = std::max(1, m_SamplesExercise1 - 1);
@@ -79,7 +77,7 @@ void dae::ThrashTheCacheComponent::RenderExercise2Window()
 	ImGui::SetWindowSize(ImVec2(static_cast<float>(m_HalfWindowWidth), static_cast<float>(m_WindowHeight)), ImGuiCond_FirstUseEver);
 
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.6f);
-	ImGui::SliderInt("", &m_SamplesExercise2, 1, 100);
+	ImGui::SliderInt(" ", &m_SamplesExercise2, 1, 100);
 	ImGui::PopItemWidth();
 	ImGui::SameLine();
 	if (ImGui::Button("-")) m_SamplesExercise2 = std::max(1, m_SamplesExercise2 - 1);
