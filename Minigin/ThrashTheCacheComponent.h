@@ -10,6 +10,26 @@
 using TimingsVec = std::vector<float>;
 namespace dae
 {
+	struct Transform
+	{
+		float matrix[16] = {
+			1,0,0,0,
+			0,1,0,0,
+			0,0,1,0,
+			0,0,0,1 };
+	};
+	class GameObject3D
+	{
+	public:
+		Transform transform{};
+		int ID{};
+	};
+	class GameObject3DAlt
+	{
+	public:
+		Transform* transform{};
+		int ID{};
+	};
 	class ThrashTheCacheComponent final : public BaseComponent
 	{
 	public:
@@ -19,15 +39,6 @@ namespace dae
 		void RenderExercise1Window();
 		void RenderExercise2Window();
 
-		TimingsVec m_TimingsExercise1{};
-		TimingsVec	m_TimingsExercise2GameObject3D{};
-		TimingsVec m_TimingsExercise2GameObject3DAlt{};
-
-		int m_SamplesExercise1 = 10;
-		int m_SamplesExercise2 = 10;
-
-		int m_WindowWidth{};
-		int m_WindowHeight{};
 		TimingsVec PlotAverage(std::function<TimingsVec()> exercise, int AmountOfTest);
 		static TimingsVec Exercise1()
 		{
@@ -48,26 +59,6 @@ namespace dae
 			return timings;
 		}
 
-		struct Transform
-		{
-			float matrix[16] = {
-				1,0,0,0,
-				0,1,0,0,
-				0,0,1,0,
-				0,0,0,1 };
-		};
-		class GameObject3D
-		{
-		public:
-			Transform transform{};
-			int ID{};
-		};
-		class GameObject3DAlt
-		{
-		public:
-			Transform* transform{};
-			int ID{};
-		};
 		template <typename T>
 		static TimingsVec Exercise2()
 		{
@@ -87,5 +78,16 @@ namespace dae
 			}
 			return timings;
 		}
+
+		TimingsVec m_TimingsExercise1{};
+		TimingsVec	m_TimingsExercise2GameObject3D{};
+		TimingsVec m_TimingsExercise2GameObject3DAlt{};
+
+		int m_SamplesExercise1{ 10 };
+		int m_SamplesExercise2{ 100 };
+
+		int m_WindowWidth{};
+		int m_WindowHeight{};
+		int m_HalfWindowWidth{ m_WindowWidth / 2 };
 	};
 }
