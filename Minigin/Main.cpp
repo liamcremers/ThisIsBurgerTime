@@ -19,7 +19,7 @@ namespace fs = std::filesystem;
 
 // TODO: Missing something on line 43 in GameObject.cpp - check with the slides
 // TODO: No need for m_Origin
-static void load(int, int)
+static void load(int windowWidth, int windowHeight)
 {
 	auto& scene = dae::SceneManager::GetInstance().CreateScene("Demo");
 

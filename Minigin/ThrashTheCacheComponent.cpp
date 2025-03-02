@@ -1,19 +1,55 @@
 #include "ThrashTheCacheComponent.h"
 #include "imgui.h"
+#include <utility>
 
-dae::ThrashTheCacheComponent::ThrashTheCacheComponent(GameObject& owner)
-	: BaseComponent(owner)
+dae::ThrashTheCacheComponent::ThrashTheCacheComponent(GameObject& owner, int windowWidth, int windowHeigth)
+	: BaseComponent(owner),
+	m_WindowWidth(windowWidth),
+	m_WindowHeight(windowHeigth)
 {}
+
+void dae::ThrashTheCacheComponent::RenderExercise1Window() const
+{
+	ImGui::Begin("Exercise 1");
+	ImGui::Text("This is the Exercise 1 window.");
+
+	if (ImGui::Button("-")) m_SamplesExercise1 = std::max(1, m_SamplesExercise1 - 1);
+	ImGui::SameLine();
+	ImGui::Text("Samples: %d", m_SamplesExercise1);
+	ImGui::SameLine();
+	if (ImGui::Button("+")) m_SamplesExercise1 += 1;
+
+	if (ImGui::Button("Thrash the Cache"))
+	{
+	}
+
+	ImGui::End();
+}
+
+void dae::ThrashTheCacheComponent::RenderExercise2Window() const
+{
+	ImGui::Begin("Exercise 2");
+	ImGui::Text("This is the Exercise 2 window.");
+
+	if (ImGui::Button("-")) m_SamplesExercise2 = std::max(1, m_SamplesExercise2 - 1);
+	ImGui::SameLine();
+	ImGui::Text("Samples: %d", m_SamplesExercise2);
+	ImGui::SameLine();
+	if (ImGui::Button("+")) m_SamplesExercise2 += 1;
+
+	if (ImGui::Button("Thrash the Cache with GameObject3D"))
+	{
+	}
+
+	if (ImGui::Button("Thrash the Cache with GameObject3DAlt"))
+	{
+	}
+
+	ImGui::End();
+}
 
 void dae::ThrashTheCacheComponent::RenderUI() const
 {
-	ImGui::Begin("Thrash the Cache");
-
-	// Display the image or any other ImGui widgets
-	// Assuming you have loaded the image texture somewhere else
-	// ImGui::Image((void*)textureID, ImVec2(width, height));
-
-	ImGui::Text("This is the Thrash the Cache component.");
-
-	ImGui::End();
+	RenderExercise1Window();
+	RenderExercise2Window();
 }
