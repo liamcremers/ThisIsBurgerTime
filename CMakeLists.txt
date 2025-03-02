@@ -46,6 +46,14 @@ FetchContent_Declare(
 )  
 FetchContent_MakeAvailable(ImGui)  
 
+FetchContent_Declare(
+    imgui_plot
+    GIT_REPOSITORY https://github.com/soulthreads/imgui-plot.git
+    GIT_TAG master 
+    EXCLUDE_FROM_ALL
+)
+FetchContent_MakeAvailable(imgui_plot)
+
 # Add SDL2  
 if(WIN32)  
   FetchContent_Declare(
@@ -100,29 +108,34 @@ if(WIN32)
 
   find_package(VLD CONFIG)
 
-      set(IMGUI_SRC  
-      ${imgui_SOURCE_DIR}/imconfig.h  
-      ${imgui_SOURCE_DIR}/imgui_demo.cpp  
-      ${imgui_SOURCE_DIR}/imgui_draw.cpp  
-      ${imgui_SOURCE_DIR}/imgui_internal.h  
-      ${imgui_SOURCE_DIR}/imstb_rectpack.h  
-      ${imgui_SOURCE_DIR}/imstb_textedit.h  
-      ${imgui_SOURCE_DIR}/imstb_truetype.h  
-      ${imgui_SOURCE_DIR}/imgui_tables.cpp  
-      ${imgui_SOURCE_DIR}/imgui.cpp  
-      ${imgui_SOURCE_DIR}/imgui_widgets.cpp  
-      ${imgui_SOURCE_DIR}/imgui.h  
-   
-      # Backends  
-      ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.h  
-      ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp  
-      ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer2.cpp  
-      ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+set(IMGUI_SRC  
+    ${imgui_SOURCE_DIR}/imconfig.h  
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp  
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp  
+    ${imgui_SOURCE_DIR}/imgui_internal.h  
+    ${imgui_SOURCE_DIR}/imstb_rectpack.h  
+    ${imgui_SOURCE_DIR}/imstb_textedit.h  
+    ${imgui_SOURCE_DIR}/imstb_truetype.h  
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp  
+    ${imgui_SOURCE_DIR}/imgui.cpp  
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp  
+    ${imgui_SOURCE_DIR}/imgui.h  
+
+    # Backends  
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.h  
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp  
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer2.cpp  
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )  
 
- add_library(ImGui STATIC ${IMGUI_SRC})  
- target_include_directories(ImGui PUBLIC ${imgui_SOURCE_DIR} ${SDL2_INCLUDE_DIR})  
- target_link_libraries(ImGui PRIVATE ${SDL2_LIBRARIES})  
+add_library(ImGui STATIC ${IMGUI_SRC})  
+target_include_directories(ImGui PUBLIC ${imgui_SOURCE_DIR} ${SDL2_INCLUDE_DIR})  
+target_link_libraries(ImGui PRIVATE ${SDL2_LIBRARIES})  
+target_compile_definitions(ImGui PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
+
+target_include_directories(imgui_plot PUBLIC ${imgui_plot_SOURCE_DIR} ${imgui_SOURCE_DIR})
+target_link_libraries(imgui_plot PUBLIC ImGui)
+target_compile_definitions(imgui_plot PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
 
    # Set all include directories  
   target_include_directories(${TARGET_NAME} PRIVATE
@@ -130,17 +143,19 @@ if(WIN32)
     ${SDL2_INCLUDE_DIR} 
     ${SDL2_IMAGE_INCLUDE_DIR} 
    ${SDL2_TTF_INCLUDE_DIR}  
-   ImGui  
- )    
+   ImGui
+   ${IMGUI_INCLUDE_DIR}
+ )   
 
- # Set libraries to link with  
-  target_link_libraries(${TARGET_NAME} PUBLIC
+# Set libraries to link with  
+target_link_libraries(${TARGET_NAME} PUBLIC
     ${SDL2_LIBRARIES} 
     ${SDL2_IMAGE_LIBRARIES} 
     ${SDL2_TTF_LIBRARIES} 
     ${VLD_LIBRARY}
-       ImGui  
-  )
+    ImGui  
+    imgui_plot
+)
 
 elseif(NOT EMSCRIPTEN)
 

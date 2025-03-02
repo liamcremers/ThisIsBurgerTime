@@ -29,7 +29,7 @@ static void load(int windowWidth, int windowHeight)
 	scene.Add(std::move(go));
 
 	auto ThrashTheCache = std::make_unique<dae::GameObject>();
-	ThrashTheCache->AddComponent<dae::ThrashTheCacheComponent>();
+	ThrashTheCache->AddComponent<dae::ThrashTheCacheComponent>(windowWidth, windowHeight);
 	scene.Add(std::move(ThrashTheCache));
 }
 

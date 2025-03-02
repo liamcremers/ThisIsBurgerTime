@@ -14,7 +14,7 @@ namespace dae
 		virtual void Update() {};
 		virtual void FixedUpdate() {};
 		virtual void Render() const {};
-		virtual void RenderUI() const {};
+		virtual void RenderUI() {};
 		virtual void LateUpdate() {};
 	protected:
 		BaseComponent(GameObject& owner) : m_pOwner(owner) {}
