@@ -15,6 +15,7 @@ namespace dae
 		void FixedUpdate();
 		void Update();
 		void Render();
+		void RenderUI();
 		void LateUpdate();
 	private:
 		friend class Singleton<SceneManager>;

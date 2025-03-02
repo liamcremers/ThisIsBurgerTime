@@ -36,6 +36,7 @@ namespace dae
 		void FixedUpdate();
 		void LateUpdate();
 		void Render() const;
+		void RenderUI() const;
 
 		// Parent & Children
 		void SetParent(GameObject* pParent, bool keepWorldPosition = false);

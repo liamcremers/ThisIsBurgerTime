@@ -47,6 +47,14 @@ void Scene::Render() const
 	}
 }
 
+void dae::Scene::RenderUI() const
+{
+	for (auto& object : m_objects)
+	{
+		object->RenderUI();
+	}
+}
+
 void dae::Scene::LateUpdate()
 {
 	for (auto& object : m_objects)
