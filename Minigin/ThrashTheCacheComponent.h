@@ -19,13 +19,12 @@ namespace dae
 		void RenderExercise1Window();
 		void RenderExercise2Window();
 
-		mutable TimingsVec m_TimingsExercise1{};
-		mutable TimingsVec	m_TimingsExercise2GameObject3D{};
-		mutable TimingsVec m_TimingsExercise2GameObject3DAlt{};
+		TimingsVec m_TimingsExercise1{};
+		TimingsVec	m_TimingsExercise2GameObject3D{};
+		TimingsVec m_TimingsExercise2GameObject3DAlt{};
 
-		//not liking this mutable, but it's the only way to get the ImGui buttons to work
-		mutable int m_SamplesExercise1 = 10;
-		mutable int m_SamplesExercise2 = 10;
+		int m_SamplesExercise1 = 10;
+		int m_SamplesExercise2 = 10;
 
 		int m_WindowWidth{};
 		int m_WindowHeight{};

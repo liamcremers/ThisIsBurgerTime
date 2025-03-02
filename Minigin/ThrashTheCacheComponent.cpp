@@ -54,7 +54,7 @@ void dae::ThrashTheCacheComponent::RenderExercise1Window()
 		conf.scale.min = 0;
 		conf.scale.max = static_cast<float>(*std::max_element(m_TimingsExercise1.begin(), m_TimingsExercise1.end()));
 		conf.tooltip.show = true;
-		conf.tooltip.format = "y=%.2f";
+        conf.tooltip.format = "x=%.0f, y=%.2f"; 
 		conf.grid_x.show = true;
 		conf.grid_y.show = true;
 		conf.frame_size = ImVec2(200, 100);
@@ -69,88 +69,87 @@ void dae::ThrashTheCacheComponent::RenderExercise1Window()
 
 void dae::ThrashTheCacheComponent::RenderExercise2Window()
 {
-	ImGui::Begin("Exercise 2");
+    ImGui::Begin("Exercise 2");
 
-	if (ImGui::Button("-")) m_SamplesExercise2 = std::max(1, m_SamplesExercise2 - 1);
-	ImGui::SameLine();
-	ImGui::Text("Samples: %d", m_SamplesExercise2);
-	ImGui::SameLine();
-	if (ImGui::Button("+")) m_SamplesExercise2 += 1;
+    if (ImGui::Button("-")) m_SamplesExercise2 = std::max(1, m_SamplesExercise2 - 1);
+    ImGui::SameLine();
+    ImGui::Text("Samples: %d", m_SamplesExercise2);
+    ImGui::SameLine();
+    if (ImGui::Button("+")) m_SamplesExercise2 += 1;
 
-	if (ImGui::Button("Thrash the Cache with GameObject3D"))
-	{
-		m_TimingsExercise2GameObject3D = PlotAverage(Exercise2<GameObject3D>, m_SamplesExercise2);
-	}
+    if (ImGui::Button("Thrash the Cache with GameObject3D"))
+    {
+        m_TimingsExercise2GameObject3D = PlotAverage(Exercise2<GameObject3D>, m_SamplesExercise2);
+    }
 
-	if (ImGui::Button("Thrash the Cache with GameObject3DAlt"))
-	{
-		m_TimingsExercise2GameObject3DAlt = PlotAverage(Exercise2<GameObject3DAlt>, m_SamplesExercise2);
-	}
+    if (ImGui::Button("Thrash the Cache with GameObject3DAlt"))
+    {
+        m_TimingsExercise2GameObject3DAlt = PlotAverage(Exercise2<GameObject3DAlt>, m_SamplesExercise2);
+    }
 
-	// Plot the results if timings are available
-	if (!m_TimingsExercise2GameObject3D.empty())
-	{
-		ImGui::PlotConfig conf;
-		conf.values.ys = m_TimingsExercise2GameObject3D.data();
-		conf.values.count = static_cast<int>(m_TimingsExercise2GameObject3D.size());
-		conf.scale.min = 0;
-		conf.scale.max = static_cast<float>(*std::max_element(m_TimingsExercise2GameObject3D.begin(), m_TimingsExercise2GameObject3D.end()));
-		conf.tooltip.show = true;
-		conf.tooltip.format = "y=%.2f";
-		conf.grid_x.show = true;
-		conf.grid_y.show = true;
-		conf.frame_size = ImVec2(200, 100);
-		conf.line_thickness = 2.f;
-		conf.values.color = ImColor(0, 191, 255);
+    if (!m_TimingsExercise2GameObject3D.empty())
+    {
+        ImGui::PlotConfig conf;
+        conf.values.ys = m_TimingsExercise2GameObject3D.data();
+        conf.values.count = static_cast<int>(m_TimingsExercise2GameObject3D.size());
+        conf.scale.min = 0;
+        conf.scale.max = static_cast<float>(*std::max_element(m_TimingsExercise2GameObject3D.begin(), m_TimingsExercise2GameObject3D.end()));
+        conf.tooltip.show = true;
+        conf.tooltip.format = "x=%.0f, y=%.2f"; 
+        conf.grid_x.show = true;
+        conf.grid_y.show = true;
+        conf.frame_size = ImVec2(200, 100);
+        conf.line_thickness = 2.f;
+        conf.values.color = ImColor(0, 191, 255);
 
-		ImGui::Plot("GameObject3D Timings", conf);
-	}
+        ImGui::Plot("GameObject3D Timings", conf);
+    }
 
-	if (!m_TimingsExercise2GameObject3DAlt.empty())
-	{
-		ImGui::PlotConfig conf;
-		conf.values.ys = m_TimingsExercise2GameObject3DAlt.data();
-		conf.values.count = static_cast<int>(m_TimingsExercise2GameObject3DAlt.size());
-		conf.scale.min = 0;
-		conf.scale.max = static_cast<float>(*std::max_element(m_TimingsExercise2GameObject3DAlt.begin(), m_TimingsExercise2GameObject3DAlt.end()));
-		conf.tooltip.show = true;
-		conf.tooltip.format = "y=%.2f";
-		conf.grid_x.show = true;
-		conf.grid_y.show = true;
-		conf.frame_size = ImVec2(200, 100);
-		conf.line_thickness = 2.f;
-		conf.values.color = ImColor(0, 191, 0);
+    if (!m_TimingsExercise2GameObject3DAlt.empty())
+    {
+        ImGui::PlotConfig conf;
+        conf.values.ys = m_TimingsExercise2GameObject3DAlt.data();
+        conf.values.count = static_cast<int>(m_TimingsExercise2GameObject3DAlt.size());
+        conf.scale.min = 0;
+        conf.scale.max = static_cast<float>(*std::max_element(m_TimingsExercise2GameObject3DAlt.begin(), m_TimingsExercise2GameObject3DAlt.end()));
+        conf.tooltip.show = true;
+        conf.tooltip.format = "x=%.0f, y=%.2f"; 
+        conf.grid_x.show = true;
+        conf.grid_y.show = true;
+        conf.frame_size = ImVec2(200, 100);
+        conf.line_thickness = 2.f;
+        conf.values.color = ImColor(0, 191, 0);
 
-		ImGui::Plot("GameObject3DAlt Timings", conf);
-	}
+        ImGui::Plot("GameObject3DAlt Timings", conf);
+    }
 
-	if (!m_TimingsExercise2GameObject3D.empty() &&
-		!m_TimingsExercise2GameObject3DAlt.empty())
-	{
-		ImGui::Text("Combined:");
-		ImGui::PlotConfig conf;
-		const float* ys_list[2] = { m_TimingsExercise2GameObject3D.data(), m_TimingsExercise2GameObject3DAlt.data() };
-		conf.values.ys_list = ys_list;
-		conf.values.ys_count = 2; // Two lines
-		conf.values.count = static_cast<int>(m_TimingsExercise2GameObject3D.size()); // Same size for both datasets
-		conf.scale.min = 0;
-		conf.scale.max = std::max(
-			*std::max_element(m_TimingsExercise2GameObject3D.begin(), m_TimingsExercise2GameObject3D.end()),
-			*std::max_element(m_TimingsExercise2GameObject3DAlt.begin(), m_TimingsExercise2GameObject3DAlt.end())
-		);
-		conf.tooltip.show = true;
-		conf.tooltip.format = "y=%.2f";
-		conf.grid_x.show = true;
-		conf.grid_y.show = true;
-		conf.frame_size = ImVec2(300, 150);
-		conf.line_thickness = 2.f;
+    if (!m_TimingsExercise2GameObject3D.empty() &&
+        !m_TimingsExercise2GameObject3DAlt.empty())
+    {
+        ImGui::Text("Combined:");
+        ImGui::PlotConfig conf;
+        const float* ys_list[2] = { m_TimingsExercise2GameObject3D.data(), m_TimingsExercise2GameObject3DAlt.data() };
+        conf.values.ys_list = ys_list;
+        conf.values.ys_count = 2; // Two lines
+        conf.values.count = static_cast<int>(m_TimingsExercise2GameObject3D.size()); // Same size for both datasets
+        conf.scale.min = 0;
+        conf.scale.max = std::max(
+            *std::max_element(m_TimingsExercise2GameObject3D.begin(), m_TimingsExercise2GameObject3D.end()),
+            *std::max_element(m_TimingsExercise2GameObject3DAlt.begin(), m_TimingsExercise2GameObject3DAlt.end())
+        );
+        conf.tooltip.show = true;
+        conf.tooltip.format = "x=%.0f, y=%.2f"; 
+        conf.grid_x.show = true;
+        conf.grid_y.show = true;
+        conf.frame_size = ImVec2(300, 150);
+        conf.line_thickness = 2.f;
         const auto colors = std::make_unique<ImU32[]>(2);
         colors[0] = ImColor(0, 191, 255);
         colors[1] = ImColor(0, 191, 0);
         conf.values.colors = colors.get();
-		ImGui::Plot("Combined Timings", conf);
-	}
-	ImGui::End();
+        ImGui::Plot("Combined Timings", conf);
+    }
+    ImGui::End();
 }
 void dae::ThrashTheCacheComponent::RenderUI()
 {
