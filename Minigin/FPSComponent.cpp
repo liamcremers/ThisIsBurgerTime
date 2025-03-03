@@ -15,7 +15,7 @@ void dae::FPSComponent::Update()
 	elapsedTime += EngineTime::GetInstance().GetDeltaTime();
 	if (elapsedTime >= 1.0f)
 	{
-		int fps = static_cast<int>(frameCount / elapsedTime);
+		int fps = frameCount / static_cast<int>(elapsedTime);
 		m_pTextComponent->SetText("FPS: " + std::to_string(fps));
 		frameCount = 0;
 		elapsedTime = 0.0f;

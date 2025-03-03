@@ -28,45 +28,53 @@ static void load(int windowWidth, int windowHeight)
 	meshRenderer->SetTexture("background.tga");
 	scene.Add(std::move(go));
 
+	const glm::vec2 logoPos{ 216.0f,180.0f };
 	go = std::make_unique<dae::GameObject>();
 	meshRenderer = go->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("logo.tga");
-	go->GetComponent<dae::TransformComponent>()->SetWorldPosition({ 216.0f, 180.0f });
+	go->GetComponent<dae::TransformComponent>()->SetWorldPosition(logoPos);
 	scene.Add(std::move(go));
 
-	auto& font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
+	uint8_t fontSize{ 36 };
+	const glm::vec2 textPos{ 216.0f, 20.0f };
+	auto& font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", fontSize);
 	go = std::make_unique<dae::GameObject>();
 	go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
-	go->GetComponent<dae::TransformComponent>()->SetWorldPosition({ 80.0f, 20.0f });
+	go->GetComponent<dae::TransformComponent>()->SetWorldPosition(textPos);
 	scene.Add(std::move(go));
 
+	const glm::vec2 pos{ windowHeight / 2.0f, windowWidth / 2.0f };
 	auto parent = std::make_unique<dae::GameObject>("parent");
-	glm::vec2 pos = { windowHeight / 2.0f, windowWidth / 2.0f };
-	parent->GetComponent<dae::TransformComponent>()->SetWorldPosition({ pos });
+	parent->GetComponent<dae::TransformComponent>()->SetWorldPosition(pos);
 
+	float radius{ 40.f };
+	bool clockwise{ true };
 	auto child1 = std::make_unique<dae::GameObject>("parent");
 	meshRenderer = child1->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("ChefPeterPepperF.png");
-	child1->GetComponent<dae::TransformComponent>()->SetWorldPosition({ pos });
+	child1->GetComponent<dae::TransformComponent>()->SetWorldPosition(pos);
 	child1->SetParent(parent.get(), true);
-	child1->AddComponent<dae::RotatorComponent>(40, true);
+	child1->AddComponent<dae::RotatorComponent>(radius, clockwise);
 
-	auto child2 = std::make_unique<dae::GameObject>("child");
-	glm::vec2 newpos = pos + glm::vec2{ 20,20 };
+	bool clockwise2{ false };
+	auto child2{ std::make_unique<dae::GameObject>("child") };
+	const glm::vec2 newpos{ pos + glm::vec2{ 20,20 } };
 	meshRenderer = child2->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("ChefPeterPepperB.png");
-	child2->GetComponent<dae::TransformComponent>()->SetWorldPosition({ newpos });
+	child2->GetComponent<dae::TransformComponent>()->SetWorldPosition(newpos);
 	child2->SetParent(child1.get(), false);
-	child2->AddComponent<dae::RotatorComponent>(40, false);
+	child2->AddComponent<dae::RotatorComponent>(radius, clockwise2);
 
 	scene.Add(std::move(parent));
 	scene.Add(std::move(child1));
 	scene.Add(std::move(child2));
 
-	auto& fpsFont = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 14);
+	uint8_t smallFontSize{ 14 };
+	glm::vec2 fpsPos = { 10.0f, 6.0f };
+	auto& fpsFont = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", smallFontSize);
 	go = std::make_unique<dae::GameObject>("fps");
 	go->AddComponent<dae::FPSComponent>(fpsFont);
-	go->GetComponent<dae::TransformComponent>()->SetWorldPosition({ 10.0f, 6.0f });
+	go->GetComponent<dae::TransformComponent>()->SetWorldPosition(fpsPos);
 	scene.Add(std::move(go));
 }
 

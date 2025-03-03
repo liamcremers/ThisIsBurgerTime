@@ -17,7 +17,7 @@ namespace dae
 		virtual void LateUpdate() {};
 	protected:
 		BaseComponent(GameObject& owner) : m_pOwner(owner) {}
-		virtual [[nodiscard]] GameObject& GetOwner() const { return m_pOwner; }
+		[[nodiscard]] virtual GameObject& GetOwner() const { return m_pOwner; }
 	private:
 		GameObject& m_pOwner;
 	};

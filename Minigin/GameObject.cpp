@@ -1,6 +1,4 @@
 #include "GameObject.h"
-//TODO: remove
-#include "Windows.h"
 
 dae::GameObject::GameObject(const std::string& Name)
 	: m_Name(Name)
@@ -67,8 +65,6 @@ void dae::GameObject::UpdateWorldPosition()
 			m_pTransform->SetWorldPosition(m_pParent->GetWorldPosition() + m_pTransform->GetLocalPosition());
 		else
 			m_pTransform->SetWorldPosition(m_pTransform->GetLocalPosition());
-
-		OutputDebugStringA((m_Name + " " + std::to_string(m_pTransform->GetWorldPosition().x) + " " + std::to_string(m_pTransform->GetWorldPosition().y) + "\n").c_str());
 
 		m_PositionDirty = false;
 	}
