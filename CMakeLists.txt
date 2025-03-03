@@ -190,7 +190,7 @@ target_include_directories(${TARGET_NAME} PRIVATE
 
 # Compile at max warning level + treat warnings as errors  
 target_compile_options(${TARGET_NAME} PRIVATE
-  $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+  $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX /EHsc>
   $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>
 )
 
@@ -236,4 +236,14 @@ elseif(WIN32)
   add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Data" "$<TARGET_FILE_DIR:${TARGET_NAME}>/Data"
   )
+endif()
+
+if(WIN32)
+	find_program(CLANG_TIDY_EXE NAMES "clang-tidy" REQUIRED)
+	set(CLANG_TIDY_COMMAND 
+		"${CLANG_TIDY_EXE}" 
+		#"--checks=-*,modernize-*" 
+		"--extra-arg=/EHsc"  #ALLOW THROWS IN MSVC EXTRA ARG => SOURCE:https://stackoverflow.com/questions/75496284/clang-tidy-emits-errors-about-exceptions-being-disabled-when-the-are-enabled
+	)
+	set_target_properties(${TARGET_NAME} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
 endif()

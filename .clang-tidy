@@ -1,0 +1,3 @@
+Checks: '-*,cppcoreguidelines-*,-cppcoreguidelines-avoid-throwing-exceptions'
+HeaderFilterRegex: 'Minigin/.*'
+SystemHeaders: false
