@@ -17,8 +17,17 @@
 #include <memory>
 namespace fs = std::filesystem;
 
-// TODO: Missing something on line 43 in GameObject.cpp - check with the slides
-// TODO: No need for m_Origin
+static constexpr float RADIUS = 40.0f;
+static constexpr uint8_t SMALL_FONT_SIZE = 14;
+static constexpr float FPS_POS_X = 10.0f;
+static constexpr float FPS_POS_Y = 6.0f;
+static constexpr float LOGO_POS_X = 216.0f;
+static constexpr float LOGO_POS_Y = 180.0f;
+static constexpr uint8_t LARGE_FONT_SIZE = 36;
+static constexpr float TEXT_POS_X = 216.0f;
+static constexpr float TEXT_POS_Y = 20.0f;
+static constexpr float OFFSET = 20.0f;
+
 static void load(int windowWidth, int windowHeight)
 {
 	auto& scene = dae::SceneManager::GetInstance().CreateScene("Demo");
@@ -28,53 +37,49 @@ static void load(int windowWidth, int windowHeight)
 	meshRenderer->SetTexture("background.tga");
 	scene.Add(std::move(go));
 
-	const glm::vec2 logoPos{ 216.0f,180.0f };
+	const glm::vec2 logoPos{ LOGO_POS_X, LOGO_POS_Y };
 	go = std::make_unique<dae::GameObject>();
 	meshRenderer = go->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("logo.tga");
 	go->GetComponent<dae::TransformComponent>()->SetWorldPosition(logoPos);
 	scene.Add(std::move(go));
 
-	uint8_t fontSize{ 36 };
-	const glm::vec2 textPos{ 216.0f, 20.0f };
-	auto& font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", fontSize);
+	const glm::vec2 textPos{ TEXT_POS_X, TEXT_POS_Y };
+	auto& font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", LARGE_FONT_SIZE);
 	go = std::make_unique<dae::GameObject>();
 	go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
 	go->GetComponent<dae::TransformComponent>()->SetWorldPosition(textPos);
 	scene.Add(std::move(go));
 
-	const glm::vec2 pos{ windowHeight / 2.0f, windowWidth / 2.0f };
+	const glm::vec2 pos{ static_cast<float>(windowHeight) / 2.0f, static_cast<float>(windowWidth) / 2.0f };
 	auto parent = std::make_unique<dae::GameObject>("parent");
 	parent->GetComponent<dae::TransformComponent>()->SetWorldPosition(pos);
 
-	float radius{ 40.f };
 	bool clockwise{ true };
 	auto child1 = std::make_unique<dae::GameObject>("parent");
 	meshRenderer = child1->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("ChefPeterPepperF.png");
 	child1->GetComponent<dae::TransformComponent>()->SetWorldPosition(pos);
 	child1->SetParent(parent.get(), true);
-	child1->AddComponent<dae::RotatorComponent>(radius, clockwise);
+	child1->AddComponent<dae::RotatorComponent>(RADIUS, clockwise);
 
 	bool clockwise2{ false };
 	auto child2{ std::make_unique<dae::GameObject>("child") };
-	const glm::vec2 newpos{ pos + glm::vec2{ 20,20 } };
+	const glm::vec2 newpos{ pos + glm::vec2{ OFFSET, OFFSET } };
 	meshRenderer = child2->AddComponent<dae::RenderComponent>();
 	meshRenderer->SetTexture("ChefPeterPepperB.png");
 	child2->GetComponent<dae::TransformComponent>()->SetWorldPosition(newpos);
 	child2->SetParent(child1.get(), false);
-	child2->AddComponent<dae::RotatorComponent>(radius, clockwise2);
+	child2->AddComponent<dae::RotatorComponent>(RADIUS, clockwise2);
 
 	scene.Add(std::move(parent));
 	scene.Add(std::move(child1));
 	scene.Add(std::move(child2));
 
-	uint8_t smallFontSize{ 14 };
-	glm::vec2 fpsPos = { 10.0f, 6.0f };
-	auto& fpsFont = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", smallFontSize);
+	auto& fpsFont = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", SMALL_FONT_SIZE);
 	go = std::make_unique<dae::GameObject>("fps");
 	go->AddComponent<dae::FPSComponent>(fpsFont);
-	go->GetComponent<dae::TransformComponent>()->SetWorldPosition(fpsPos);
+	go->GetComponent<dae::TransformComponent>()->SetWorldPosition({ FPS_POS_X, FPS_POS_Y });
 	scene.Add(std::move(go));
 }
 

@@ -20,7 +20,7 @@
 
 SDL_Window* g_window{};
 
-void LogSDLVersion(const std::string& message, const SDL_version& v)
+static void LogSDLVersion(const std::string& message, const SDL_version& v)
 {
 #if WIN32
 	std::stringstream ss;
@@ -34,7 +34,7 @@ void LogSDLVersion(const std::string& message, const SDL_version& v)
 #ifdef __EMSCRIPTEN__
 #include "emscripten.h"
 
-void LoopCallback(void* arg)
+static void LoopCallback(void* arg)
 {
 	static_cast<dae::Minigin*>(arg)->RunOneFrame();
 }
@@ -43,7 +43,7 @@ void LoopCallback(void* arg)
 // Why bother with this? Because sometimes students have a different SDL version installed on their pc.
 // That is not a problem unless for some reason the dll's from this project are not copied next to the exe.
 // These entries in the debug output help to identify that issue.
-void PrintSDLVersion()
+static void PrintSDLVersion()
 {
 	SDL_version version{};
 	SDL_VERSION(&version);

@@ -14,7 +14,7 @@ void dae::RotatorComponent::Update()
 {
 	auto deltaTime = EngineTime::GetInstance().GetDeltaTime();
 	m_Angle += static_cast<float>(m_Clockwise ? 1 : -1) * static_cast<float>(m_AngleSpeed) * deltaTime;
-	m_Angle = fmod(m_Angle, 360.0f);
+	m_Angle = fmod(m_Angle, m_AngleMax);
 
 	glm::vec2 pos{};
 	float angleRad = glm::radians(m_Angle);
