@@ -14,16 +14,24 @@ TimingsVec dae::ThrashTheCacheComponent::PlotAverage(std::function<TimingsVec()>
 	std::vector<TimingsVec> results(AmountOfTest);
 	std::ranges::generate(results, exercise);
 
-	results.erase(results.begin());
-	results.pop_back();
-
 	TimingsVec averageTimings(results[0].size(), 0);
-	for (const TimingsVec& result : results)
+	for (size_t i = 0; i < results[0].size(); ++i)
 	{
-		std::ranges::transform(averageTimings, result, averageTimings.begin(), std::plus<>{});
+		std::vector<float> values;
+		std::ranges::transform(results, std::back_inserter(values), [i](const TimingsVec& result) { return result[i]; });
+
+		if (values.size() > 2)
+		{
+			auto [min, max] = std::minmax_element(values.begin(), values.end());
+			values.erase(std::remove_if(values.begin(), values.end(), [min, max](float value)
+						 {
+							 return value == *min || value == *max;
+						 }), values.end());
+		}
+
+		float sum = std::accumulate(values.begin(), values.end(), 0.0f);
+		averageTimings[i] = sum / static_cast<float>(values.size());
 	}
-	for (auto& time : averageTimings)
-		time /= static_cast<float>(results.size());
 
 	return averageTimings;
 }
