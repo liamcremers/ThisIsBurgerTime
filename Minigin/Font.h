@@ -2,6 +2,7 @@
 #include <string>
 
 struct _TTF_Font;
+
 namespace dae
 {
     /**

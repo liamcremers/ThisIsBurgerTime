@@ -4,6 +4,7 @@
 #include <filesystem>
 
 struct SDL_Window;
+
 namespace dae
 {
     class Minigin final
@@ -13,10 +14,12 @@ namespace dae
         ~Minigin();
         void Run(const std::function<void()>& load);
         void GameLoop();
+
         [[nodiscard]] constexpr auto GetWindowWidth() const -> int
         {
             return m_WindowWidth;
         }
+
         [[nodiscard]] constexpr auto GetWindowHeight() const -> int
         {
             return m_WindowHeight;

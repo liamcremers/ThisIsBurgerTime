@@ -8,11 +8,11 @@
 #include "Texture2D.h"
 
 dae::TextComponent::TextComponent(GameObject& parent,
-                                  const std::string& text,
+                                  std::string text,
                                   Font& font) :
     BaseComponent(parent),
     m_needsUpdate(true),
-    m_text(text),
+    m_text(std::move(text)),
     m_font(font),
     m_textTexture(nullptr),
     m_pTransform(parent.GetComponent<TransformComponent>())

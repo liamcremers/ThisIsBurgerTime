@@ -16,7 +16,9 @@ namespace dae
         }
 
         float GetDeltaTime() const { return m_DeltaTime; }
+
         float GetFixedTimeStep() const { return m_FixedTimeStep; }
+
         auto GetLastTime() const { return m_LastTime; }
 
     private:

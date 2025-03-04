@@ -87,7 +87,7 @@ static void load(int windowWidth, int windowHeight)
     scene.Add(std::move(go));
 }
 
-int main(int, char*[])
+auto main(int, char*[]) -> int
 {
 #if __EMSCRIPTEN__
     fs::path data_location = "";

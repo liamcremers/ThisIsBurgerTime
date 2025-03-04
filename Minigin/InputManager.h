@@ -1,6 +1,5 @@
 #pragma once
 #include "Singleton.h"
-
 #include "SceneManager.h"
 
 namespace dae
@@ -10,5 +9,4 @@ namespace dae
     public:
         bool ProcessInput();
     };
-
 }

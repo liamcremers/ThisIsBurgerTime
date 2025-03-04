@@ -24,7 +24,7 @@ namespace dae
     class GameObject final
     {
     public:
-        GameObject(const std::string& Name = {});
+        GameObject(std::string name = {});
 
         GameObject(const GameObject&) = delete;
         GameObject(GameObject&&) = delete;
@@ -39,8 +39,11 @@ namespace dae
 
         // Parent & Children
         void SetParent(GameObject* pParent, bool keepWorldPosition = false);
+
         void DetechFromParent() { SetParent(nullptr); }
-        [[nodiscard]] constexpr bool IsChild(const GameObject* pChild) const;
+
+        [[nodiscard]] auto IsChild(const GameObject* pChild) const -> bool;
+
         [[nodiscard]] GameObject* GetParent() const { return m_pParent; }
 
         [[nodiscard]] const glm::vec2& GetWorldPosition();
@@ -51,10 +54,12 @@ namespace dae
 
         // Object state management
         void MarkForDelete();
+
         [[nodiscard]] auto IsMarkedForDelete() const -> bool
         {
             return m_MarkedForDelete;
         }
+
         [[nodiscard]] auto HasNoComponents() const -> bool
         {
             return m_pComponents.empty();

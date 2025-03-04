@@ -7,10 +7,12 @@
 #include "Singleton.h"
 #include "Texture2D.h"
 #include "Font.h"
+
 namespace dae
 {
     class Texture2D;
     class Font;
+
     class ResourceManager final : public Singleton<ResourceManager>
     {
     public:

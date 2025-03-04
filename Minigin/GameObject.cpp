@@ -1,7 +1,7 @@
 #include "GameObject.h"
 
-dae::GameObject::GameObject(const std::string& Name) :
-    m_Name(Name),
+dae::GameObject::GameObject(std::string Name) :
+    m_Name(std::move(Name)),
     m_pTransform(AddComponent<TransformComponent>())
 {}
 
@@ -24,11 +24,8 @@ void dae::GameObject::LateUpdate()
     for (auto& child : m_pChildren)
         child->LateUpdate();
 
-    m_pChildren.erase(std::remove_if(m_pChildren.begin(),
-                                     m_pChildren.end(),
-                                     [](GameObject* child)
-                                     { return child->IsMarkedForDelete(); }),
-                      m_pChildren.end());
+    std::erase_if(m_pChildren,
+                  [](GameObject* child) { return child->IsMarkedForDelete(); });
 }
 
 void dae::GameObject::Render() const
@@ -59,13 +56,12 @@ void dae::GameObject::SetParent(GameObject* pParent, bool keepWorldPosition)
         pParent->AddChild(this);
 }
 
-constexpr bool dae::GameObject::IsChild(const GameObject* pChild) const
+auto dae::GameObject::IsChild(const GameObject* pChild) const -> bool
 {
-    return std::find(m_pChildren.begin(), m_pChildren.end(), pChild) !=
-           m_pChildren.end();
+    return std::ranges::find(m_pChildren, pChild) != m_pChildren.end();
 }
 
-const glm::vec2& dae::GameObject::GetWorldPosition()
+auto dae::GameObject::GetWorldPosition() -> const glm::vec2&
 {
     if (m_PositionDirty)
         UpdateWorldPosition();
@@ -95,7 +91,7 @@ void dae::GameObject::MarkForDelete()
     }
 }
 
-const glm::vec2& dae::GameObject::GetLocalPosition() const
+auto dae::GameObject::GetLocalPosition() const -> const glm::vec2&
 {
     return m_pTransform->GetLocalPosition();
 }

@@ -4,6 +4,7 @@
 #include "Renderer.h"
 
 #include <iostream>
+
 namespace dae
 {
     class RenderComponent final : public BaseComponent

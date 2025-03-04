@@ -47,3 +47,4 @@ SpaceAfterTemplateKeyword: false
 SpacesInAngles: false
 SpacesInContainerLiterals: false
 PackConstructorInitializers: Never
+SeparateDefinitionBlocks: Always

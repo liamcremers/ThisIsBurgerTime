@@ -2,7 +2,7 @@
 #include "InputManager.h"
 #include <backends/imgui_impl_sdl2.h>
 
-bool dae::InputManager::ProcessInput()
+auto dae::InputManager::ProcessInput() -> bool
 {
     SDL_Event e;
     while (SDL_PollEvent(&e))

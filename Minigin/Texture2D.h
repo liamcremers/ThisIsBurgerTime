@@ -3,6 +3,7 @@
 #include <string>
 
 struct SDL_Texture;
+
 namespace dae
 {
     /**

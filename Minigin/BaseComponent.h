@@ -1,7 +1,9 @@
 #pragma once
+
 namespace dae
 {
     class GameObject;
+
     class BaseComponent
     {
     public:
@@ -20,6 +22,7 @@ namespace dae
         BaseComponent(GameObject& owner) :
             m_pOwner(owner)
         {}
+
         [[nodiscard]] virtual GameObject& GetOwner() const { return m_pOwner; }
 
     private:

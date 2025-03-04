@@ -8,7 +8,7 @@
 #include <backends/imgui_impl_sdl2.h>
 #include <backends/imgui_impl_opengl3.h>
 
-int GetOpenGLDriverIndex()
+static auto GetOpenGLDriverIndex() -> int
 {
     auto openglIndex = -1;
     const auto driverCount = SDL_GetNumRenderDrivers();
@@ -39,7 +39,7 @@ void dae::Renderer::Init(SDL_Window* window)
     ImGui_ImplOpenGL3_Init("#version 130");
 }
 
-void dae::Renderer::Render() const
+auto dae::Renderer::Render() const -> void
 {
     const auto& color = GetBackgroundColor();
     SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
@@ -56,7 +56,7 @@ void dae::Renderer::Render() const
     SDL_RenderPresent(m_renderer);
 }
 
-void dae::Renderer::Destroy()
+auto dae::Renderer::Destroy() -> void
 {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
@@ -69,9 +69,9 @@ void dae::Renderer::Destroy()
     }
 }
 
-void dae::Renderer::RenderTexture(const Texture2D& texture,
+auto dae::Renderer::RenderTexture(const Texture2D& texture,
                                   const float x,
-                                  const float y) const
+                                  const float y) const -> void
 {
     SDL_Rect dst{};
     dst.x = static_cast<int>(x);
@@ -80,11 +80,11 @@ void dae::Renderer::RenderTexture(const Texture2D& texture,
     SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
 }
 
-void dae::Renderer::RenderTexture(const Texture2D& texture,
+auto dae::Renderer::RenderTexture(const Texture2D& texture,
                                   const float x,
                                   const float y,
                                   const float width,
-                                  const float height) const
+                                  const float height) const -> void
 {
     SDL_Rect dst{};
     dst.x = static_cast<int>(x);
@@ -94,4 +94,7 @@ void dae::Renderer::RenderTexture(const Texture2D& texture,
     SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
 }
 
-SDL_Renderer* dae::Renderer::GetSDLRenderer() const { return m_renderer; }
+auto dae::Renderer::GetSDLRenderer() const -> SDL_Renderer*
+{
+    return m_renderer;
+}
