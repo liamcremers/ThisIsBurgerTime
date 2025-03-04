@@ -56,9 +56,16 @@ void dae::GameObject::SetParent(GameObject* pParent, bool keepWorldPosition)
         pParent->AddChild(this);
 }
 
+void dae::GameObject::DetechFromParent() { SetParent(nullptr); }
+
 auto dae::GameObject::IsChild(const GameObject* pChild) const -> bool
 {
     return std::ranges::find(m_pChildren, pChild) != m_pChildren.end();
+}
+
+[[nodiscard]] auto dae::GameObject::GetParent() const -> dae::GameObject*
+{
+    return m_pParent;
 }
 
 auto dae::GameObject::GetWorldPosition() -> const glm::vec2&
@@ -89,6 +96,21 @@ void dae::GameObject::MarkForDelete()
     {
         child->MarkForDelete();
     }
+}
+
+[[nodiscard]] auto dae::GameObject::IsMarkedForDelete() const -> bool
+{
+    return m_MarkedForDelete;
+}
+
+[[nodiscard]] auto dae::GameObject::HasNoComponents() const -> bool
+{
+    return m_pComponents.empty();
+}
+
+[[nodiscard]] auto dae::GameObject::GetName() const -> const std::string&
+{
+    return m_Name;
 }
 
 auto dae::GameObject::GetLocalPosition() const -> const glm::vec2&

@@ -39,13 +39,9 @@ namespace dae
 
         // Parent & Children
         void SetParent(GameObject* pParent, bool keepWorldPosition = false);
-
-        void DetechFromParent() { SetParent(nullptr); }
-
+        void DetechFromParent();
         [[nodiscard]] auto IsChild(const GameObject* pChild) const -> bool;
-
-        [[nodiscard]] GameObject* GetParent() const { return m_pParent; }
-
+        [[nodiscard]] GameObject* GetParent() const;
         [[nodiscard]] const glm::vec2& GetWorldPosition();
         [[nodiscard]] const glm::vec2& GetLocalPosition() const;
         void UpdateWorldPosition();
@@ -54,26 +50,16 @@ namespace dae
 
         // Object state management
         void MarkForDelete();
-
-        [[nodiscard]] auto IsMarkedForDelete() const -> bool
-        {
-            return m_MarkedForDelete;
-        }
-
-        [[nodiscard]] auto HasNoComponents() const -> bool
-        {
-            return m_pComponents.empty();
-        }
-
-        [[nodiscard]] const std::string& GetName() const { return m_Name; }
+        [[nodiscard]] auto IsMarkedForDelete() const -> bool;
+        [[nodiscard]] auto HasNoComponents() const -> bool;
+        [[nodiscard]] const std::string& GetName() const;
 
         // Component management
         template<Component CompT, typename... Args>
         auto AddComponent(Args&&... args) -> CompT*
         {
             if (HasComponent<CompT>())
-                RemoveComponent<CompT>();
-            //static_assert(HasComponent<CompT>());
+                assert("GameObject already has this component" && false);
 
             auto component =
                 std::make_unique<CompT>(*this, std::forward<Args>(args)...);
@@ -121,17 +107,17 @@ namespace dae
         }
 
     private:
+        void RemoveChild(GameObject* pChild);
+        void AddChild(GameObject* pChild);
+
         GameObject* m_pParent{};
         std::vector<GameObject*> m_pChildren{};
         std::vector<std::unique_ptr<BaseComponent>> m_pComponents{};
 
+        TransformComponent* m_pTransform{ nullptr };
+
         std::string m_Name{};
         bool m_MarkedForDelete{};
         bool m_PositionDirty{};
-
-        TransformComponent* m_pTransform{ nullptr };
-
-        void RemoveChild(GameObject* pChild);
-        void AddChild(GameObject* pChild);
     };
 }

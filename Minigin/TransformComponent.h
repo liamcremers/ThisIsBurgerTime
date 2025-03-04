@@ -12,36 +12,15 @@ namespace dae
     {
     public:
         TransformComponent(GameObject& owner) :
-            BaseComponent(owner),
-            m_Position{ 0.0f, 0.0f }
+            BaseComponent(owner)
         {}
 
-        TransformComponent(GameObject& owner, glm::vec2 pos) :
-            BaseComponent(owner),
-            m_Position{ pos }
-        {}
-
-        TransformComponent(GameObject& owner, const float x, const float y) :
-            BaseComponent(owner),
-            m_Position{ x, y }
-        {}
-
-        [[nodiscard]] const glm::vec2& GetWorldPosition() const
-        {
-            return m_WorldPosition;
-        };
-
-        void SetWorldPosition(const glm::vec2& pos) { m_WorldPosition = pos; };
-
-        [[nodiscard]] const glm::vec2& GetLocalPosition() const
-        {
-            return m_LocalPosition;
-        }
-
-        void SetLocalPosition(const glm::vec2& pos) { m_LocalPosition = pos; }
+        [[nodiscard]] const glm::vec2& GetWorldPosition() const;
+        void SetWorldPosition(const glm::vec2& pos);
+        [[nodiscard]] const glm::vec2& GetLocalPosition() const;
+        void SetLocalPosition(const glm::vec2& pos);
 
     private:
-        glm::vec2 m_Position{};
         glm::vec2 m_WorldPosition{};
         glm::vec2 m_LocalPosition{};
     };

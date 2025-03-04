@@ -33,7 +33,7 @@ void dae::SceneManager::LateUpdate()
     }
 }
 
-dae::Scene& dae::SceneManager::CreateScene(const std::string& name)
+auto dae::SceneManager::CreateScene(const std::string& name) -> dae::Scene&
 {
     const auto& scene = std::shared_ptr<Scene>(new Scene(name));
     m_scenes.push_back(scene);

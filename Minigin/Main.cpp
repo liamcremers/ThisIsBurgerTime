@@ -28,7 +28,7 @@ static constexpr float TEXT_POS_X = 80.0f;
 static constexpr float TEXT_POS_Y = 20.0f;
 static constexpr float OFFSET = 20.0f;
 
-static void load(int windowWidth, int windowHeight)
+static void load(const int windowWidth, const int windowHeight)
 {
     auto& scene = dae::SceneManager::GetInstance().CreateScene("Demo");
 

@@ -1,3 +1,4 @@
-Checks: '-*,cppcoreguidelines-*,-cppcoreguidelines-avoid-throwing-exceptions'
+Checks: '-*,cppcoreguidelines-*,readability-redundant--specifier
+-cppcoreguidelines-avoid-throwing-exceptions'
 HeaderFilterRegex: 'Minigin/.*'
 SystemHeaders: false

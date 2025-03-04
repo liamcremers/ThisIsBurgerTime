@@ -98,3 +98,13 @@ auto dae::Renderer::GetSDLRenderer() const -> SDL_Renderer*
 {
     return m_renderer;
 }
+
+const SDL_Color& dae::Renderer::GetBackgroundColor() const
+{
+    return m_clearColor;
+}
+
+void dae::Renderer::SetBackgroundColor(const SDL_Color& color)
+{
+    m_clearColor = color;
+}

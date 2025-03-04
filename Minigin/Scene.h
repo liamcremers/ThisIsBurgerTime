@@ -34,5 +34,4 @@ namespace dae
 
         static unsigned int m_idCounter;
     };
-
 }

@@ -30,7 +30,6 @@ static void LogSDLVersion(const std::string& message, const SDL_version& v)
               << (int)v.patch << "\n";
 #endif
 }
-
 #ifdef __EMSCRIPTEN__
 #include "emscripten.h"
 
@@ -39,7 +38,6 @@ static void LoopCallback(void* arg)
     static_cast<dae::Minigin*>(arg)->RunOneFrame();
 }
 #endif
-
 // Why bother with this? Because sometimes students have a different SDL version installed on their pc.
 // That is not a problem unless for some reason the dll's from this project are not copied next to the exe.
 // These entries in the debug output help to identify that issue.
