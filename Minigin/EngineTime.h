@@ -20,7 +20,11 @@ namespace dae
         auto GetLastTime() const { return m_LastTime; }
 
     private:
-        EngineTime() : m_LastTime(std::chrono::high_resolution_clock::now()), m_DeltaTime(0.0f), m_FixedTimeStep(1.0f / 60.0f) {}
+        EngineTime() :
+            m_LastTime(std::chrono::high_resolution_clock::now()),
+            m_DeltaTime(0.0f),
+            m_FixedTimeStep(1.0f / 60.0f)
+        {}
         friend class Singleton<EngineTime>;
 
         std::chrono::high_resolution_clock::time_point m_LastTime;

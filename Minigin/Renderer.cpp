@@ -25,10 +25,12 @@ int GetOpenGLDriverIndex()
 void dae::Renderer::Init(SDL_Window* window)
 {
     m_window = window;
-    m_renderer = SDL_CreateRenderer(window, GetOpenGLDriverIndex(), SDL_RENDERER_ACCELERATED);
+    m_renderer = SDL_CreateRenderer(
+        window, GetOpenGLDriverIndex(), SDL_RENDERER_ACCELERATED);
     if (m_renderer == nullptr)
     {
-        throw std::runtime_error(std::string("SDL_CreateRenderer Error: ") + SDL_GetError());
+        throw std::runtime_error(std::string("SDL_CreateRenderer Error: ") +
+                                 SDL_GetError());
     }
 
     IMGUI_CHECKVERSION();
@@ -48,7 +50,6 @@ void dae::Renderer::Render() const
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-    ImGui::ShowDemoWindow();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -68,7 +69,9 @@ void dae::Renderer::Destroy()
     }
 }
 
-void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const float y) const
+void dae::Renderer::RenderTexture(const Texture2D& texture,
+                                  const float x,
+                                  const float y) const
 {
     SDL_Rect dst{};
     dst.x = static_cast<int>(x);
@@ -77,7 +80,11 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const
     SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
 }
 
-void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const float y, const float width, const float height) const
+void dae::Renderer::RenderTexture(const Texture2D& texture,
+                                  const float x,
+                                  const float y,
+                                  const float width,
+                                  const float height) const
 {
     SDL_Rect dst{};
     dst.x = static_cast<int>(x);

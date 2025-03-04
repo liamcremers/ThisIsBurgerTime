@@ -9,28 +9,29 @@
 
 namespace dae
 {
-	class TextComponent final : public BaseComponent
-	{
-	public:
-		TextComponent(GameObject& parent, const std::string& text, Font& font);
+    class TextComponent final : public BaseComponent
+    {
+    public:
+        TextComponent(GameObject& parent, const std::string& text, Font& font);
 
-		void Update() override;
-		void Render() const override;
+        void Update() override;
+        void Render() const override;
 
-		void SetText(const std::string& text);
+        void SetText(const std::string& text);
 
-		void SetPosition(const float x, const float y);
+        void SetPosition(const float x, const float y);
 
-		virtual ~TextComponent() = default;
-		TextComponent(const TextComponent& other) = delete;
-		TextComponent(TextComponent&& other) = delete;
-		TextComponent& operator=(const TextComponent& other) = delete;
-		TextComponent& operator=(TextComponent&& other) = delete;
-	private:
-		bool m_needsUpdate;
-		std::string m_text;
-		Font& m_font;
-		std::unique_ptr<Texture2D> m_textTexture;
-		TransformComponent* m_pTransform{ nullptr };
-	};
+        virtual ~TextComponent() = default;
+        TextComponent(const TextComponent& other) = delete;
+        TextComponent(TextComponent&& other) = delete;
+        TextComponent& operator=(const TextComponent& other) = delete;
+        TextComponent& operator=(TextComponent&& other) = delete;
+
+    private:
+        bool m_needsUpdate;
+        std::string m_text;
+        Font& m_font;
+        std::unique_ptr<Texture2D> m_textTexture;
+        TransformComponent* m_pTransform{ nullptr };
+    };
 }

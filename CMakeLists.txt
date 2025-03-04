@@ -12,6 +12,7 @@ endif()
 
 # Automatically gather all .cpp files in the Minigin folder  
 file(GLOB MINIGIN_SOURCES CONFIGURE_DEPENDS "Minigin/*.cpp")  
+file(GLOB MINIGIN_HEADERS CONFIGURE_DEPENDS "Minigin/*.h")  
 
 # Add executable using the gathered files  
 add_executable(${TARGET_NAME} ${TARGET_PARAM} ${MINIGIN_SOURCES})  
@@ -246,4 +247,12 @@ if(WIN32)
 		"--extra-arg=/EHsc"  #ALLOW THROWS IN MSVC EXTRA ARG => SOURCE:https://stackoverflow.com/questions/75496284/clang-tidy-emits-errors-about-exceptions-being-disabled-when-the-are-enabled
 	)
 	set_target_properties(${TARGET_NAME} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
+
+	find_program(CLANG_FORMAT_EXE NAMES "clang-format" REQUIRED)
+	add_custom_target(clang-format
+		COMMAND ${CLANG_FORMAT_EXE} -i ${MINIGIN_SOURCES} ${MINIGIN_HEADERS}
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		COMMENT "Running clang-format on source files"
+	)
+	add_dependencies(${TARGET_NAME} clang-format)
 endif()
