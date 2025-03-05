@@ -23,7 +23,7 @@ namespace dae
             m_pOwner(owner)
         {}
 
-        [[nodiscard]] virtual GameObject& GetOwner() const { return m_pOwner; }
+        [[nodiscard]] virtual GameObject& GetOwner() const final;
 
     private:
         GameObject& m_pOwner;

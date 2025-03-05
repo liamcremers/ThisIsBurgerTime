@@ -20,9 +20,3 @@ auto dae::EngineTime::GetLastTime() const
 {
     return m_LastTime;
 }
-
-dae::EngineTime::EngineTime() :
-    m_LastTime(std::chrono::high_resolution_clock::now()),
-    m_DeltaTime(0.0f),
-    m_FixedTimeStep(1.0f / 60.0f)
-{}

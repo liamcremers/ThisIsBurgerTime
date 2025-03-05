@@ -19,7 +19,6 @@ namespace dae
         void LateUpdate();
 
     private:
-        friend class Singleton<SceneManager>;
-        std::vector<std::shared_ptr<Scene>> m_scenes;
+        std::vector<std::shared_ptr<Scene>> m_Scenes{};
     };
 }

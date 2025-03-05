@@ -31,11 +31,12 @@ namespace dae
         Minigin& operator=(Minigin&& other) = delete;
 
     private:
-        SDL_Window* m_window{};
-        bool m_continue{ true };
-        float m_lag{};
         static constexpr int m_msPerFrame{ 16 };
         static constexpr int m_WindowWidth{ 640 };
         static constexpr int m_WindowHeight{ 480 };
+
+        SDL_Window* m_window{};
+        bool m_continue{ true };
+        float m_lag{};
     };
 }

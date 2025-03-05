@@ -24,8 +24,7 @@ static constexpr float FPS_POS_Y = 6.0f;
 static constexpr float LOGO_POS_X = 216.0f;
 static constexpr float LOGO_POS_Y = 180.0f;
 static constexpr uint8_t LARGE_FONT_SIZE = 36;
-static constexpr float TEXT_POS_X = 80.0f;
-static constexpr float TEXT_POS_Y = 20.0f;
+static constexpr glm::vec2 TEXT_POS = { 80.0f, 20.0f };
 static constexpr float OFFSET = 20.0f;
 
 static void load(const int windowWidth, const int windowHeight)
@@ -44,12 +43,11 @@ static void load(const int windowWidth, const int windowHeight)
     go->GetComponent<dae::TransformComponent>()->SetWorldPosition(logoPos);
     scene.Add(std::move(go));
 
-    const glm::vec2 textPos{ TEXT_POS_X, TEXT_POS_Y };
     auto& font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf",
                                                               LARGE_FONT_SIZE);
     go = std::make_unique<dae::GameObject>();
     go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
-    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(textPos);
+    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(TEXT_POS);
     scene.Add(std::move(go));
 
     const glm::vec2 pos{ static_cast<float>(windowHeight) / 2.0f,

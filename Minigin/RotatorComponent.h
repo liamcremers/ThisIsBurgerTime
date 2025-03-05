@@ -14,12 +14,11 @@ namespace dae
         void Update() override;
 
     private:
-        float m_Angle{ 0 };
-        int m_AngleSpeed{ 60 };
+        static constexpr float m_AngleMax{ 360.f };
+        static constexpr int m_AngleSpeed{ 60 };
 
+        float m_Angle{};
         float m_Radius{};
         bool m_Clockwise{};
-
-        static constexpr float m_AngleMax{ 360.f };
     };
 }
