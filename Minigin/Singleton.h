@@ -12,6 +12,7 @@ namespace dae
             return instance;
         }
 
+        ~Singleton() = default;
         Singleton(const Singleton& other) = delete;
         Singleton(Singleton&& other) = delete;
         Singleton& operator=(const Singleton& other) = delete;
