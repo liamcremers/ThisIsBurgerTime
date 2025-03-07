@@ -8,8 +8,6 @@ Scene::Scene(std::string name) :
     m_name(std::move(name))
 {}
 
-Scene::~Scene() = default;
-
 void Scene::Add(std::unique_ptr<GameObject> object)
 {
     m_objects.emplace_back(std::move(object));

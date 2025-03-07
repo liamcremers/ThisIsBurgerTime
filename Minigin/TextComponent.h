@@ -18,10 +18,8 @@ namespace dae
         void Render() const override;
 
         void SetText(const std::string& text);
-
         void SetPosition(const float x, const float y);
 
-        virtual ~TextComponent() = default;
         TextComponent(const TextComponent& other) = delete;
         TextComponent(TextComponent&& other) = delete;
         TextComponent& operator=(const TextComponent& other) = delete;

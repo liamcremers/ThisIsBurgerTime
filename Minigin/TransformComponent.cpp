@@ -1,6 +1,7 @@
 #include "TransformComponent.h"
 
-[[nodiscard]] const glm::vec2& dae::TransformComponent::GetWorldPosition() const
+[[nodiscard]] auto dae::TransformComponent::GetWorldPosition() const
+    -> const glm::vec2&
 {
     return m_WorldPosition;
 }
@@ -10,7 +11,8 @@ void dae::TransformComponent::SetWorldPosition(const glm::vec2& pos)
     m_WorldPosition = pos;
 }
 
-[[nodiscard]] const glm::vec2& dae::TransformComponent::GetLocalPosition() const
+[[nodiscard]] auto dae::TransformComponent::GetLocalPosition() const
+    -> const glm::vec2&
 {
     return m_LocalPosition;
 }
