@@ -9,6 +9,7 @@
 
 #include "Minigin.h"
 #include "ResourceManager.h"
+#include "InputManager.h"
 #include "Scene.h"
 
 #include "ComponentsHeader.h"
@@ -17,72 +18,57 @@
 #include <memory>
 namespace fs = std::filesystem;
 
-static constexpr float RADIUS = 40.0f;
-static constexpr uint8_t SMALL_FONT_SIZE = 14;
-static constexpr float FPS_POS_X = 10.0f;
-static constexpr float FPS_POS_Y = 6.0f;
-static constexpr float LOGO_POS_X = 216.0f;
-static constexpr float LOGO_POS_Y = 180.0f;
-static constexpr uint8_t LARGE_FONT_SIZE = 36;
+static constexpr glm::vec2 FPS_POS = { 10.0f, 6.0f };
+static constexpr glm::vec2 LOGO_POS = { 216.0f, 180.0f };
 static constexpr glm::vec2 TEXT_POS = { 80.0f, 20.0f };
 static constexpr float OFFSET = 20.0f;
+static constexpr float RADIUS = 40.0f;
+static constexpr uint8_t LARGE_FONT_SIZE = 36;
+static constexpr uint8_t SMALL_FONT_SIZE = 14;
 
 static void load(const int windowWidth, const int windowHeight)
 {
     auto& scene = dae::SceneManager::GetInstance().CreateScene("Demo");
 
-    auto go = std::make_unique<dae::GameObject>();
-    auto meshRenderer = go->AddComponent<dae::RenderComponent>();
-    meshRenderer->SetTexture("background.tga");
+    auto go = std::make_unique<dae::GameObject>("background");
+    auto RenderComp = go->AddComponent<dae::RenderComponent>();
+    RenderComp->SetTexture("background.tga");
     scene.Add(std::move(go));
 
-    const glm::vec2 logoPos{ LOGO_POS_X, LOGO_POS_Y };
-    go = std::make_unique<dae::GameObject>();
-    meshRenderer = go->AddComponent<dae::RenderComponent>();
-    meshRenderer->SetTexture("logo.tga");
-    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(logoPos);
+    go = std::make_unique<dae::GameObject>("logo");
+    RenderComp = go->AddComponent<dae::RenderComponent>();
+    RenderComp->SetTexture("logo.tga");
+    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(LOGO_POS);
     scene.Add(std::move(go));
 
     auto& font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf",
                                                               LARGE_FONT_SIZE);
-    go = std::make_unique<dae::GameObject>();
+    go = std::make_unique<dae::GameObject>("Title");
     go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
     go->GetComponent<dae::TransformComponent>()->SetWorldPosition(TEXT_POS);
     scene.Add(std::move(go));
-
-    const glm::vec2 pos{ static_cast<float>(windowHeight) / 2.0f,
-                         static_cast<float>(windowWidth) / 2.0f };
-    auto parent = std::make_unique<dae::GameObject>("parent");
-    parent->GetComponent<dae::TransformComponent>()->SetWorldPosition(pos);
-
-    bool clockwise{ true };
-    auto child1 = std::make_unique<dae::GameObject>("parent");
-    meshRenderer = child1->AddComponent<dae::RenderComponent>();
-    meshRenderer->SetTexture("ChefPeterPepperF.png");
-    child1->GetComponent<dae::TransformComponent>()->SetWorldPosition(pos);
-    child1->SetParent(parent.get(), true);
-    child1->AddComponent<dae::RotatorComponent>(RADIUS, clockwise);
-
-    bool clockwise2{ false };
-    auto child2{ std::make_unique<dae::GameObject>("child") };
-    const glm::vec2 newpos{ pos + glm::vec2{ OFFSET, OFFSET } };
-    meshRenderer = child2->AddComponent<dae::RenderComponent>();
-    meshRenderer->SetTexture("ChefPeterPepperB.png");
-    child2->GetComponent<dae::TransformComponent>()->SetWorldPosition(newpos);
-    child2->SetParent(child1.get(), false);
-    child2->AddComponent<dae::RotatorComponent>(RADIUS, clockwise2);
-
-    scene.Add(std::move(parent));
-    scene.Add(std::move(child1));
-    scene.Add(std::move(child2));
 
     auto& fpsFont = dae::ResourceManager::GetInstance().LoadFont(
         "Lingua.otf", SMALL_FONT_SIZE);
     go = std::make_unique<dae::GameObject>("fps");
     go->AddComponent<dae::FPSComponent>(fpsFont);
-    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
-        { FPS_POS_X, FPS_POS_Y });
+    go->GetComponent<dae::TransformComponent>()->SetWorldPosition({ FPS_POS });
     scene.Add(std::move(go));
+
+    // Create 2 player objects
+    for (int i = 0; i < 2; ++i)
+    {
+        glm::vec2 middlePos = { windowWidth / 2.f, windowHeight / 2.f };
+        glm::vec2 playerPos = { middlePos.x + OFFSET * (i - 1), middlePos.y };
+        go = std::make_unique<dae::GameObject>("player" + std::to_string(i));
+        RenderComp = go->AddComponent<dae::RenderComponent>();
+        RenderComp->SetTexture(i == 0 ? "ChefPeterPepperB.png" :
+                                        "ChefPeterPepperF.png");
+        go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+            { playerPos });
+        go->AddComponent<dae::PlayerComponent>(static_cast<uint8_t>(i));
+        scene.Add(std::move(go));
+    }
 }
 
 auto main(int, char*[]) -> int

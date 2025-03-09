@@ -239,6 +239,13 @@ elseif(WIN32)
   )
 endif()
 
+# Define target architecture
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  target_compile_definitions(${TARGET_NAME} PRIVATE _AMD64_)
+else()
+  target_compile_definitions(${TARGET_NAME} PRIVATE _X86_)
+endif()
+
 #if(WIN32)
 #	find_program(CLANG_TIDY_EXE NAMES "clang-tidy" REQUIRED)
 #	set(CLANG_TIDY_COMMAND 
