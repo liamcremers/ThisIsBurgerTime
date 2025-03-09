@@ -18,9 +18,8 @@ auto dae::InputManager::ProcessInput() -> bool
         {
             return false;
         }
-
-        std::ranges::for_each(m_ControllerVec, &Controller::ProcessInput);
     }
+    std::ranges::for_each(m_ControllerVec, &Controller::ProcessInput);
     return true;
 }
 

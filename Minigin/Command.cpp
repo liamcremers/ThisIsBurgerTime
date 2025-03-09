@@ -26,6 +26,7 @@ void dae::MoveCommand::Execute()
         m_Direction.x * (m_Speed * EngineTime::GetInstance().GetDeltaTime()),
         m_Direction.y * (m_Speed * EngineTime::GetInstance().GetDeltaTime())
     };
+    GetGameObject()->SetLocalPosition(pos);
 }
 
 void dae::MoveCommand::SetSpeed(int speed) { m_Speed = speed; }

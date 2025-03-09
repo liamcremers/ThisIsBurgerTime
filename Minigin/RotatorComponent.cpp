@@ -8,8 +8,7 @@ dae::RotatorComponent::RotatorComponent(GameObject& owner,
     m_Radius{ radius },
     m_Clockwise{ clockwise }
 {
-    //TODO: Add a check to see if the owner has a TransformComponent
-    //assert((GetOwner().GetParent()->IsChild(&GetOwner())));
+    assert("Rotator needs a parent" && (GetOwner().GetParent() != nullptr));
 }
 
 void dae::RotatorComponent::Update()
