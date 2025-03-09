@@ -16,9 +16,6 @@ namespace dae
         bool ProcessInput();
 
         void AddController(Controller* controller);
-        void AddControllerCommand(Command& pCommand,
-                                  int button,
-                                  uint8_t controllerIdx);
 
     private:
         std::vector<Controller*> m_ControllerVec;

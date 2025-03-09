@@ -1,5 +1,6 @@
 #include "Command.h"
 #include "GameObject.h"
+#include "EngineTime.h"
 
 dae::GameObjectCommand::GameObjectCommand(GameObject* pGameObject) :
     m_pGameObject{ pGameObject }
@@ -18,6 +19,13 @@ dae::MoveCommand::MoveCommand(GameObject& pGameObject,
     m_Speed{ speed }
 {}
 
-void dae::MoveCommand::Execute() {}
+void dae::MoveCommand::Execute()
+{
+    auto worldPos = this->GetGameObject()->GetWorldPosition();
+    auto pos = worldPos + glm::vec2{
+        m_Direction.x * (m_Speed * EngineTime::GetInstance().GetDeltaTime()),
+        m_Direction.y * (m_Speed * EngineTime::GetInstance().GetDeltaTime())
+    };
+}
 
 void dae::MoveCommand::SetSpeed(int speed) { m_Speed = speed; }

@@ -10,10 +10,10 @@ namespace dae
 
         Command() = default;
         virtual ~Command() = default;
-        Command(const Command& other) noexcept = delete;
-        Command(Command&& other) noexcept = delete;
-        Command& operator=(const Command& other) noexcept = delete;
-        Command& operator=(Command&& other) noexcept = delete;
+        Command(const Command& other) noexcept = default;
+        Command(Command&& other) noexcept = default;
+        Command& operator=(const Command& other) noexcept = default;
+        Command& operator=(Command&& other) noexcept = default;
     };
 
     class GameObject;
@@ -37,13 +37,13 @@ namespace dae
     public:
         MoveCommand(GameObject& pGameObject,
                     glm::i8vec2 direction,
-                    int speed = 1);
+                    int speed = 100);
         ~MoveCommand() = default;
         void Execute() override;
         void SetSpeed(int speed);
 
     private:
-        const glm::i8vec2 m_Direction{};
-        int m_Speed{ 1 };
+        glm::i8vec2 m_Direction{};
+        int m_Speed{ 100 };
     };
 }

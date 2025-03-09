@@ -29,5 +29,3 @@ void dae::InputManager::AddController(Controller* controller)
     if (m_ControllerVec.size() < 2)
         m_ControllerVec.emplace_back(controller);
 }
-
-void dae::InputManager::AddControllerCommand(Command&, int, uint8_t) {}
