@@ -16,18 +16,17 @@ auto dae::InputManager::ProcessInput() -> bool
 
         if (e.type == SDL_QUIT)
             return false;
-        }
+    }
 
-        for (auto& [key, command] : m_KeyCommandMap)
+    for (auto& [key, command] : m_KeyCommandMap)
+    {
+        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == key)
         {
-            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == key)
-            {
-                command->Execute();
-            }
-            else if (e.type == SDL_KEYUP && e.key.keysym.sym == key)
-            {
-                // TODO: Implement
-            }
+            command->Execute();
+        }
+        else if (e.type == SDL_KEYUP && e.key.keysym.sym == key)
+        {
+            // TODO: Implement
         }
     }
     std::ranges::for_each(m_ControllerVec, &Controller::ProcessInput);

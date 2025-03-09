@@ -118,8 +118,4 @@ namespace dae
     {
         m_pImpl->AddCommand(pCommand, button);
     }
-
-bool dae::Controller::IsPressed(unsigned int button) const
-{
-    return m_pImpl->IsPressed(button);
 }
