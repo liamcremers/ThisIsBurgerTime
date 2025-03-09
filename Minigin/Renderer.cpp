@@ -99,7 +99,7 @@ auto dae::Renderer::GetSDLRenderer() const -> SDL_Renderer*
     return m_renderer;
 }
 
-const SDL_Color& dae::Renderer::GetBackgroundColor() const
+auto dae::Renderer::GetBackgroundColor() const -> const SDL_Color&
 {
     return m_clearColor;
 }

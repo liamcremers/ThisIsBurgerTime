@@ -1,13 +1,13 @@
 #pragma once
-#include <memory>
-#include "Font.h"
 #include "BaseComponent.h"
-#include "ComponentsHeader.h"
-#include "EngineTime.h"
-#include "TextComponent.h"
+
+#include <memory>
 
 namespace dae
 {
+    class Font;
+    class TextComponent;
+
     class FPSComponent final : public BaseComponent
     {
     public:
@@ -16,6 +16,6 @@ namespace dae
 
     private:
         Font& m_pFont;
-        TextComponent* m_pTextComponent{ nullptr };
+        TextComponent* m_pTextComponent;
     };
 }

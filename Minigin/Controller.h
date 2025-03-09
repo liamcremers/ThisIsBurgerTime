@@ -5,18 +5,18 @@
 
 namespace dae
 {
+    class Command;
+
     class Controller
     {
     public:
-        Controller();
-
-        bool ProcessInput();
-        bool IsDownThisFrame(unsigned int button) const;
-        bool IsUpThisFrame(unsigned int button) const;
-        bool IsPressed(unsigned int button) const;
+        Controller(unsigned long idx);
+        ~Controller();
+        void ProcessInput();
+        void AddCommand(Command& pCommand, unsigned int button);
 
     private:
         class ControllerImpl;
-        std::unique_ptr<ControllerImpl> m_pImpl;
+        ControllerImpl* m_pImpl;
     };
 }

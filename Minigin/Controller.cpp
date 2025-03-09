@@ -1,79 +1,123 @@
 #include "Controller.h"
+#include "Command.h"
+
 #include <Xinput.h>
-
-#include <unordered_map>
 #include <minwinbase.h>
+#include <unordered_map>
+#include <string>
 
-class dae::Controller::ControllerImpl
+namespace dae
 {
-public:
-    void ProcessInput();
-    bool IsDownThisFrame(unsigned int button) const;
-    bool IsUpThisFrame(unsigned int button) const;
-    bool IsPressed(unsigned int button) const;
+    class Controller::ControllerImpl
+    {
+    public:
+        explicit ControllerImpl(DWORD idx) :
+            m_ControllerIndex{ idx }
+        {}
 
-private:
-    DWORD m_controllerIndex{ 0 };
-    XINPUT_STATE m_PreviousState{};
-    XINPUT_STATE m_CurrentState{};
-    int m_ButtonsPressedThisFrame{};
-    int m_ButtonsReleasedThisFrame{};
+        void ProcessInput();
+        [[nodiscard]] auto IsDownThisFrame(unsigned int button) const -> bool;
+        [[nodiscard]] auto IsUpThisFrame(unsigned int button) const -> bool;
+        [[nodiscard]] auto IsPressed(unsigned int button) const -> bool;
+        [[nodiscard]] auto IsReleased(unsigned int button) const -> bool;
 
-    std::unordered_map<int, std::pair<Command&, int>> m_CommandsMap;
-};
+        void AddCommand(Command& pCommand, unsigned int button);
 
-void dae::Controller::ControllerImpl::ProcessInput()
-{
-    CopyMemory(&m_PreviousState, &m_CurrentState, sizeof(XINPUT_STATE));
-    ZeroMemory(&m_CurrentState, sizeof(XINPUT_STATE));
-    XInputGetState(m_controllerIndex, &m_CurrentState);
+    private:
+        DWORD m_ControllerIndex{};
+        XINPUT_STATE m_PreviousState{};
+        XINPUT_STATE m_CurrentState{};
+        int m_ButtonsPressedThisFrame{};
+        int m_ButtonsReleasedThisFrame{};
 
-    auto buttonChanges =
-        m_CurrentState.Gamepad.wButtons ^ m_PreviousState.Gamepad.wButtons;
+        std::unordered_map<unsigned int, Command*> m_CommandsMap;
+    };
 
-    m_ButtonsPressedThisFrame = buttonChanges & m_CurrentState.Gamepad.wButtons;
+    void Controller::ControllerImpl::ProcessInput()
+    {
+        CopyMemory(&m_PreviousState, &m_CurrentState, sizeof(XINPUT_STATE));
+        ZeroMemory(&m_CurrentState, sizeof(XINPUT_STATE));
+        XInputGetState(m_ControllerIndex, &m_CurrentState);
 
-    m_ButtonsReleasedThisFrame =
-        buttonChanges & (~m_CurrentState.Gamepad.wButtons);
-}
+        auto buttonChanges =
+            m_CurrentState.Gamepad.wButtons ^ m_PreviousState.Gamepad.wButtons;
 
-bool dae::Controller::ControllerImpl::IsDownThisFrame(unsigned int button) const
-{
-    return m_ButtonsPressedThisFrame & button;
-}
+        m_ButtonsPressedThisFrame =
+            buttonChanges & m_CurrentState.Gamepad.wButtons;
+        m_ButtonsReleasedThisFrame =
+            buttonChanges & (~m_CurrentState.Gamepad.wButtons);
 
-bool dae::Controller::ControllerImpl::IsUpThisFrame(unsigned int button) const
-{
-    return m_ButtonsReleasedThisFrame & button;
-}
+        for (auto& [key, command] : m_CommandsMap)
+        {
+            if (IsDownThisFrame(key))
+            {
+                //command->Execute();
+                //break;
+            }
+            if (IsUpThisFrame(key))
+            {
+                //command->Execute();
+                //break;
+            }
+            if (IsPressed(key))
+            {
+                command->Execute();
+                break;
+            }
+            if (IsReleased(key))
+            {
+                //command->Execute();
+                //break;
+            }
+        }
+    }
 
-bool dae::Controller::ControllerImpl::IsPressed(unsigned int button) const
-{
-    return m_CurrentState.Gamepad.wButtons & button;
-}
+    auto Controller::ControllerImpl::IsDownThisFrame(unsigned int button) const
+        -> bool
+    {
+        return m_ButtonsPressedThisFrame & button;
+    }
 
-////////////////////////
-// Controller
-////////////////////////
-dae::Controller::Controller() :
-    m_pImpl{ std::make_unique<ControllerImpl>() }
-{}
+    auto Controller::ControllerImpl::IsUpThisFrame(unsigned int button) const
+        -> bool
+    {
+        return m_ButtonsReleasedThisFrame & button;
+    }
 
-bool dae::Controller::ProcessInput()
-{
-    m_pImpl->ProcessInput();
-    return true;
-}
+    auto Controller::ControllerImpl::IsPressed(unsigned int button) const
+        -> bool
+    {
+        return m_CurrentState.Gamepad.wButtons & button;
+    }
 
-bool dae::Controller::IsDownThisFrame(unsigned int button) const
-{
-    return m_pImpl->IsDownThisFrame(button);
-}
+    auto Controller::ControllerImpl::IsReleased(unsigned int button) const
+        -> bool
+    {
+        return !(m_CurrentState.Gamepad.wButtons & button);
+    }
 
-bool dae::Controller::IsUpThisFrame(unsigned int button) const
-{
-    return m_pImpl->IsUpThisFrame(button);
-}
+    void Controller::ControllerImpl::AddCommand(Command& pCommand,
+                                                unsigned int button)
+    {
+        m_CommandsMap[button] = &pCommand;
+    }
+
+    ////////////////////////
+    // Controller
+    ////////////////////////
+
+    Controller::Controller(unsigned long idx) :
+        m_pImpl{ new ControllerImpl(idx) }
+    {}
+
+    Controller::~Controller() { delete m_pImpl; }
+
+    void Controller::ProcessInput() { m_pImpl->ProcessInput(); }
+
+    void Controller::AddCommand(Command& pCommand, unsigned int button)
+    {
+        m_pImpl->AddCommand(pCommand, button);
+    }
 
 bool dae::Controller::IsPressed(unsigned int button) const
 {

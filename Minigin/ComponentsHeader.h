@@ -8,3 +8,4 @@
 #include "FPSComponent.h"
 #include "TextComponent.h"
 #include "RotatorComponent.h"
+#include "PlayerComponent.h"

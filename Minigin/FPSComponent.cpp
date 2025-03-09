@@ -1,4 +1,7 @@
 #include "FPSComponent.h"
+#include "TextComponent.h"
+#include "EngineTime.h"
+#include "Font.h"
 #include "GameObject.h"
 
 dae::FPSComponent::FPSComponent(GameObject& parent, Font& font) :
