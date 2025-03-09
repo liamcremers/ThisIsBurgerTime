@@ -3,6 +3,8 @@
 #include "Controller.h"
 #include "Command.h"
 
+#include <SDL.h>
+
 namespace dae
 {
     PlayerComponent::PlayerComponent(GameObject& parent, unsigned long idx) :
@@ -21,6 +23,8 @@ namespace dae
                                   XINPUT_GAMEPAD_DPAD_LEFT);
         m_pController->AddCommand(*m_pMoveCommandRight,
                                   XINPUT_GAMEPAD_DPAD_RIGHT);
+
+        SetUpKeyboardControls(idx);
     }
 
     PlayerComponent::~PlayerComponent() = default;
@@ -36,5 +40,27 @@ namespace dae
         m_pMoveCommandDown->SetSpeed(speed);
         m_pMoveCommandLeft->SetSpeed(speed);
         m_pMoveCommandRight->SetSpeed(speed);
+    }
+
+    void PlayerComponent::SetUpKeyboardControls(unsigned long idx)
+    {
+        auto& inputManager = InputManager::GetInstance();
+        if (idx == 0)
+        {
+            inputManager.AddKeyboardCommand(SDLK_w, m_pMoveCommandUp.get());
+            inputManager.AddKeyboardCommand(SDLK_s, m_pMoveCommandDown.get());
+            inputManager.AddKeyboardCommand(SDLK_a, m_pMoveCommandLeft.get());
+            inputManager.AddKeyboardCommand(SDLK_d, m_pMoveCommandRight.get());
+        }
+        if (idx == 1)
+        {
+            inputManager.AddKeyboardCommand(SDLK_UP, m_pMoveCommandUp.get());
+            inputManager.AddKeyboardCommand(SDLK_DOWN,
+                                            m_pMoveCommandDown.get());
+            inputManager.AddKeyboardCommand(SDLK_LEFT,
+                                            m_pMoveCommandLeft.get());
+            inputManager.AddKeyboardCommand(SDLK_RIGHT,
+                                            m_pMoveCommandRight.get());
+        }
     }
 }

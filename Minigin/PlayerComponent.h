@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseComponent.h"
+
 #include <memory>
 #include <vector>
 #include <glm.hpp>
@@ -7,6 +8,7 @@
 namespace dae
 {
     class Controller;
+    class Keyboard;
     class MoveCommand;
 
     class PlayerComponent final : public BaseComponent
@@ -19,6 +21,8 @@ namespace dae
         void SetSpeed(int speed);
 
     private:
+        void SetUpKeyboardControls(unsigned long idx);
+
         static constexpr glm::i8vec2 MoveUp{ 0, -1 };
         static constexpr glm::i8vec2 MoveDown{ 0, 1 };
         static constexpr glm::i8vec2 MoveLeft{ -1, 0 };

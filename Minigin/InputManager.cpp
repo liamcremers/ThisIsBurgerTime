@@ -18,6 +18,18 @@ auto dae::InputManager::ProcessInput() -> bool
         {
             return false;
         }
+
+        for (auto& [key, command] : m_KeyCommandMap)
+        {
+            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == key)
+            {
+                command->Execute();
+            }
+            else if (e.type == SDL_KEYUP && e.key.keysym.sym == key)
+            {
+                // TODO: Implement
+            }
+        }
     }
     std::ranges::for_each(m_ControllerVec, &Controller::ProcessInput);
     return true;
@@ -27,4 +39,10 @@ void dae::InputManager::AddController(Controller* controller)
 {
     if (m_ControllerVec.size() < 2)
         m_ControllerVec.emplace_back(controller);
+}
+
+void dae::InputManager::AddKeyboardCommand(SDL_Keycode keyboardButton,
+                                           Command* command)
+{
+    m_KeyCommandMap[keyboardButton] = command;
 }

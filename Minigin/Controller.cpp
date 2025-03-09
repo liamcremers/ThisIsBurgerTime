@@ -1,10 +1,9 @@
 #include "Controller.h"
 #include "Command.h"
-#include <Xinput.h>
 
-#include <Windows.h>
-#include <unordered_map>
+#include <Xinput.h>
 #include <minwinbase.h>
+#include <unordered_map>
 #include <string>
 
 namespace dae
