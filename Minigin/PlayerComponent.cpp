@@ -47,13 +47,6 @@ namespace dae
         auto& inputManager = InputManager::GetInstance();
         if (idx == 0)
         {
-            inputManager.AddKeyboardCommand(SDLK_w, m_pMoveCommandUp.get());
-            inputManager.AddKeyboardCommand(SDLK_s, m_pMoveCommandDown.get());
-            inputManager.AddKeyboardCommand(SDLK_a, m_pMoveCommandLeft.get());
-            inputManager.AddKeyboardCommand(SDLK_d, m_pMoveCommandRight.get());
-        }
-        if (idx == 1)
-        {
             inputManager.AddKeyboardCommand(SDLK_UP, m_pMoveCommandUp.get());
             inputManager.AddKeyboardCommand(SDLK_DOWN,
                                             m_pMoveCommandDown.get());
@@ -61,6 +54,13 @@ namespace dae
                                             m_pMoveCommandLeft.get());
             inputManager.AddKeyboardCommand(SDLK_RIGHT,
                                             m_pMoveCommandRight.get());
+        }
+        if (idx == 1)
+        {
+            inputManager.AddKeyboardCommand(SDLK_w, m_pMoveCommandUp.get());
+            inputManager.AddKeyboardCommand(SDLK_s, m_pMoveCommandDown.get());
+            inputManager.AddKeyboardCommand(SDLK_a, m_pMoveCommandLeft.get());
+            inputManager.AddKeyboardCommand(SDLK_d, m_pMoveCommandRight.get());
         }
     }
 }
