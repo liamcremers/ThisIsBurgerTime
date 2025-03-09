@@ -6,7 +6,7 @@ dae::GameObjectCommand::GameObjectCommand(GameObject* pGameObject) :
     m_pGameObject{ pGameObject }
 {}
 
-dae::GameObject* dae::GameObjectCommand::GetGameObject() const
+auto dae::GameObjectCommand::GetGameObject() const -> dae::GameObject*
 {
     return m_pGameObject;
 }
@@ -21,7 +21,7 @@ dae::MoveCommand::MoveCommand(GameObject& pGameObject,
 
 void dae::MoveCommand::Execute()
 {
-    auto worldPos = this->GetGameObject()->GetWorldPosition();
+    auto& worldPos = GetGameObject()->GetWorldPosition();
     auto pos = worldPos + glm::vec2{
         m_Direction.x * (m_Speed * EngineTime::GetInstance().GetDeltaTime()),
         m_Direction.y * (m_Speed * EngineTime::GetInstance().GetDeltaTime())

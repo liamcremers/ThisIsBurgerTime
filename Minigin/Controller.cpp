@@ -16,10 +16,10 @@ namespace dae
         {}
 
         void ProcessInput();
-        bool IsDownThisFrame(unsigned int button) const;
-        bool IsUpThisFrame(unsigned int button) const;
-        bool IsPressed(unsigned int button) const;
-        bool IsReleased(unsigned int button) const;
+        [[nodiscard]] auto IsDownThisFrame(unsigned int button) const -> bool;
+        [[nodiscard]] auto IsUpThisFrame(unsigned int button) const -> bool;
+        [[nodiscard]] auto IsPressed(unsigned int button) const -> bool;
+        [[nodiscard]] auto IsReleased(unsigned int button) const -> bool;
 
         void AddCommand(Command& pCommand, unsigned int button);
 
@@ -72,22 +72,26 @@ namespace dae
         }
     }
 
-    bool Controller::ControllerImpl::IsDownThisFrame(unsigned int button) const
+    auto Controller::ControllerImpl::IsDownThisFrame(unsigned int button) const
+        -> bool
     {
         return m_ButtonsPressedThisFrame & button;
     }
 
-    bool Controller::ControllerImpl::IsUpThisFrame(unsigned int button) const
+    auto Controller::ControllerImpl::IsUpThisFrame(unsigned int button) const
+        -> bool
     {
         return m_ButtonsReleasedThisFrame & button;
     }
 
-    bool Controller::ControllerImpl::IsPressed(unsigned int button) const
+    auto Controller::ControllerImpl::IsPressed(unsigned int button) const
+        -> bool
     {
         return m_CurrentState.Gamepad.wButtons & button;
     }
 
-    bool Controller::ControllerImpl::IsReleased(unsigned int button) const
+    auto Controller::ControllerImpl::IsReleased(unsigned int button) const
+        -> bool
     {
         return !(m_CurrentState.Gamepad.wButtons & button);
     }

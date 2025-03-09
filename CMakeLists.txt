@@ -249,20 +249,20 @@ else()
  target_compile_definitions(${TARGET_NAME} PRIVATE _X86_)  
 endif()  
  
-#if(WIN32)  
-#	find_program(CLANG_TIDY_EXE NAMES "clang-tidy" REQUIRED)  
-#	set(CLANG_TIDY_COMMAND   
-#		"${CLANG_TIDY_EXE}"   
-#		"--checks=-*,modernize-*"   
-#		"--extra-arg=/EHsc"  #ALLOW THROWS IN MSVC EXTRA ARG => SOURCE:https://stackoverflow.com/questions/75496284/clang-tidy-emits-errors-about-exceptions-being-disabled-when-the-are-enabled  
-#	)  
-#	set_target_properties(${TARGET_NAME} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")  
-#  
-#	find_program(CLANG_FORMAT_EXE NAMES "clang-format" REQUIRED)  
-#	add_custom_target(clang-format  
-#		COMMAND ${CLANG_FORMAT_EXE} -i ${MINIGIN_SOURCES} ${MINIGIN_HEADERS}  
-#		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}  
-#		COMMENT "Running clang-format on source files"  
-#	)  
-#	add_dependencies(${TARGET_NAME} clang-format)  
-#endif()
+if(WIN32)  
+	find_program(CLANG_TIDY_EXE NAMES "clang-tidy" REQUIRED)  
+	set(CLANG_TIDY_COMMAND   
+		"${CLANG_TIDY_EXE}"   
+		"--checks=-*,modernize-*"   
+		"--extra-arg=/EHsc"  #ALLOW THROWS IN MSVC EXTRA ARG => SOURCE:https://stackoverflow.com/questions/75496284/clang-tidy-emits-errors-about-exceptions-being-disabled-when-the-are-enabled  
+	)  
+	set_target_properties(${TARGET_NAME} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")  
+  
+	find_program(CLANG_FORMAT_EXE NAMES "clang-format" REQUIRED)  
+	add_custom_target(clang-format  
+		COMMAND ${CLANG_FORMAT_EXE} -i ${MINIGIN_SOURCES} ${MINIGIN_HEADERS}  
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}  
+		COMMENT "Running clang-format on source files"  
+	)  
+	add_dependencies(${TARGET_NAME} clang-format)  
+endif()
