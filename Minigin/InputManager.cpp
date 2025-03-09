@@ -17,10 +17,10 @@ auto dae::InputManager::ProcessInput() -> bool
         if (e.type == SDL_QUIT)
         {
             return false;
+        }
+
+        std::ranges::for_each(m_ControllerVec, &Controller::ProcessInput);
     }
-
-    std::ranges::for_each(m_ControllerVec, &Controller::ProcessInput);
-
     return true;
 }
 
