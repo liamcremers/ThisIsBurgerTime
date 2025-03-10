@@ -30,3 +30,5 @@ void dae::MoveCommand::Execute()
 }
 
 void dae::MoveCommand::SetSpeed(int speed) { m_Speed = speed; }
+
+void dae::MoveCommand::Undo() {}

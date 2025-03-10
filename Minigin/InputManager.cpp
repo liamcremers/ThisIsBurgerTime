@@ -20,13 +20,9 @@ auto dae::InputManager::ProcessInput() -> bool
         for (auto& [key, command] : m_KeyCommandMap)
         {
             if (e.type == SDL_KEYDOWN && e.key.keysym.sym == key)
-            {
                 command->Execute();
-            }
             else if (e.type == SDL_KEYUP && e.key.keysym.sym == key)
-            {
-                // TODO: Implement
-            }
+                command->Undo();
         }
     }
     std::ranges::for_each(m_ControllerVec, &Controller::ProcessInput);

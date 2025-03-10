@@ -7,6 +7,7 @@ namespace dae
     {
     public:
         virtual void Execute() = 0;
+        virtual void Undo() = 0;
 
         Command() = default;
         virtual ~Command() = default;
@@ -24,6 +25,7 @@ namespace dae
         GameObjectCommand(GameObject* pGameObject);
         ~GameObjectCommand() = default;
         void Execute() override = 0;
+        void Undo() override = 0;
 
     protected:
         virtual GameObject* GetGameObject() const final;
@@ -40,6 +42,7 @@ namespace dae
                     int speed = 100);
         ~MoveCommand() = default;
         void Execute() override;
+        void Undo() override;
         void SetSpeed(int speed);
 
     private:
