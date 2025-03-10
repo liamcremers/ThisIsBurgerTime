@@ -29,7 +29,7 @@ namespace dae
 
     PlayerComponent::~PlayerComponent() = default;
 
-    const Controller* PlayerComponent::GetController() const
+    auto PlayerComponent::GetController() const -> const Controller*
     {
         return m_pController.get();
     }
