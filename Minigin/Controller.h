@@ -1,7 +1,4 @@
 #pragma once
-#include "Command.h"
-
-#include <memory>
 
 namespace dae
 {

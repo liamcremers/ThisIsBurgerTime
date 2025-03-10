@@ -2,8 +2,6 @@
 #include "SceneManager.h"
 #include "GameObject.h"
 
-#include <algorithm>
-
 namespace dae
 {
     class Scene final
