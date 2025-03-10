@@ -86,7 +86,10 @@ static void load(const int windowWidth, const int windowHeight)
                                         "ChefPeterPepperB.png");
         go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
             { playerPos });
-        go->AddComponent<dae::PlayerComponent>(static_cast<uint8_t>(i));
+        auto playerComp =
+            go->AddComponent<dae::PlayerComponent>(static_cast<uint8_t>(i));
+        playerComp->SetSpeed(100 * (i + 1));
+
         scene.Add(std::move(go));
     }
 }
