@@ -43,7 +43,7 @@ void dae::Scene::FixedUpdate()
 
 void Scene::Render() const
 {
-    for (auto& object : m_objects)
+    for (const auto& object : m_objects)
     {
         object->Render();
     }

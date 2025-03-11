@@ -22,7 +22,7 @@ dae::MoveCommand::MoveCommand(GameObject& pGameObject,
 void dae::MoveCommand::Execute()
 {
     auto deltaTime = EngineTime::GetInstance().GetDeltaTime();
-    auto& worldPos = GetGameObject()->GetWorldPosition();
+    const auto& worldPos = GetGameObject()->GetWorldPosition();
     auto pos =
         worldPos +
         glm::vec2{ static_cast<float>(m_Direction[0] * m_Speed) * deltaTime,

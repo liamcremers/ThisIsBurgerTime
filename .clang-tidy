@@ -1,4 +1,4 @@
-Checks: 'cppcoreguidelines-*,readability-redundant--specifier,modernize-*,
--cppcoreguidelines-avoid-throwing-exceptions'
+Checks: 'cppcoreguidelines-*,modernize-*,
+readability-qualified-auto,readability-redundant-'
 HeaderFilterRegex: 'Minigin/.*'
 SystemHeaders: false

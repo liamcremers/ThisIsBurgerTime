@@ -24,14 +24,14 @@ void dae::TextComponent::Update()
     if (m_needsUpdate)
     {
         const SDL_Color color = { 255, 255, 255, 255 };
-        const auto surf =
+        auto* const surf =
             TTF_RenderText_Blended(m_font.GetFont(), m_text.c_str(), color);
         if (surf == nullptr)
         {
             throw std::runtime_error(std::string("Render text failed: ") +
                                      SDL_GetError());
         }
-        auto texture = SDL_CreateTextureFromSurface(
+        auto* texture = SDL_CreateTextureFromSurface(
             Renderer::GetInstance().GetSDLRenderer(), surf);
         if (texture == nullptr)
         {

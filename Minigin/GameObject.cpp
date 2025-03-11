@@ -30,7 +30,7 @@ void dae::GameObject::LateUpdate()
 
 void dae::GameObject::Render() const
 {
-    for (auto& comp : m_pComponents)
+    for (const auto& comp : m_pComponents)
         comp->Render();
 }
 

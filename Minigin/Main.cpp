@@ -35,7 +35,7 @@ static void load(const int windowWidth, const int windowHeight)
     auto& scene = dae::SceneManager::GetInstance().CreateScene("Demo");
 
     auto go = std::make_unique<dae::GameObject>("background");
-    auto RenderComp = go->AddComponent<dae::RenderComponent>();
+    auto* RenderComp = go->AddComponent<dae::RenderComponent>();
     RenderComp->SetTexture("background.tga");
     scene.Add(std::move(go));
 
@@ -84,7 +84,7 @@ static void load(const int windowWidth, const int windowHeight)
     {
         glm::vec2 middlePos = { windowWidth / 2, windowHeight / 2 };
         glm::vec2 playerPos = {
-            middlePos[0] + OFFSET * static_cast<float>(i - 1), middlePos[1]
+            middlePos[0] + (OFFSET * static_cast<float>(i - 1)), middlePos[1]
         };
         go = std::make_unique<dae::GameObject>("player" + std::to_string(i));
         RenderComp = go->AddComponent<dae::RenderComponent>();
@@ -92,7 +92,7 @@ static void load(const int windowWidth, const int windowHeight)
                                         "ChefPeterPepperB.png");
         go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
             playerPos);
-        auto playerComp =
+        auto* playerComp =
             go->AddComponent<dae::PlayerComponent>(static_cast<uint8_t>(i));
         playerComp->SetSpeed(BASE_SPEED * (i + 1));
 
