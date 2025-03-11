@@ -25,6 +25,10 @@ static constexpr float OFFSET = 20.0f;
 static constexpr float RADIUS = 40.0f;
 static constexpr uint8_t LARGE_FONT_SIZE = 36;
 static constexpr uint8_t SMALL_FONT_SIZE = 14;
+static constexpr float INSTRUCTION_OFFSET_1 = 60.0f;
+static constexpr float INSTRUCTION_OFFSET_2 = 80.0f;
+static constexpr float DIVISOR = 2.0f;
+static constexpr int BASE_SPEED = 100;
 
 static void load(const int windowWidth, const int windowHeight)
 {
@@ -52,43 +56,45 @@ static void load(const int windowWidth, const int windowHeight)
         "Lingua.otf", SMALL_FONT_SIZE);
     go = std::make_unique<dae::GameObject>("fps");
     go->AddComponent<dae::FPSComponent>(fpsFont);
-    go->GetComponent<dae::TransformComponent>()->SetWorldPosition({ FPS_POS });
+    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(FPS_POS);
     scene.Add(std::move(go));
 
     //'use the D-Pad (on the first controller) or the arrow keys to move the frontfacing player'
     go = std::make_unique<dae::GameObject>("instruction0");
-    go.get()->AddComponent<dae::TextComponent>(
+    go->AddComponent<dae::TextComponent>(
         "Use the D-Pad (on the first controller) or the arrow keys to move the "
         "frontfacing player",
         fpsFont);
-    go.get()->GetComponent<dae::TransformComponent>()->SetWorldPosition(
-        { FPS_POS.x, FPS_POS.y + 60.0f });
+    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+        { FPS_POS[0], FPS_POS[1] + INSTRUCTION_OFFSET_1 });
     scene.Add(std::move(go));
 
     //'use the D-Pad (on the second controller) or the WASD keys to move the backfacing player'
     go = std::make_unique<dae::GameObject>("instruction1");
-    go.get()->AddComponent<dae::TextComponent>(
+    go->AddComponent<dae::TextComponent>(
         "Use the D-Pad (on the second controller) or the WASD keys to move the "
         "backfacing player",
         fpsFont);
-    go.get()->GetComponent<dae::TransformComponent>()->SetWorldPosition(
-        { FPS_POS.x, FPS_POS.y + 80.0f });
+    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+        { FPS_POS[0], FPS_POS[1] + INSTRUCTION_OFFSET_2 });
     scene.Add(std::move(go));
 
     // Create 2 player objects
     for (int i = 0; i < 2; ++i)
     {
-        glm::vec2 middlePos = { windowWidth / 2.f, windowHeight / 2.f };
-        glm::vec2 playerPos = { middlePos.x + OFFSET * (i - 1), middlePos.y };
+        glm::vec2 middlePos = { windowWidth / 2, windowHeight / 2 };
+        glm::vec2 playerPos = {
+            middlePos[0] + OFFSET * static_cast<float>(i - 1), middlePos[1]
+        };
         go = std::make_unique<dae::GameObject>("player" + std::to_string(i));
         RenderComp = go->AddComponent<dae::RenderComponent>();
         RenderComp->SetTexture(i == 0 ? "ChefPeterPepperF.png" :
                                         "ChefPeterPepperB.png");
         go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
-            { playerPos });
+            playerPos);
         auto playerComp =
             go->AddComponent<dae::PlayerComponent>(static_cast<uint8_t>(i));
-        playerComp->SetSpeed(100 * (i + 1));
+        playerComp->SetSpeed(BASE_SPEED * (i + 1));
 
         scene.Add(std::move(go));
     }

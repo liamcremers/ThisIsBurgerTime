@@ -7,8 +7,6 @@
 
 #include "GameObject.h"
 #include "Renderer.h"
-#include "Font.h"
-#include "Texture2D.h"
 
 dae::TextComponent::TextComponent(GameObject& parent,
                                   std::string text,
@@ -52,7 +50,7 @@ void dae::TextComponent::Render() const
     if (m_textTexture != nullptr)
     {
         const auto& pos = GetOwner().GetWorldPosition();
-        Renderer::GetInstance().RenderTexture(*m_textTexture, pos.x, pos.y);
+        Renderer::GetInstance().RenderTexture(*m_textTexture, pos[0], pos[1]);
     }
 }
 

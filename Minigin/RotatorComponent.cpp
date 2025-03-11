@@ -18,12 +18,9 @@ void dae::RotatorComponent::Update()
                static_cast<float>(m_AngleSpeed) * deltaTime;
     m_Angle = fmod(m_Angle, m_AngleMax);
 
-    glm::vec2 pos{};
     float angleRad = glm::radians(m_Angle);
 
-    pos.x = m_Radius * cos(angleRad);
-
-    pos.y = m_Radius * sin(angleRad);
+    glm::vec2 pos{ m_Radius * cos(angleRad), m_Radius * sin(angleRad) };
 
     GetOwner().SetLocalPosition(pos);
 }

@@ -21,11 +21,12 @@ dae::MoveCommand::MoveCommand(GameObject& pGameObject,
 
 void dae::MoveCommand::Execute()
 {
+    auto deltaTime = EngineTime::GetInstance().GetDeltaTime();
     auto& worldPos = GetGameObject()->GetWorldPosition();
-    auto pos = worldPos + glm::vec2{
-        m_Direction.x * (m_Speed * EngineTime::GetInstance().GetDeltaTime()),
-        m_Direction.y * (m_Speed * EngineTime::GetInstance().GetDeltaTime())
-    };
+    auto pos =
+        worldPos +
+        glm::vec2{ static_cast<float>(m_Direction[0] * m_Speed) * deltaTime,
+                   static_cast<float>(m_Direction[1] * m_Speed) * deltaTime };
     GetGameObject()->SetLocalPosition(pos);
 }
 
