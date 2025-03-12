@@ -253,6 +253,7 @@ if(WIN32)
 	find_program(CLANG_TIDY_EXE NAMES "clang-tidy" REQUIRED)  
 	set(CLANG_TIDY_COMMAND   
 		"${CLANG_TIDY_EXE}"   
+	    "--fix"  # This tells clang-tidy to apply fixes
         "--extra-arg=/EHsc"  # ALLOW THROWS IN MSVC EXTRA ARG => SOURCE: https://stackoverflow.com/questions/75496284/clang-tidy-emits-errors-about-exceptions-being-disabled-when-they-are-enabled
 	)  
 	set_target_properties(${TARGET_NAME} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")  

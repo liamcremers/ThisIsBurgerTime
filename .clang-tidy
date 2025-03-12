@@ -2,3 +2,4 @@ Checks: 'cppcoreguidelines-*,modernize-*,
 readability-qualified-auto,readability-redundant-'
 HeaderFilterRegex: 'Minigin/.*'
 SystemHeaders: false
+FormatStyle: 'file'       
