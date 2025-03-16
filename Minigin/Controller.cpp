@@ -4,7 +4,9 @@
 #include <Xinput.h>
 #include <minwinbase.h>
 #include <unordered_map>
+#include <vector>
 #include <string>
+#include <algorithm>
 
 namespace dae
 {
@@ -22,6 +24,7 @@ namespace dae
         [[nodiscard]] auto IsReleased(unsigned int button) const -> bool;
 
         void AddCommand(Command& pCommand, unsigned int button);
+        void RemoveCommand(Command& pCommand, unsigned int button);
 
     private:
         DWORD m_ControllerIndex{};
@@ -30,7 +33,7 @@ namespace dae
         int m_ButtonsPressedThisFrame{};
         int m_ButtonsReleasedThisFrame{};
 
-        std::unordered_map<unsigned int, Command*> m_CommandsMap;
+        std::unordered_map<unsigned int, std::vector<Command*>> m_CommandsMap;
     };
 
     void Controller::ControllerImpl::ProcessInput()
@@ -47,27 +50,30 @@ namespace dae
         m_ButtonsReleasedThisFrame =
             buttonChanges & (~m_CurrentState.Gamepad.wButtons);
 
-        for (auto& [key, command] : m_CommandsMap)
+        for (auto& [key, commands] : m_CommandsMap)
         {
-            if (IsDownThisFrame(key))
+            for (auto& command : commands)
             {
-                //command->Execute();
-                //break;
-            }
-            if (IsUpThisFrame(key))
-            {
-                //command->Execute();
-                //break;
-            }
-            if (IsPressed(key))
-            {
-                command->Execute();
-                break;
-            }
-            if (IsReleased(key))
-            {
-                //command->Execute();
-                //break;
+                if (IsDownThisFrame(key))
+                {
+                    //command->Execute();
+                    //break;
+                }
+                if (IsUpThisFrame(key))
+                {
+                    //command->Execute();
+                    //break;
+                }
+                if (IsPressed(key))
+                {
+                    command->Execute();
+                    break;
+                }
+                if (IsReleased(key))
+                {
+                    //command->Execute();
+                    //break;
+                }
             }
         }
     }
@@ -99,7 +105,18 @@ namespace dae
     void Controller::ControllerImpl::AddCommand(Command& pCommand,
                                                 unsigned int button)
     {
-        m_CommandsMap[button] = &pCommand;
+        m_CommandsMap[button].push_back(&pCommand);
+    }
+
+    void Controller::ControllerImpl::RemoveCommand(Command& pCommand,
+                                                   unsigned int button)
+    {
+        auto& commands = m_CommandsMap[button];
+        std::erase(commands, &pCommand);
+        if (commands.empty())
+        {
+            m_CommandsMap.erase(button);
+        }
     }
 
     ////////////////////////
@@ -117,5 +134,10 @@ namespace dae
     void Controller::AddCommand(Command& pCommand, unsigned int button)
     {
         m_pImpl->AddCommand(pCommand, button);
+    }
+
+    void Controller::RemoveCommand(Command& pCommand, unsigned int button)
+    {
+        m_pImpl->RemoveCommand(pCommand, button);
     }
 }

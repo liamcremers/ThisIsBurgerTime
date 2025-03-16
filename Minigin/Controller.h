@@ -11,6 +11,7 @@ namespace dae
         ~Controller();
         void ProcessInput();
         void AddCommand(Command& pCommand, unsigned int button);
+        void RemoveCommand(Command& pCommand, unsigned int button);
 
     private:
         class ControllerImpl;

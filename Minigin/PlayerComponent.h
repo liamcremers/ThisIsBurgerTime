@@ -11,11 +11,11 @@ namespace dae
     class Keyboard;
     class MoveCommand;
 
-    class PlayerComponent final : public BaseComponent
+    class PlayerInputComponent final : public BaseComponent
     {
     public:
-        PlayerComponent(GameObject& parent, unsigned long idx);
-        ~PlayerComponent();
+        PlayerInputComponent(GameObject& parent, unsigned long idx);
+        ~PlayerInputComponent();
         const Controller* GetController() const;
 
         void SetSpeed(int speed);

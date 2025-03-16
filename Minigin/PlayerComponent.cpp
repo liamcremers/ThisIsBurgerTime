@@ -7,7 +7,8 @@
 
 namespace dae
 {
-    PlayerComponent::PlayerComponent(GameObject& parent, unsigned long idx) :
+    PlayerInputComponent::PlayerInputComponent(GameObject& parent,
+                                               unsigned long idx) :
         BaseComponent(parent),
         m_pController{ std::make_unique<Controller>(idx) },
         m_pMoveCommandUp{ std::make_unique<MoveCommand>(parent, MoveUp) },
@@ -27,14 +28,23 @@ namespace dae
         SetUpKeyboardControls(idx);
     }
 
-    PlayerComponent::~PlayerComponent() = default;
+    PlayerInputComponent::~PlayerInputComponent()
+    {
+        m_pController->RemoveCommand(*m_pMoveCommandUp, XINPUT_GAMEPAD_DPAD_UP);
+        m_pController->RemoveCommand(*m_pMoveCommandDown,
+                                     XINPUT_GAMEPAD_DPAD_DOWN);
+        m_pController->RemoveCommand(*m_pMoveCommandLeft,
+                                     XINPUT_GAMEPAD_DPAD_LEFT);
+        m_pController->RemoveCommand(*m_pMoveCommandRight,
+                                     XINPUT_GAMEPAD_DPAD_RIGHT);
+    }
 
-    auto PlayerComponent::GetController() const -> const Controller*
+    auto PlayerInputComponent::GetController() const -> const Controller*
     {
         return m_pController.get();
     }
 
-    void PlayerComponent::SetSpeed(int speed)
+    void PlayerInputComponent::SetSpeed(int speed)
     {
         m_pMoveCommandUp->SetSpeed(speed);
         m_pMoveCommandDown->SetSpeed(speed);
@@ -42,7 +52,7 @@ namespace dae
         m_pMoveCommandRight->SetSpeed(speed);
     }
 
-    void PlayerComponent::SetUpKeyboardControls(unsigned long idx)
+    void PlayerInputComponent::SetUpKeyboardControls(unsigned long idx)
     {
         auto& inputManager = InputManager::GetInstance();
         if (idx == 0)
