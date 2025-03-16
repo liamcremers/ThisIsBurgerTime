@@ -12,6 +12,7 @@ namespace dae
     {
     public:
         LivesUIComponent(GameObject& parent, Font& font);
+        ~LivesUIComponent() override;
 
     protected:
         void OnNotify(const std::string& eventId) override;

@@ -1,7 +1,11 @@
 #include "Observer.h"
+#include <cassert>
+
+Subject::~Subject() { Notify("SubjectDestroyed"); }
 
 void Subject::AddObserver(Observer* observer)
 {
+    assert(observer && "Observer must not be null");
     m_ObserverList.push_back(observer);
 }
 
@@ -12,7 +16,7 @@ void Subject::RemoveObserver(Observer* observer)
 
 void Subject::Notify(const std::string& eventId)
 {
-    for (auto* observer : m_ObserverList)
+    for (const auto& observer : m_ObserverList)
     {
         observer->OnNotify(eventId);
     }

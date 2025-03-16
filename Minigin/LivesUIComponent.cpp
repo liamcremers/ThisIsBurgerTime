@@ -1,6 +1,10 @@
 #include "LivesUIComponent.h"
 #include "LivesComponent.h"
 #include "GameObject.h"
+#include "TextComponent.h"
+#include "Font.h"
+#include <cassert>
+#include <string>
 
 dae::LivesUIComponent::LivesUIComponent(GameObject& parent, Font& font) :
     BaseComponent{ parent },
@@ -14,12 +18,20 @@ dae::LivesUIComponent::LivesUIComponent(GameObject& parent, Font& font) :
     m_pLivesComponent->AddObserver(this);
 }
 
+dae::LivesUIComponent::~LivesUIComponent()
+{
+    if (m_pLivesComponent)
+        m_pLivesComponent->RemoveObserver(this);
+}
+
 void dae::LivesUIComponent::OnNotify(const std::string& eventId)
 {
     if (eventId == "LifeLost")
         UpdateUI();
-    if (eventId == "GameOver")
+    else if (eventId == "GameOver")
         UIGameOver();
+    else if (eventId == "SubjectDestroyed")
+        m_pLivesComponent = nullptr;
 }
 
 void dae::LivesUIComponent::UpdateUI()
