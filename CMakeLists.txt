@@ -300,13 +300,12 @@ else()
     set(STEAM_DLL_PATH "${STEAMWORKS_DIR}/redistributable_bin")
 endif()
 
-# Post-Build: Copy all Steamworks DLLs (wildcard style)
-file(GLOB STEAM_DLLS "${STEAMWORKS_DIR}/redistributable_bin/*.dll")
+# Post-Build: Copy all Steamworks DLLs (wildcard style) no matter how deep they are in the directory structure
+file(GLOB_RECURSE STEAM_DLLS "${STEAMWORKS_DIR}/redistributable_bin/**/*.dll")
 
 add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${STEAM_DLLS} "$<TARGET_FILE_DIR:${TARGET_NAME}>"
 )
-
 
 # Post-Build: Create steam_appid.txt
 add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
