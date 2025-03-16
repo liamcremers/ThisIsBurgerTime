@@ -24,32 +24,54 @@ namespace dae
 
     {
         InputManager::GetInstance().AddController(m_pController.get());
-        m_pController->AddCommand(*m_pMoveCommandUp, XINPUT_GAMEPAD_DPAD_UP);
+        m_pController->AddCommand(*m_pMoveCommandUp,
+                                  XINPUT_GAMEPAD_DPAD_UP,
+                                  dae::ButtonState::Pressed);
         m_pController->AddCommand(*m_pMoveCommandDown,
-                                  XINPUT_GAMEPAD_DPAD_DOWN);
+                                  XINPUT_GAMEPAD_DPAD_DOWN,
+                                  dae::ButtonState::Pressed);
         m_pController->AddCommand(*m_pMoveCommandLeft,
-                                  XINPUT_GAMEPAD_DPAD_LEFT);
+                                  XINPUT_GAMEPAD_DPAD_LEFT,
+                                  dae::ButtonState::Pressed);
         m_pController->AddCommand(*m_pMoveCommandRight,
-                                  XINPUT_GAMEPAD_DPAD_RIGHT);
-        m_pController->AddCommand(*m_pSelfDamageCommand, XINPUT_GAMEPAD_X);
-        m_pController->AddCommand(*m_pAdd100PointsCommand, XINPUT_GAMEPAD_A);
-        m_pController->AddCommand(*m_pAdd10PointsCommand, XINPUT_GAMEPAD_B);
+                                  XINPUT_GAMEPAD_DPAD_RIGHT,
+                                  dae::ButtonState::Pressed);
+        m_pController->AddCommand(*m_pSelfDamageCommand,
+                                  XINPUT_GAMEPAD_X,
+                                  dae::ButtonState::DownThisFrame);
+        m_pController->AddCommand(*m_pAdd100PointsCommand,
+                                  XINPUT_GAMEPAD_A,
+                                  dae::ButtonState::DownThisFrame);
+        m_pController->AddCommand(*m_pAdd10PointsCommand,
+                                  XINPUT_GAMEPAD_B,
+                                  dae::ButtonState::DownThisFrame);
 
         SetUpKeyboardControls(idx);
     }
 
     PlayerInputComponent::~PlayerInputComponent()
     {
-        m_pController->RemoveCommand(*m_pMoveCommandUp, XINPUT_GAMEPAD_DPAD_UP);
+        m_pController->RemoveCommand(*m_pMoveCommandUp,
+                                     XINPUT_GAMEPAD_DPAD_UP,
+                                     dae::ButtonState::Pressed);
         m_pController->RemoveCommand(*m_pMoveCommandDown,
-                                     XINPUT_GAMEPAD_DPAD_DOWN);
+                                     XINPUT_GAMEPAD_DPAD_DOWN,
+                                     dae::ButtonState::Pressed);
         m_pController->RemoveCommand(*m_pMoveCommandLeft,
-                                     XINPUT_GAMEPAD_DPAD_LEFT);
+                                     XINPUT_GAMEPAD_DPAD_LEFT,
+                                     dae::ButtonState::Pressed);
         m_pController->RemoveCommand(*m_pMoveCommandRight,
-                                     XINPUT_GAMEPAD_DPAD_RIGHT);
-        m_pController->RemoveCommand(*m_pSelfDamageCommand, XINPUT_GAMEPAD_X);
-        m_pController->RemoveCommand(*m_pAdd100PointsCommand, XINPUT_GAMEPAD_A);
-        m_pController->RemoveCommand(*m_pAdd10PointsCommand, XINPUT_GAMEPAD_B);
+                                     XINPUT_GAMEPAD_DPAD_RIGHT,
+                                     dae::ButtonState::Pressed);
+        m_pController->RemoveCommand(*m_pSelfDamageCommand,
+                                     XINPUT_GAMEPAD_X,
+                                     dae::ButtonState::DownThisFrame);
+        m_pController->RemoveCommand(*m_pAdd100PointsCommand,
+                                     XINPUT_GAMEPAD_A,
+                                     dae::ButtonState::DownThisFrame);
+        m_pController->RemoveCommand(*m_pAdd10PointsCommand,
+                                     XINPUT_GAMEPAD_B,
+                                     dae::ButtonState::DownThisFrame);
     }
 
     auto PlayerInputComponent::GetController() const -> const Controller*
