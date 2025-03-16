@@ -20,4 +20,9 @@ void Subject::Notify(const std::string& eventId)
     {
         observer->OnNotify(eventId);
     }
+    if (eventId == "SubjectDestroyed")
+        for (const auto& observer : m_ObserverList)
+        {
+            observer->OnDestroy();
+        }
 }

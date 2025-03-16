@@ -11,12 +11,13 @@ dae::LivesUIComponent::LivesUIComponent(GameObject& parent,
                                         LivesComponent* pLivesComponent) :
     BaseComponent{ parent },
     m_pFont{ font },
-    m_pTextComponent{ parent.AddComponent<TextComponent>("Lives: ", font) },
-    m_pLivesComponent{ pLivesComponent }
+    m_pLivesComponent{ pLivesComponent },
+    m_pTextComponent{ parent.AddComponent<TextComponent>(
+        "Lives: " + std::to_string(m_pLivesComponent->GetLives()),
+        font) }
 {
     assert(m_pLivesComponent && "LivesUIComponent depends on LivesComponent");
     m_pLivesComponent->AddObserver(this);
-    m_pTextComponent->SetText("Lives: ");
 }
 
 dae::LivesUIComponent::~LivesUIComponent()
@@ -31,9 +32,9 @@ void dae::LivesUIComponent::OnNotify(const std::string& eventId)
         UpdateUI();
     else if (eventId == "GameOver")
         UIGameOver();
-    else if (eventId == "SubjectDestroyed")
-        m_pLivesComponent = nullptr;
 }
+
+void dae::LivesUIComponent::OnDestroy() { m_pLivesComponent = nullptr; }
 
 void dae::LivesUIComponent::UpdateUI()
 {
