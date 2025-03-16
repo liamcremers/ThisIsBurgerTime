@@ -7,11 +7,14 @@ namespace dae
     class Font;
     class LivesComponent;
     class TextComponent;
+    class LivesComponent;
 
     class LivesUIComponent final : public BaseComponent, public Observer
     {
     public:
-        LivesUIComponent(GameObject& parent, Font& font);
+        LivesUIComponent(GameObject& parent,
+                         Font& font,
+                         LivesComponent* livesComponent);
         ~LivesUIComponent() override;
 
     protected:

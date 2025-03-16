@@ -7,11 +7,14 @@ namespace dae
     class Font;
     class ScoreComponent;
     class TextComponent;
+    class ScoreComponent;
 
     class ScoreUIComponent final : public BaseComponent, public Observer
     {
     public:
-        ScoreUIComponent(GameObject& parent, Font& font);
+        ScoreUIComponent(GameObject& parent,
+                         Font& font,
+                         ScoreComponent* pScoreComp);
         ~ScoreUIComponent() override;
 
     protected:

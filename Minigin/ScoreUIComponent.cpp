@@ -6,13 +6,13 @@
 #include <cassert>
 #include <string>
 
-dae::ScoreUIComponent::ScoreUIComponent(GameObject& parent, Font& font) :
+dae::ScoreUIComponent::ScoreUIComponent(GameObject& parent,
+                                        Font& font,
+                                        ScoreComponent* pScoreComp) :
     BaseComponent{ parent },
     m_pFont{ font },
     m_pTextComponent{ parent.AddComponent<TextComponent>("Score: ", font) },
-    m_pScoreComponent{ parent.TryGetComponent<ScoreComponent>().has_value() ?
-                           parent.TryGetComponent<ScoreComponent>().value() :
-                           nullptr }
+    m_pScoreComponent{ pScoreComp }
 {
     assert(m_pScoreComponent && "ScoreUIComponent depends on ScoreComponent");
     m_pScoreComponent->AddObserver(this);

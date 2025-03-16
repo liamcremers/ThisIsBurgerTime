@@ -6,16 +6,17 @@
 #include <cassert>
 #include <string>
 
-dae::LivesUIComponent::LivesUIComponent(GameObject& parent, Font& font) :
+dae::LivesUIComponent::LivesUIComponent(GameObject& parent,
+                                        Font& font,
+                                        LivesComponent* pLivesComponent) :
     BaseComponent{ parent },
     m_pFont{ font },
     m_pTextComponent{ parent.AddComponent<TextComponent>("Lives: ", font) },
-    m_pLivesComponent{ parent.TryGetComponent<LivesComponent>().has_value() ?
-                           parent.TryGetComponent<LivesComponent>().value() :
-                           nullptr }
+    m_pLivesComponent{ pLivesComponent }
 {
     assert(m_pLivesComponent && "LivesUIComponent depends on LivesComponent");
     m_pLivesComponent->AddObserver(this);
+    m_pTextComponent->SetText("Lives: ");
 }
 
 dae::LivesUIComponent::~LivesUIComponent()
