@@ -23,4 +23,5 @@ class Observer
 
 protected:
     virtual void OnNotify(const std::string& eventId) = 0;
+    virtual void OnDestroy() = 0;
 };

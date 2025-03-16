@@ -11,8 +11,10 @@ dae::ScoreUIComponent::ScoreUIComponent(GameObject& parent,
                                         ScoreComponent* pScoreComp) :
     BaseComponent{ parent },
     m_pFont{ font },
-    m_pTextComponent{ parent.AddComponent<TextComponent>("Score: ", font) },
-    m_pScoreComponent{ pScoreComp }
+    m_pScoreComponent{ pScoreComp },
+    m_pTextComponent{ parent.AddComponent<TextComponent>(
+        "Score: " + std::to_string(m_pScoreComponent->GetScore()),
+        font) }
 {
     assert(m_pScoreComponent && "ScoreUIComponent depends on ScoreComponent");
     m_pScoreComponent->AddObserver(this);
@@ -28,9 +30,9 @@ void dae::ScoreUIComponent::OnNotify(const std::string& eventId)
 {
     if (eventId == "ScoreUpdated")
         UpdateUI();
-    else if (eventId == "SubjectDestroyed")
-        m_pScoreComponent = nullptr;
 }
+
+void dae::ScoreUIComponent::OnDestroy() { m_pScoreComponent = nullptr; }
 
 void dae::ScoreUIComponent::UpdateUI()
 {

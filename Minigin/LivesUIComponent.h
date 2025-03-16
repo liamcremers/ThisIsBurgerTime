@@ -19,6 +19,7 @@ namespace dae
 
     protected:
         void OnNotify(const std::string& eventId) override;
+        void OnDestroy() override;
 
     private:
         void UpdateUI();
