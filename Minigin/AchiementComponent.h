@@ -19,8 +19,11 @@ namespace dae
 
     protected:
         void OnNotify(const std::string& eventId) override;
+        void OnDestroy() override;
 
     private:
+        constexpr static int SCORE_TO_UNLOCK = 500;
+
         ScoreComponent* m_pScoreComponent;
         bool m_AchievementUnlocked;
 

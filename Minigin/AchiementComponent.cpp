@@ -14,7 +14,7 @@ dae::AchievementComponent::AchievementComponent(GameObject& parent,
 
     if (!SteamAPI_Init())
     {
-        std::cerr << "Steam must be running to unlock achievements.\n";
+        assert("Steam must be running to unlock achievements.\n" && false);
     }
 }
 
@@ -22,7 +22,7 @@ void dae::AchievementComponent::OnNotify(const std::string& eventId)
 {
     if (eventId == "ScoreUpdated" && !m_AchievementUnlocked)
     {
-        if (m_pScoreComponent->GetScore() >= 500)
+        if (m_pScoreComponent->GetScore() >= SCORE_TO_UNLOCK)
         {
             UnlockAchievement("ACH_WIN_ONE_GAME");
             m_AchievementUnlocked = true;
@@ -30,12 +30,13 @@ void dae::AchievementComponent::OnNotify(const std::string& eventId)
     }
 }
 
+void dae::AchievementComponent::OnDestroy() { m_pScoreComponent = nullptr; }
+
 void dae::AchievementComponent::UnlockAchievement(const char* achievementID)
 {
     if (SteamUserStats())
     {
         SteamUserStats()->SetAchievement(achievementID);
         SteamUserStats()->StoreStats();
-        std::cout << "Achievement unlocked: " << achievementID << "\n";
     }
 }

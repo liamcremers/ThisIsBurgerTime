@@ -132,7 +132,7 @@ static void load(const int windowWidth, const int windowHeight)
     go = std::make_unique<dae::GameObject>("instruction1");
     go->AddComponent<dae::TextComponent>(
         "Use the D-Pad to move the backfacing player, C to inflict damage, Z "
-        "and X to pick up pellets",
+        "and Q to pick up pellets",
         smallFont);
     go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
         { FPS_POS[0], FPS_POS[1] + INSTRUCTION_OFFSET_2 });
@@ -152,16 +152,13 @@ auto main(int, char*[]) -> int
 #endif
     if (!SteamAPI_Init())
     {
-        std::cerr << "Fatal Error - Steam must be running to play this "
-                     "game (SteamAPI_Init() failed)."
-                  << std::endl;
+        assert("Fatal Error - Steam must be running to play this game "
+               "(SteamAPI_Init() failed)." &&
+               false);
         return 1;
     }
     else
-    {
         std::cout << "Successfully initialized steam." << std::endl;
-        //
-    }
 
     dae::Minigin engine(data_location);
     engine.Run([&engine]()

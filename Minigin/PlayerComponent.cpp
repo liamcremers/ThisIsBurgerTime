@@ -16,9 +16,11 @@ namespace dae
         m_pMoveCommandLeft{ std::make_unique<MoveCommand>(parent, MoveLeft) },
         m_pMoveCommandRight{ std::make_unique<MoveCommand>(parent, MoveRight) },
         m_pSelfDamageCommand{ std::make_unique<SelfDamageCommand>(parent) },
-        m_pGet100PointsCommand{ std::make_unique<AddPointsCommand>(parent,
-                                                                   100) },
-        m_pGet10PointsCommand{ std::make_unique<AddPointsCommand>(parent, 10) }
+        m_pAdd100PointsCommand{
+            std::make_unique<AddPointsCommand>(parent, HUNDRED_POINTS)
+        },
+        m_pAdd10PointsCommand{ std::make_unique<AddPointsCommand>(parent,
+                                                                  TEN_POINTS) }
 
     {
         InputManager::GetInstance().AddController(m_pController.get());
@@ -30,8 +32,8 @@ namespace dae
         m_pController->AddCommand(*m_pMoveCommandRight,
                                   XINPUT_GAMEPAD_DPAD_RIGHT);
         m_pController->AddCommand(*m_pSelfDamageCommand, XINPUT_GAMEPAD_X);
-        m_pController->AddCommand(*m_pGet100PointsCommand, XINPUT_GAMEPAD_A);
-        m_pController->AddCommand(*m_pGet10PointsCommand, XINPUT_GAMEPAD_B);
+        m_pController->AddCommand(*m_pAdd100PointsCommand, XINPUT_GAMEPAD_A);
+        m_pController->AddCommand(*m_pAdd10PointsCommand, XINPUT_GAMEPAD_B);
 
         SetUpKeyboardControls(idx);
     }
@@ -46,8 +48,8 @@ namespace dae
         m_pController->RemoveCommand(*m_pMoveCommandRight,
                                      XINPUT_GAMEPAD_DPAD_RIGHT);
         m_pController->RemoveCommand(*m_pSelfDamageCommand, XINPUT_GAMEPAD_X);
-        m_pController->RemoveCommand(*m_pGet100PointsCommand, XINPUT_GAMEPAD_A);
-        m_pController->RemoveCommand(*m_pGet10PointsCommand, XINPUT_GAMEPAD_B);
+        m_pController->RemoveCommand(*m_pAdd100PointsCommand, XINPUT_GAMEPAD_A);
+        m_pController->RemoveCommand(*m_pAdd10PointsCommand, XINPUT_GAMEPAD_B);
     }
 
     auto PlayerInputComponent::GetController() const -> const Controller*
@@ -82,6 +84,11 @@ namespace dae
             inputManager.AddKeyboardCommand(SDLK_s, m_pMoveCommandDown.get());
             inputManager.AddKeyboardCommand(SDLK_a, m_pMoveCommandLeft.get());
             inputManager.AddKeyboardCommand(SDLK_d, m_pMoveCommandRight.get());
+            inputManager.AddKeyboardCommand(SDLK_c, m_pSelfDamageCommand.get());
+            inputManager.AddKeyboardCommand(SDLK_z,
+                                            m_pAdd100PointsCommand.get());
+            inputManager.AddKeyboardCommand(SDLK_q,
+                                            m_pAdd10PointsCommand.get());
         }
     }
 }
