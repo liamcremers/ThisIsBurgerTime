@@ -14,7 +14,12 @@ namespace dae
         m_pMoveCommandUp{ std::make_unique<MoveCommand>(parent, MoveUp) },
         m_pMoveCommandDown{ std::make_unique<MoveCommand>(parent, MoveDown) },
         m_pMoveCommandLeft{ std::make_unique<MoveCommand>(parent, MoveLeft) },
-        m_pMoveCommandRight{ std::make_unique<MoveCommand>(parent, MoveRight) }
+        m_pMoveCommandRight{ std::make_unique<MoveCommand>(parent, MoveRight) },
+        m_pSelfDamageCommand{ std::make_unique<SelfDamageCommand>(parent) },
+        m_pGet100PointsCommand{ std::make_unique<AddPointsCommand>(parent,
+                                                                   100) },
+        m_pGet10PointsCommand{ std::make_unique<AddPointsCommand>(parent, 10) }
+
     {
         InputManager::GetInstance().AddController(m_pController.get());
         m_pController->AddCommand(*m_pMoveCommandUp, XINPUT_GAMEPAD_DPAD_UP);
@@ -24,6 +29,9 @@ namespace dae
                                   XINPUT_GAMEPAD_DPAD_LEFT);
         m_pController->AddCommand(*m_pMoveCommandRight,
                                   XINPUT_GAMEPAD_DPAD_RIGHT);
+        m_pController->AddCommand(*m_pSelfDamageCommand, XINPUT_GAMEPAD_X);
+        m_pController->AddCommand(*m_pGet100PointsCommand, XINPUT_GAMEPAD_A);
+        m_pController->AddCommand(*m_pGet10PointsCommand, XINPUT_GAMEPAD_B);
 
         SetUpKeyboardControls(idx);
     }
@@ -37,6 +45,9 @@ namespace dae
                                      XINPUT_GAMEPAD_DPAD_LEFT);
         m_pController->RemoveCommand(*m_pMoveCommandRight,
                                      XINPUT_GAMEPAD_DPAD_RIGHT);
+        m_pController->RemoveCommand(*m_pSelfDamageCommand, XINPUT_GAMEPAD_X);
+        m_pController->RemoveCommand(*m_pGet100PointsCommand, XINPUT_GAMEPAD_A);
+        m_pController->RemoveCommand(*m_pGet10PointsCommand, XINPUT_GAMEPAD_B);
     }
 
     auto PlayerInputComponent::GetController() const -> const Controller*

@@ -10,6 +10,8 @@ namespace dae
     class Controller;
     class Keyboard;
     class MoveCommand;
+    class SelfDamageCommand;
+    class AddPointsCommand;
 
     class PlayerInputComponent final : public BaseComponent
     {
@@ -32,11 +34,17 @@ namespace dae
         static constexpr unsigned int XINPUT_GAMEPAD_DPAD_DOWN = 0x0002;
         static constexpr unsigned int XINPUT_GAMEPAD_DPAD_LEFT = 0x0004;
         static constexpr unsigned int XINPUT_GAMEPAD_DPAD_RIGHT = 0x0008;
+        static constexpr unsigned int XINPUT_GAMEPAD_A = 0x1000;
+        static constexpr unsigned int XINPUT_GAMEPAD_B = 0x2000;
+        static constexpr unsigned int XINPUT_GAMEPAD_X = 0x4000;
 
         std::unique_ptr<Controller> m_pController{};
         std::unique_ptr<MoveCommand> m_pMoveCommandUp{};
         std::unique_ptr<MoveCommand> m_pMoveCommandDown{};
         std::unique_ptr<MoveCommand> m_pMoveCommandLeft{};
         std::unique_ptr<MoveCommand> m_pMoveCommandRight{};
+        std::unique_ptr<SelfDamageCommand> m_pSelfDamageCommand;
+        std::unique_ptr<AddPointsCommand> m_pGet100PointsCommand;
+        std::unique_ptr<AddPointsCommand> m_pGet10PointsCommand;
     };
 }

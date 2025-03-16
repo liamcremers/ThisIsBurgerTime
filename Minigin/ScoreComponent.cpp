@@ -7,7 +7,7 @@ dae::ScoreComponent::ScoreComponent(GameObject& parent) :
 void dae::ScoreComponent::AddScore(int addedScore)
 {
     m_Score += addedScore;
-    Notify("ScoreAdded");
+    Notify("ScoreUpdated");
 }
 
 auto dae::ScoreComponent::GetScore() const -> int { return m_Score; }

@@ -9,7 +9,7 @@ dae::LivesComponent::LivesComponent(GameObject& parent, int lives) :
 void dae::LivesComponent::LoseLife()
 {
     if (m_Lives < 0)
-        assert("GameObject already has this component" && false);
+        assert("Dead player cannot lose more lives" && false);
 
     --m_Lives;
     Notify(m_Lives < 0 ? "GameOver" : "LifeLost");

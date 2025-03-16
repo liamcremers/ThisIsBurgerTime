@@ -26,7 +26,7 @@ dae::ScoreUIComponent::~ScoreUIComponent()
 
 void dae::ScoreUIComponent::OnNotify(const std::string& eventId)
 {
-    if (eventId == "ScoreAdded")
+    if (eventId == "ScoreUpdated")
         UpdateUI();
     else if (eventId == "SubjectDestroyed")
         m_pScoreComponent = nullptr;

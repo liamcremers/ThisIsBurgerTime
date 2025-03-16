@@ -13,3 +13,4 @@
 #include "LivesUIComponent.h"
 #include "ScoreComponent.h"
 #include "ScoreUIComponent.h"
+#include "AchiementComponent.h"
