@@ -121,7 +121,7 @@ if(WIN32)
         ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp  
     )    
 
-    add_library(ImGui STATIC ${IMGUI_SRC})    
+    add_library(ImGui STATIC ${IMGUI_SRC})
     target_include_directories(ImGui PUBLIC ${imgui_SOURCE_DIR} ${SDL2_INCLUDE_DIR})    
     target_link_libraries(ImGui PRIVATE ${SDL2_LIBRARIES})    
 

@@ -9,3 +9,5 @@
 #include "TextComponent.h"
 #include "RotatorComponent.h"
 #include "PlayerComponent.h"
+#include "LivesComponent.h"
+#include "LivesUIComponent.h"

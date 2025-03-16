@@ -1,8 +1,6 @@
 #pragma once
 #include "BaseComponent.h"
 
-#include <memory>
-
 namespace dae
 {
     class Font;
@@ -16,6 +14,6 @@ namespace dae
 
     private:
         Font& m_pFont;
-        TextComponent* m_pTextComponent;
+        TextComponent* m_pTextComponent{};
     };
 }
