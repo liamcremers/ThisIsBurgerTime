@@ -11,6 +11,9 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+
+#include <steam_api.h>
+
 #include "Minigin.h"
 #include "InputManager.h"
 #include "SceneManager.h"
@@ -121,6 +124,7 @@ void dae::Minigin::GameLoop()
 
         m_continue = InputManager::GetInstance().ProcessInput();
 
+        SteamAPI_RunCallbacks();
         sceneManager.Update();
         while (m_lag >= engineTime.GetFixedTimeStep())
         {

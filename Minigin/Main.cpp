@@ -7,6 +7,8 @@
 #endif
 #endif
 
+#include <steam_api.h>
+
 #include "Minigin.h"
 #include "ResourceManager.h"
 #include "InputManager.h"
@@ -160,8 +162,19 @@ auto main(int, char*[]) -> int
     if (!fs::exists(data_location))
         data_location = "../Data/";
 #endif
+    if (!SteamAPI_Init())
+    {
+        std::cerr << "Fatal Error - Steam must be running to play this "
+                     "game (SteamAPI_Init() failed)."
+                  << std::endl;
+        return 1;
+    }
+    else
+        std::cout << "Successfully initialized steam." << std::endl;
+
     dae::Minigin engine(data_location);
     engine.Run([&engine]()
                { load(engine.GetWindowWidth(), engine.GetWindowHeight()); });
+    SteamAPI_Shutdown();
     return 0;
 }
