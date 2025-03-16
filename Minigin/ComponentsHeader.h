@@ -11,3 +11,5 @@
 #include "PlayerComponent.h"
 #include "LivesComponent.h"
 #include "LivesUIComponent.h"
+#include "ScoreComponent.h"
+#include "ScoreUIComponent.h"

@@ -20,6 +20,7 @@ namespace fs = std::filesystem;
 
 static constexpr glm::vec2 FPS_POS = { 10.0f, 6.0f };
 static constexpr glm::vec2 LIVES_UI_POS = { 10.0f, 100.0f };
+static constexpr glm::vec2 SCORE_UI_POS = { 10.0f, 130.0f };
 static constexpr glm::vec2 LOGO_POS = { 216.0f, 180.0f };
 static constexpr glm::vec2 TEXT_POS = { 80.0f, 20.0f };
 static constexpr float OFFSET = 20.0f;
@@ -29,6 +30,7 @@ static constexpr float INSTRUCTION_OFFSET_2 = 80.0f;
 static constexpr float DIVISOR = 2.0f;
 static constexpr int BASE_SPEED = 100;
 static constexpr int START_LIVES = 3;
+static constexpr int SCORE_TEN = 10;
 static constexpr uint8_t LARGE_FONT_SIZE = 36;
 static constexpr uint8_t SMALL_FONT_SIZE = 14;
 
@@ -101,17 +103,29 @@ static void load(const int windowWidth, const int windowHeight)
         scene.Add(std::move(go));
     }
 
-    auto testGo = std::make_unique<dae::GameObject>("lives");
-    auto* livesComp = testGo->AddComponent<dae::LivesComponent>(START_LIVES);
-    testGo->AddComponent<dae::LivesUIComponent>(fpsFont);
-    testGo->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+    auto testLivesGo = std::make_unique<dae::GameObject>("lives");
+    auto* livesComp =
+        testLivesGo->AddComponent<dae::LivesComponent>(START_LIVES);
+    testLivesGo->AddComponent<dae::LivesUIComponent>(fpsFont);
+    testLivesGo->GetComponent<dae::TransformComponent>()->SetWorldPosition(
         LIVES_UI_POS);
+    scene.Add(std::move(testLivesGo));
 
-    scene.Add(std::move(testGo));
     livesComp->LoseLife();
     livesComp->LoseLife();
     livesComp->LoseLife();
     livesComp->LoseLife();
+
+    auto testScoreGo = std::make_unique<dae::GameObject>("Score");
+    auto* scoreComp = testScoreGo->AddComponent<dae::ScoreComponent>();
+    testScoreGo->AddComponent<dae::ScoreUIComponent>(fpsFont);
+    testScoreGo->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+        SCORE_UI_POS);
+    scene.Add(std::move(testScoreGo));
+
+    scoreComp->AddScore(SCORE_TEN);
+    scoreComp->AddScore(SCORE_TEN);
+    scoreComp->AddScore(SCORE_TEN);
 }
 
 auto main(int, char*[]) -> int
