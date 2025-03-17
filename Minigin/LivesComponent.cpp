@@ -13,12 +13,11 @@ void dae::LivesComponent::LoseLife()
 
     --m_Lives;
     m_LivesSubject.Notify(m_Lives < 0 ? "GameOver" : "LifeLost");
-    //Notify(m_Lives < 0 ? "GameOver" : "LifeLost");
 }
 
 auto dae::LivesComponent::GetLives() const -> int { return m_Lives; }
 
-auto dae::LivesComponent::GetLivesSubject() -> dae::Subject
+auto dae::LivesComponent::GetLivesSubject() -> dae::Subject&
 {
     return m_LivesSubject;
 }

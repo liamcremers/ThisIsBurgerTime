@@ -6,16 +6,21 @@ namespace dae
 {
     class Observer;
 
-    class Subject
+    class Subject final
     {
     public:
-        virtual ~Subject();
+        Subject() = default;
+        ~Subject();
+
         void AddObserver(Observer* observer);
         void RemoveObserver(Observer* observer);
-
         void Notify(const std::string& eventId);
 
-    protected:
+        Subject(const Subject& other) = delete;
+        Subject(Subject&& other) = delete;
+        Subject& operator=(const Subject& other) = delete;
+        Subject& operator=(Subject&& other) = delete;
+
     private:
         std::list<Observer*> m_ObserverList;
     };
@@ -25,6 +30,7 @@ namespace dae
         friend class Subject;
 
     protected:
+        Observer() = default;
         virtual void OnNotify(const std::string& eventId) = 0;
         virtual void OnDestroy() = 0;
     };

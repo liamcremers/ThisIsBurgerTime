@@ -9,12 +9,11 @@ namespace dae
     public:
         LivesComponent(GameObject& parent, int lives);
         void LoseLife();
+        Subject& GetLivesSubject();
         int GetLives() const;
-        Subject GetLivesSubject();
 
     private:
-        int m_Lives{};
-        int m_MaxHealth{};
         Subject m_LivesSubject{};
+        int m_Lives{};
     };
 }

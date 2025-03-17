@@ -68,19 +68,19 @@ static void SetupPlayers(const int windowWidth,
         scene.Add(std::move(player));
 
         // create UI elements
-        auto livesUI =
+        auto livesUIgo =
             std::make_unique<dae::GameObject>("LivesUI" + std::to_string(i));
-        livesUI->AddComponent<dae::LivesUIComponent>(smallFont, livesComp);
-        livesUI->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+        livesUIgo->AddComponent<dae::LivesUIComponent>(smallFont, livesComp);
+        livesUIgo->GetComponent<dae::TransformComponent>()->SetWorldPosition(
             LIVES_UI_POS + glm::vec2(0, i * LIVES_UI_OFFSET_Y));
-        scene.Add(std::move(livesUI));
+        scene.Add(std::move(livesUIgo));
 
-        auto scoreUI =
+        auto scoreUIgo =
             std::make_unique<dae::GameObject>("scoreUI" + std::to_string(i));
-        scoreUI->AddComponent<dae::ScoreUIComponent>(smallFont, scoreComp);
-        scoreUI->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+        scoreUIgo->AddComponent<dae::ScoreUIComponent>(smallFont, scoreComp);
+        scoreUIgo->GetComponent<dae::TransformComponent>()->SetWorldPosition(
             SCORE_UI_POS + glm::vec2(0, i * SCORE_UI_OFFSET_Y));
-        scene.Add(std::move(scoreUI));
+        scene.Add(std::move(scoreUIgo));
 
         auto Achievements =
             std::make_unique<dae::GameObject>("Achiements" + std::to_string(i));

@@ -10,12 +10,18 @@ dae::AchievementComponent::AchievementComponent(GameObject& parent,
 {
     assert(m_pScoreComponent &&
            "dae::AchievementComponent depends on ScoreComponent");
-    m_pScoreComponent->AddObserver(this);
+    m_pScoreComponent->GetScoreSubject().AddObserver(this);
 
     if (!SteamAPI_Init())
     {
         assert("Steam must be running to unlock achievements.\n" && false);
     }
+}
+
+dae::AchievementComponent::~AchievementComponent()
+{
+    if (m_pScoreComponent)
+        m_pScoreComponent->GetScoreSubject().RemoveObserver(this);
 }
 
 void dae::AchievementComponent::OnNotify(const std::string& eventId)

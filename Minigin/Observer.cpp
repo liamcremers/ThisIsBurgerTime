@@ -1,7 +1,13 @@
 #include "Observer.h"
 #include <cassert>
 
-dae::Subject::~Subject() { Notify("SubjectDestroyed"); }
+dae::Subject::~Subject()
+{
+    for (const auto& observer : m_ObserverList)
+    {
+        observer->OnDestroy();
+    }
+}
 
 void dae::Subject::AddObserver(Observer* observer)
 {
@@ -20,9 +26,4 @@ void dae::Subject::Notify(const std::string& eventId)
     {
         observer->OnNotify(eventId);
     }
-    if (eventId == "SubjectDestroyed")
-        for (const auto& observer : m_ObserverList)
-        {
-            observer->OnDestroy();
-        }
 }

@@ -26,6 +26,7 @@ namespace dae
     public:
         GameObject(std::string name = {});
 
+        ~GameObject() = default;
         GameObject(const GameObject&) = delete;
         GameObject(GameObject&&) = delete;
         GameObject& operator=(const GameObject&) = delete;

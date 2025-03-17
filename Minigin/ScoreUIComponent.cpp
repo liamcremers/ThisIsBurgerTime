@@ -17,13 +17,13 @@ dae::ScoreUIComponent::ScoreUIComponent(GameObject& parent,
         font) }
 {
     assert(m_pScoreComponent && "ScoreUIComponent depends on ScoreComponent");
-    m_pScoreComponent->AddObserver(this);
+    m_pScoreComponent->GetScoreSubject().AddObserver(this);
 }
 
 dae::ScoreUIComponent::~ScoreUIComponent()
 {
     if (m_pScoreComponent)
-        m_pScoreComponent->RemoveObserver(this);
+        m_pScoreComponent->GetScoreSubject().RemoveObserver(this);
 }
 
 void dae::ScoreUIComponent::OnNotify(const std::string& eventId)

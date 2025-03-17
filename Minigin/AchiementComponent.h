@@ -10,23 +10,21 @@ namespace dae
     {
     public:
         AchievementComponent(GameObject& parent, ScoreComponent* pScoreComp);
+        ~AchievementComponent();
+        void OnNotify(const std::string& eventId) override;
+        void OnDestroy() override;
 
-        ~AchievementComponent() override = default;
         AchievementComponent(const AchievementComponent&) = delete;
         AchievementComponent(AchievementComponent&&) = delete;
         AchievementComponent& operator=(const AchievementComponent&) = delete;
         AchievementComponent& operator=(AchievementComponent&&) = delete;
 
-    protected:
-        void OnNotify(const std::string& eventId) override;
-        void OnDestroy() override;
-
     private:
+        void UnlockAchievement(const char* achievementID);
+
         constexpr static int SCORE_TO_UNLOCK = 500;
 
         ScoreComponent* m_pScoreComponent;
         bool m_Achievement_WinOneGameUnlocked;
-
-        void UnlockAchievement(const char* achievementID);
     };
 }
