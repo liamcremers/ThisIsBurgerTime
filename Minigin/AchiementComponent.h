@@ -10,8 +10,8 @@ namespace dae
     {
     public:
         AchievementComponent(GameObject& parent, ScoreComponent* pScoreComp);
-        ~AchievementComponent() override = default;
 
+        ~AchievementComponent() override = default;
         AchievementComponent(const AchievementComponent&) = delete;
         AchievementComponent(AchievementComponent&&) = delete;
         AchievementComponent& operator=(const AchievementComponent&) = delete;
@@ -25,7 +25,7 @@ namespace dae
         constexpr static int SCORE_TO_UNLOCK = 500;
 
         ScoreComponent* m_pScoreComponent;
-        bool m_AchievementUnlocked;
+        bool m_Achievement_WinOneGameUnlocked;
 
         void UnlockAchievement(const char* achievementID);
     };

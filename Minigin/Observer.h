@@ -1,27 +1,31 @@
 #pragma once
 #include <list>
 #include <string>
-class Observer;
 
-class Subject
+namespace dae
 {
-public:
-    virtual ~Subject();
-    void AddObserver(Observer* observer);
-    void RemoveObserver(Observer* observer);
+    class Observer;
 
-protected:
-    void Notify(const std::string& eventId);
+    class Subject
+    {
+    public:
+        virtual ~Subject();
+        void AddObserver(Observer* observer);
+        void RemoveObserver(Observer* observer);
 
-private:
-    std::list<Observer*> m_ObserverList{};
-};
+        void Notify(const std::string& eventId);
 
-class Observer
-{
-    friend class Subject;
+    protected:
+    private:
+        std::list<Observer*> m_ObserverList;
+    };
 
-protected:
-    virtual void OnNotify(const std::string& eventId) = 0;
-    virtual void OnDestroy() = 0;
-};
+    class Observer
+    {
+        friend class Subject;
+
+    protected:
+        virtual void OnNotify(const std::string& eventId) = 0;
+        virtual void OnDestroy() = 0;
+    };
+}

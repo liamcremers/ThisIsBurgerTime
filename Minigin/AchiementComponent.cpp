@@ -6,7 +6,7 @@ dae::AchievementComponent::AchievementComponent(GameObject& parent,
                                                 ScoreComponent* pScoreComp) :
     BaseComponent(parent),
     m_pScoreComponent(pScoreComp),
-    m_AchievementUnlocked(false)
+    m_Achievement_WinOneGameUnlocked(false)
 {
     assert(m_pScoreComponent &&
            "dae::AchievementComponent depends on ScoreComponent");
@@ -20,12 +20,12 @@ dae::AchievementComponent::AchievementComponent(GameObject& parent,
 
 void dae::AchievementComponent::OnNotify(const std::string& eventId)
 {
-    if (eventId == "ScoreUpdated" && !m_AchievementUnlocked)
+    if (eventId == "ScoreUpdated" && !m_Achievement_WinOneGameUnlocked)
     {
         if (m_pScoreComponent->GetScore() >= SCORE_TO_UNLOCK)
         {
             UnlockAchievement("ACH_WIN_ONE_GAME");
-            m_AchievementUnlocked = true;
+            m_Achievement_WinOneGameUnlocked = true;
         }
     }
 }
