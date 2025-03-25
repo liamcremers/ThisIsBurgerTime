@@ -58,15 +58,3 @@ void dae::Scene::LateUpdate()
                   [](const std::unique_ptr<GameObject>& object)
                   { return object->IsMarkedForDelete(); });
 }
-
-auto Scene::GetGameObjectByName(const std::string& name) const -> GameObject*
-{
-    for (const auto& object : m_objects)
-    {
-        if (object->GetName() == name)
-        {
-            return object.get();
-        }
-    }
-    return nullptr;
-}

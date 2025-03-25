@@ -18,10 +18,6 @@ namespace dae
         void Render() const;
         void LateUpdate();
 
-        //TEST REMOVE THIS
-        [[nodiscard]] GameObject* GetGameObjectByName(
-            const std::string& name) const;
-
         ~Scene() = default;
         Scene(const Scene& other) = delete;
         Scene(Scene&& other) = delete;
