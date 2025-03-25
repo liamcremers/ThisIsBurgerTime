@@ -22,7 +22,7 @@ namespace dae
         Subject& operator=(Subject&& other) = delete;
 
     private:
-        std::list<Observer*> m_ObserverList;
+        std::list<Observer*> m_ObserverList{};
     };
 
     class Observer

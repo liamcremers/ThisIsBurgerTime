@@ -7,8 +7,6 @@
 #endif
 #endif
 
-#include <steam_api.h>
-
 #include "Minigin.h"
 #include "ResourceManager.h"
 #include "InputManager.h"
@@ -81,11 +79,6 @@ static void SetupPlayers(const int windowWidth,
         scoreUIgo->GetComponent<dae::TransformComponent>()->SetWorldPosition(
             SCORE_UI_POS + glm::vec2(0, i * SCORE_UI_OFFSET_Y));
         scene.Add(std::move(scoreUIgo));
-
-        auto Achievements =
-            std::make_unique<dae::GameObject>("Achiements" + std::to_string(i));
-        Achievements->AddComponent<dae::AchievementComponent>(scoreComp);
-        scene.Add(std::move(Achievements));
     }
 }
 
@@ -150,19 +143,8 @@ auto main(int, char*[]) -> int
     if (!fs::exists(data_location))
         data_location = "../Data/";
 #endif
-    if (!SteamAPI_Init())
-    {
-        assert("Fatal Error - Steam must be running to play this game "
-               "(SteamAPI_Init() failed)." &&
-               false);
-        return 1;
-    }
-    else
-        std::cout << "Successfully initialized steam." << std::endl;
-
     dae::Minigin engine(data_location);
     engine.Run([&engine]()
                { load(engine.GetWindowWidth(), engine.GetWindowHeight()); });
-    SteamAPI_Shutdown();
     return 0;
 }
