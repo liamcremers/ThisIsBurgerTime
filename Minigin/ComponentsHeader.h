@@ -1,8 +1,5 @@
 #pragma once
-#include "AudioComponent.h"
 #include "BaseComponent.h"
-#include "NavMeshComponent.h"
-#include "PhysicsComponent.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "FPSComponent.h"

@@ -1,5 +1,5 @@
 Checks: 'cppcoreguidelines-*,modernize-*,
 readability-qualified-auto,readability-redundant-'
-HeaderFilterRegex: 'Minigin/.*'
+HeaderFilterRegex: '(Minigin|BurgerTime)/.*'
 SystemHeaders: false
-FormatStyle: 'file'       
+FormatStyle: 'file'
