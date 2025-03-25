@@ -49,4 +49,31 @@ namespace dae
         glm::i8vec2 m_Direction{};
         int m_Speed{ 100 };
     };
+
+    class LivesComponent;
+
+    class SelfDamageCommand : public GameObjectCommand
+    {
+    public:
+        SelfDamageCommand(GameObject& pGameObject);
+        void Execute() override;
+        void Undo() override;
+
+    private:
+        LivesComponent* m_pLivesComp;
+    };
+
+    class ScoreComponent;
+
+    class AddPointsCommand : public GameObjectCommand
+    {
+    public:
+        AddPointsCommand(GameObject& pGameObject, int pointsAdded);
+        void Execute() override;
+        void Undo() override;
+
+    private:
+        ScoreComponent* m_pScoreComp{};
+        int m_PointsAdded{};
+    };
 }

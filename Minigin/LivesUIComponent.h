@@ -14,7 +14,7 @@ namespace dae
     public:
         LivesUIComponent(GameObject& parent,
                          Font& font,
-                         LivesComponent* livesComponent);
+                         LivesComponent* pLivesComponent);
         ~LivesUIComponent() override;
 
     protected:

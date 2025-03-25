@@ -272,3 +272,43 @@ if(WIN32)
         add_dependencies(${TARGET_NAME} clang-format)
     endif()
 endif()
+
+# Steamworks Integration
+set(STEAMWORKS_DIR "${CMAKE_SOURCE_DIR}/3rdParty/steamworks")
+
+# Include Steamworks headers
+target_include_directories(${TARGET_NAME} PRIVATE
+    ${STEAMWORKS_DIR}/public/steam
+)
+
+# Suppress MSVC warnings for "unsafe" C functions
+#'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+target_compile_definitions(${TARGET_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
+
+# Detect 64-bit or 32-bit and link the correct Steamworks library
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    # 64-bit build
+    target_link_libraries(${TARGET_NAME} PRIVATE
+        ${STEAMWORKS_DIR}/redistributable_bin/win64/steam_api64.lib
+    )
+    set(STEAM_DLL_PATH "${STEAMWORKS_DIR}/redistributable_bin/win64")
+else()
+    # 32-bit build
+    target_link_libraries(${TARGET_NAME} PRIVATE
+        ${STEAMWORKS_DIR}/redistributable_bin/steam_api.lib
+    )
+    set(STEAM_DLL_PATH "${STEAMWORKS_DIR}/redistributable_bin")
+endif()
+
+# Post-Build: Copy all Steamworks DLLs (wildcard style) no matter how deep they are in the directory structure
+file(GLOB_RECURSE STEAM_DLLS "${STEAMWORKS_DIR}/redistributable_bin/**/*.dll")
+
+add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${STEAM_DLLS} "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+)
+
+# Post-Build: Create steam_appid.txt
+add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E echo "480" > "$<TARGET_FILE_DIR:${TARGET_NAME}>/steam_appid.txt"
+)
+

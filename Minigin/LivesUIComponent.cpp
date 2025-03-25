@@ -17,13 +17,13 @@ dae::LivesUIComponent::LivesUIComponent(GameObject& parent,
         font) }
 {
     assert(m_pLivesComponent && "LivesUIComponent depends on LivesComponent");
-    m_pLivesComponent->AddObserver(this);
+    m_pLivesComponent->GetLivesSubject().AddObserver(this);
 }
 
 dae::LivesUIComponent::~LivesUIComponent()
 {
     if (m_pLivesComponent)
-        m_pLivesComponent->RemoveObserver(this);
+        m_pLivesComponent->GetLivesSubject().RemoveObserver(this);
 }
 
 void dae::LivesUIComponent::OnNotify(const std::string& eventId)

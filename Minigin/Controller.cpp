@@ -23,8 +23,12 @@ namespace dae
         [[nodiscard]] auto IsPressed(unsigned int button) const -> bool;
         [[nodiscard]] auto IsReleased(unsigned int button) const -> bool;
 
-        void AddCommand(Command& pCommand, unsigned int button);
-        void RemoveCommand(Command& pCommand, unsigned int button);
+        void AddCommand(Command& pCommand,
+                        unsigned int button,
+                        ButtonState btnState);
+        void RemoveCommand(Command& pCommand,
+                           unsigned int button,
+                           ButtonState btnState);
 
     private:
         DWORD m_ControllerIndex{};
@@ -33,7 +37,9 @@ namespace dae
         int m_ButtonsPressedThisFrame{};
         int m_ButtonsReleasedThisFrame{};
 
-        std::unordered_map<unsigned int, std::vector<Command*>> m_CommandsMap;
+        std::unordered_map<unsigned int,
+                           std::vector<std::pair<Command*, ButtonState>>>
+            m_CommandsMap;
     };
 
     void Controller::ControllerImpl::ProcessInput()
@@ -50,29 +56,29 @@ namespace dae
         m_ButtonsReleasedThisFrame =
             buttonChanges & (~m_CurrentState.Gamepad.wButtons);
 
-        for (auto& [key, commands] : m_CommandsMap)
+        for (auto& [key, commandStatePair] : m_CommandsMap)
         {
-            for (auto& command : commands)
+            for (auto& [command, state] : commandStatePair)
             {
-                if (IsDownThisFrame(key))
-                {
-                    //command->Execute();
-                    //break;
-                }
-                if (IsUpThisFrame(key))
-                {
-                    //command->Execute();
-                    //break;
-                }
-                if (IsPressed(key))
+                if (state == ButtonState::DownThisFrame && IsDownThisFrame(key))
                 {
                     command->Execute();
                     break;
                 }
-                if (IsReleased(key))
+                if (state == ButtonState::UpThisFrame && IsUpThisFrame(key))
                 {
-                    //command->Execute();
-                    //break;
+                    command->Execute();
+                    break;
+                }
+                if (state == ButtonState::Pressed && IsPressed(key))
+                {
+                    command->Execute();
+                    break;
+                }
+                if (state == ButtonState::Released && IsReleased(key))
+                {
+                    command->Execute();
+                    break;
                 }
             }
         }
@@ -103,16 +109,25 @@ namespace dae
     }
 
     void Controller::ControllerImpl::AddCommand(Command& pCommand,
-                                                unsigned int button)
+                                                unsigned int button,
+                                                ButtonState btnState)
     {
-        m_CommandsMap[button].push_back(&pCommand);
+        m_CommandsMap[button].emplace_back(&pCommand, btnState);
     }
 
     void Controller::ControllerImpl::RemoveCommand(Command& pCommand,
-                                                   unsigned int button)
+                                                   unsigned int button,
+                                                   ButtonState btnState)
     {
         auto& commands = m_CommandsMap[button];
-        std::erase(commands, &pCommand);
+
+        std::erase_if(commands,
+                      [&pCommand, btnState](const auto& pair)
+                      {
+                          auto& [oCommand, oBtnState] = pair;
+                          return oCommand == &pCommand && oBtnState == btnState;
+                      });
+
         if (commands.empty())
         {
             m_CommandsMap.erase(button);
@@ -131,13 +146,17 @@ namespace dae
 
     void Controller::ProcessInput() { m_pImpl->ProcessInput(); }
 
-    void Controller::AddCommand(Command& pCommand, unsigned int button)
+    void Controller::AddCommand(Command& pCommand,
+                                unsigned int button,
+                                ButtonState btnState)
     {
-        m_pImpl->AddCommand(pCommand, button);
+        m_pImpl->AddCommand(pCommand, button, btnState);
     }
 
-    void Controller::RemoveCommand(Command& pCommand, unsigned int button)
+    void Controller::RemoveCommand(Command& pCommand,
+                                   unsigned int button,
+                                   ButtonState btnState)
     {
-        m_pImpl->RemoveCommand(pCommand, button);
+        m_pImpl->RemoveCommand(pCommand, button, btnState);
     }
 }

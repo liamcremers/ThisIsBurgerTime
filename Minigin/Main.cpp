@@ -7,6 +7,8 @@
 #endif
 #endif
 
+#include <steam_api.h>
+
 #include "Minigin.h"
 #include "ResourceManager.h"
 #include "InputManager.h"
@@ -35,6 +37,57 @@ static constexpr int LIVES_UI_OFFSET_Y = 25;
 static constexpr int SCORE_UI_OFFSET_Y = 25;
 static constexpr uint8_t LARGE_FONT_SIZE = 36;
 static constexpr uint8_t SMALL_FONT_SIZE = 14;
+
+static void SetupPlayers(const int windowWidth,
+                         const int windowHeight,
+                         dae::RenderComponent*& RenderComp,
+                         dae::Scene& scene,
+                         dae::Font& smallFont)
+{
+    for (int i = 0; i < 2; ++i)
+    {
+        glm::vec2 middlePos = { windowWidth / 2, windowHeight / 2 };
+        glm::vec2 playerPos = {
+            middlePos[0] + (OFFSET * static_cast<float>(i - 1)), middlePos[1]
+        };
+        auto player =
+            std::make_unique<dae::GameObject>("player" + std::to_string(i));
+        RenderComp = player->AddComponent<dae::RenderComponent>();
+        RenderComp->SetTexture(i == 0 ? "ChefPeterPepperF.png" :
+                                        "ChefPeterPepperB.png");
+        player->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+            playerPos);
+
+        auto* livesComp =
+            player->AddComponent<dae::LivesComponent>(START_LIVES);
+        auto* scoreComp = player->AddComponent<dae::ScoreComponent>();
+
+        auto* inputComp = player->AddComponent<dae::PlayerInputComponent>(
+            static_cast<uint8_t>(i));
+        inputComp->SetSpeed(BASE_SPEED * (i + 1));
+        scene.Add(std::move(player));
+
+        // create UI elements
+        auto livesUIgo =
+            std::make_unique<dae::GameObject>("LivesUI" + std::to_string(i));
+        livesUIgo->AddComponent<dae::LivesUIComponent>(smallFont, livesComp);
+        livesUIgo->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+            LIVES_UI_POS + glm::vec2(0, i * LIVES_UI_OFFSET_Y));
+        scene.Add(std::move(livesUIgo));
+
+        auto scoreUIgo =
+            std::make_unique<dae::GameObject>("scoreUI" + std::to_string(i));
+        scoreUIgo->AddComponent<dae::ScoreUIComponent>(smallFont, scoreComp);
+        scoreUIgo->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+            SCORE_UI_POS + glm::vec2(0, i * SCORE_UI_OFFSET_Y));
+        scene.Add(std::move(scoreUIgo));
+
+        auto Achievements =
+            std::make_unique<dae::GameObject>("Achiements" + std::to_string(i));
+        Achievements->AddComponent<dae::AchievementComponent>(scoreComp);
+        scene.Add(std::move(Achievements));
+    }
+}
 
 static void load(const int windowWidth, const int windowHeight)
 {
@@ -68,8 +121,8 @@ static void load(const int windowWidth, const int windowHeight)
     //'use the D-Pad (on the first controller) or the arrow keys to move the frontfacing player'
     go = std::make_unique<dae::GameObject>("instruction0");
     go->AddComponent<dae::TextComponent>(
-        "Use the D-Pad (on the first controller) or the arrow keys to move the "
-        "frontfacing player",
+        "Use the D-Pad to move the frontfacing player, x to inflict damage, A "
+        "and B to pick up pellets",
         smallFont);
     go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
         { FPS_POS[0], FPS_POS[1] + INSTRUCTION_OFFSET_1 });
@@ -78,77 +131,14 @@ static void load(const int windowWidth, const int windowHeight)
     //'use the D-Pad (on the second controller) or the WASD keys to move the backfacing player'
     go = std::make_unique<dae::GameObject>("instruction1");
     go->AddComponent<dae::TextComponent>(
-        "Use the D-Pad (on the second controller) or the WASD keys to move the "
-        "backfacing player",
+        "Use the D-Pad to move the backfacing player, C to inflict damage, Z "
+        "and Q to pick up pellets",
         smallFont);
     go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
         { FPS_POS[0], FPS_POS[1] + INSTRUCTION_OFFSET_2 });
     scene.Add(std::move(go));
 
-    // Create 2 player objects
-    for (int i = 0; i < 2; ++i)
-    {
-        glm::vec2 middlePos = { windowWidth / 2, windowHeight / 2 };
-        glm::vec2 playerPos = {
-            middlePos[0] + (OFFSET * static_cast<float>(i - 1)), middlePos[1]
-        };
-        auto player =
-            std::make_unique<dae::GameObject>("player" + std::to_string(i));
-        RenderComp = player->AddComponent<dae::RenderComponent>();
-        RenderComp->SetTexture(i == 0 ? "ChefPeterPepperF.png" :
-                                        "ChefPeterPepperB.png");
-        player->GetComponent<dae::TransformComponent>()->SetWorldPosition(
-            playerPos);
-        auto* playerComp = player->AddComponent<dae::PlayerInputComponent>(
-            static_cast<uint8_t>(i));
-        playerComp->SetSpeed(BASE_SPEED * (i + 1));
-
-        auto* livesComp =
-            player->AddComponent<dae::LivesComponent>(START_LIVES);
-        auto* scoreComp = player->AddComponent<dae::ScoreComponent>();
-
-        scene.Add(std::move(player));
-
-        // create UI elements
-        auto livesUI =
-            std::make_unique<dae::GameObject>("LivesUI" + std::to_string(i));
-        livesUI->AddComponent<dae::LivesUIComponent>(smallFont, livesComp);
-        livesUI->GetComponent<dae::TransformComponent>()->SetWorldPosition(
-            LIVES_UI_POS + glm::vec2(0, i * LIVES_UI_OFFSET_Y));
-        scene.Add(std::move(livesUI));
-
-        auto scoreUI =
-            std::make_unique<dae::GameObject>("scoreUI" + std::to_string(i));
-        scoreUI->AddComponent<dae::ScoreUIComponent>(smallFont, scoreComp);
-        scoreUI->GetComponent<dae::TransformComponent>()->SetWorldPosition(
-            SCORE_UI_POS + glm::vec2(0, i * SCORE_UI_OFFSET_Y));
-        scene.Add(std::move(scoreUI));
-    }
-
-    ///
-    ///TEST CODE REMOVE
-    ///
-    auto* playerObj = scene.GetGameObjectByName("player0");
-    if (playerObj)
-    {
-        auto* playerLivesComp = playerObj->GetComponent<dae::LivesComponent>();
-        if (playerLivesComp)
-        {
-            playerLivesComp->LoseLife();
-            playerLivesComp->LoseLife();
-            playerLivesComp->LoseLife();
-            playerLivesComp->LoseLife(); // Should hit 0 and stop.
-        }
-
-        // Test score addition
-        auto* playerScoreComp = playerObj->GetComponent<dae::ScoreComponent>();
-        if (playerScoreComp)
-        {
-            playerScoreComp->AddScore(SCORE_TEN);
-            playerScoreComp->AddScore(SCORE_TEN);
-            playerScoreComp->AddScore(SCORE_TEN);
-        }
-    }
+    SetupPlayers(windowWidth, windowHeight, RenderComp, scene, smallFont);
 }
 
 auto main(int, char*[]) -> int
@@ -160,8 +150,19 @@ auto main(int, char*[]) -> int
     if (!fs::exists(data_location))
         data_location = "../Data/";
 #endif
+    if (!SteamAPI_Init())
+    {
+        assert("Fatal Error - Steam must be running to play this game "
+               "(SteamAPI_Init() failed)." &&
+               false);
+        return 1;
+    }
+    else
+        std::cout << "Successfully initialized steam." << std::endl;
+
     dae::Minigin engine(data_location);
     engine.Run([&engine]()
                { load(engine.GetWindowWidth(), engine.GetWindowHeight()); });
+    SteamAPI_Shutdown();
     return 0;
 }

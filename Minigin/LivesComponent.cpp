@@ -9,10 +9,15 @@ dae::LivesComponent::LivesComponent(GameObject& parent, int lives) :
 void dae::LivesComponent::LoseLife()
 {
     if (m_Lives < 0)
-        assert("GameObject already has this component" && false);
+        assert("Dead player cannot lose more lives" && false);
 
     --m_Lives;
-    Notify(m_Lives < 0 ? "GameOver" : "LifeLost");
+    m_LivesSubject.Notify(m_Lives < 0 ? "GameOver" : "LifeLost");
 }
 
 auto dae::LivesComponent::GetLives() const -> int { return m_Lives; }
+
+auto dae::LivesComponent::GetLivesSubject() -> dae::Subject&
+{
+    return m_LivesSubject;
+}
