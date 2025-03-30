@@ -18,10 +18,10 @@
 #include <memory>
 namespace fs = std::filesystem;
 
-static constexpr glm::vec2 FPS_POS = { 10.0f, 6.0f };
+static constexpr glm::vec2 FPS_POS = { 5.0f, 6.0f };
 static constexpr glm::vec2 INSTRUCTION_POS = { 58.0f, 6.0f };
-static constexpr glm::vec2 LIVES_UI_POS = { 10.0f, 20.0f };
-static constexpr glm::vec2 SCORE_UI_POS = { 10.0f, 30.0f };
+static constexpr glm::vec2 LIVES_UI_POS = { 5.0f, 20.0f };
+static constexpr glm::vec2 SCORE_UI_POS = { 5.0f, 30.0f };
 static constexpr glm::vec2 LOGO_POS = { 216.0f, 180.0f };
 static constexpr glm::vec2 TEXT_POS = { 80.0f, 20.0f };
 static constexpr float OFFSET = 20.0f;

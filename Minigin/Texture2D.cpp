@@ -36,7 +36,8 @@ void dae::Texture2D::Scale(float scale)
     SDL_SetTextureBlendMode(newTexture, SDL_BLENDMODE_BLEND);
     SDL_SetRenderTarget(Renderer::GetInstance().GetSDLRenderer(), newTexture);
     SDL_Rect dst{ 0, 0, size.x, size.y };
-    SDL_RenderCopy(Renderer::GetInstance().GetSDLRenderer(), m_texture, nullptr, &dst);
+    SDL_RenderCopy(
+        Renderer::GetInstance().GetSDLRenderer(), m_texture, nullptr, &dst);
     SDL_SetRenderTarget(Renderer::GetInstance().GetSDLRenderer(), nullptr);
 
     SDL_DestroyTexture(m_texture);

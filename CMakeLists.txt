@@ -4,6 +4,19 @@ project(GameEngine)
 add_subdirectory(Minigin)
 add_subdirectory(BurgerTime)
 
+target_compile_features(Minigin PUBLIC cxx_std_20)
+target_compile_features(BurgerTime PUBLIC cxx_std_20)
+
+target_compile_options(Minigin PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX /EHsc>
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>
+)
+
+target_compile_options(BurgerTime PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX /EHsc>
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>
+)
+
 if(WIN32)
     # Clang-tidy integration for Windows (see /EHsc)
     find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
