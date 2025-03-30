@@ -1,5 +1,7 @@
 #include "SceneManager.h"
 #include "Scene.h"
+#include <cassert>
+#include <algorithm>
 
 void dae::SceneManager::Update()
 {
@@ -35,6 +37,13 @@ void dae::SceneManager::LateUpdate()
 
 auto dae::SceneManager::CreateScene(const std::string& name) -> dae::Scene&
 {
+    assert(!name.empty() && "Scene name cannot be empty");
+    assert(std::ranges::none_of(m_Scenes,
+
+                                [&name](const std::shared_ptr<Scene>& scene)
+                                { return scene->GetName() == name; }) &&
+           "Scene with name already exists");
+
     const auto& scene = std::shared_ptr<Scene>(new Scene(name));
     m_Scenes.push_back(scene);
     return *scene;

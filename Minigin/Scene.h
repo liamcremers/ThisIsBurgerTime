@@ -18,6 +18,8 @@ namespace dae
         void Render() const;
         void LateUpdate();
 
+        [[nodiscard]] const std::string& GetName() const { return m_name; }
+
         ~Scene() = default;
         Scene(const Scene& other) = delete;
         Scene(Scene&& other) = delete;

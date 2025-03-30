@@ -14,6 +14,7 @@ namespace dae
 
         void Render() const override;
         void SetTexture(const std::string& filename);
+        void Scale(float scale) const;
 
     private:
         Texture2D* m_texture{};

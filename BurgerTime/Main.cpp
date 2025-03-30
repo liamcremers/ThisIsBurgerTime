@@ -19,14 +19,15 @@
 namespace fs = std::filesystem;
 
 static constexpr glm::vec2 FPS_POS = { 10.0f, 6.0f };
-static constexpr glm::vec2 LIVES_UI_POS = { 10.0f, 100.0f };
-static constexpr glm::vec2 SCORE_UI_POS = { 10.0f, 110.0f };
+static constexpr glm::vec2 INSTRUCTION_POS = { 58.0f, 6.0f };
+static constexpr glm::vec2 LIVES_UI_POS = { 10.0f, 20.0f };
+static constexpr glm::vec2 SCORE_UI_POS = { 10.0f, 30.0f };
 static constexpr glm::vec2 LOGO_POS = { 216.0f, 180.0f };
 static constexpr glm::vec2 TEXT_POS = { 80.0f, 20.0f };
 static constexpr float OFFSET = 20.0f;
 static constexpr float RADIUS = 40.0f;
-static constexpr float INSTRUCTION_OFFSET_1 = 60.0f;
-static constexpr float INSTRUCTION_OFFSET_2 = 80.0f;
+static constexpr float INSTRUCTION_OFFSET_1 = 0.0f;
+static constexpr float INSTRUCTION_OFFSET_2 = 20.0f;
 static constexpr float DIVISOR = 2.0f;
 static constexpr int BASE_SPEED = 100;
 static constexpr int START_LIVES = 3;
@@ -35,13 +36,19 @@ static constexpr int LIVES_UI_OFFSET_Y = 25;
 static constexpr int SCORE_UI_OFFSET_Y = 25;
 static constexpr uint8_t LARGE_FONT_SIZE = 36;
 static constexpr uint8_t SMALL_FONT_SIZE = 14;
+static constexpr uint8_t INSTRUCTION_FONT_SIZE = 11;
+static constexpr auto INSTRUCTION_TXT_0 =
+    "Use the D-Pad to move the frontfacing player, x to inflict damage, A and "
+    "B to pick up pellets";
+static constexpr auto INSTRUCTION_TXT_1 =
+    "Use the D-Pad to move the backfacing player, C to inflict damage, Z "
+    "and Q to pick up pellets";
 
-static void SetupPlayers(const int windowWidth,
-                         const int windowHeight,
-                         dae::RenderComponent*& RenderComp,
-                         dae::Scene& scene,
-                         dae::Font& smallFont)
+static void SetupPlayers(const int windowWidth, const int windowHeight)
 {
+    auto& scene = dae::SceneManager::GetInstance().CreateScene("PlayerScene");
+    auto& smallFont = dae::ResourceManager::GetInstance().LoadFont(
+        "Lingua.otf", SMALL_FONT_SIZE);
     for (int i = 0; i < 2; ++i)
     {
         glm::vec2 middlePos = { windowWidth / 2, windowHeight / 2 };
@@ -50,9 +57,10 @@ static void SetupPlayers(const int windowWidth,
         };
         auto player =
             std::make_unique<dae::GameObject>("player" + std::to_string(i));
-        RenderComp = player->AddComponent<dae::RenderComponent>();
-        RenderComp->SetTexture(i == 0 ? "ChefPeterPepperF.png" :
+        auto* renderComp = player->AddComponent<dae::RenderComponent>();
+        renderComp->SetTexture(i == 0 ? "ChefPeterPepperF.png" :
                                         "ChefPeterPepperB.png");
+        renderComp->Scale(2);
         player->GetComponent<dae::TransformComponent>()->SetWorldPosition(
             playerPos);
 
@@ -82,56 +90,52 @@ static void SetupPlayers(const int windowWidth,
     }
 }
 
+static void SetupFPSScene()
+{
+    auto& FPSScene = dae::SceneManager::GetInstance().CreateScene("FPS");
+    auto& fpsFont = dae::ResourceManager::GetInstance().LoadFont(
+        "Lingua.otf", SMALL_FONT_SIZE);
+    auto fps = std::make_unique<dae::GameObject>("fps");
+    fps->AddComponent<dae::FPSComponent>(fpsFont);
+    fps->GetComponent<dae::TransformComponent>()->SetWorldPosition(FPS_POS);
+    FPSScene.Add(std::move(fps));
+}
+
+static void SetupInstructions()
+{
+    auto& scene = dae::SceneManager::GetInstance().CreateScene("Instructions");
+    auto& instructionFont = dae::ResourceManager::GetInstance().LoadFont(
+        "Lingua.otf", INSTRUCTION_FONT_SIZE);
+    auto go = std::make_unique<dae::GameObject>("instruction0");
+    go->AddComponent<dae::TextComponent>(INSTRUCTION_TXT_0, instructionFont);
+    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+        { INSTRUCTION_POS[0], INSTRUCTION_POS[1] + INSTRUCTION_OFFSET_1 });
+    scene.Add(std::move(go));
+
+    go = std::make_unique<dae::GameObject>("instruction1");
+    go->AddComponent<dae::TextComponent>(INSTRUCTION_TXT_1, instructionFont);
+    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
+        { INSTRUCTION_POS[0], INSTRUCTION_POS[1] + INSTRUCTION_OFFSET_2 });
+    scene.Add(std::move(go));
+}
+
+static void SetupLevel0()
+{
+    auto& Level0Scene = dae::SceneManager::GetInstance().CreateScene("Level0");
+
+    auto go = std::make_unique<dae::GameObject>("levelBackground");
+    auto* rendererComp = go->AddComponent<dae::RenderComponent>();
+    rendererComp->SetTexture("Level0.png");
+    rendererComp->Scale(2);
+    Level0Scene.Add(std::move(go));
+}
+
 static void load(const int windowWidth, const int windowHeight)
 {
-    auto& scene = dae::SceneManager::GetInstance().CreateScene("Demo");
-
-    auto go = std::make_unique<dae::GameObject>("background");
-    auto* RenderComp = go->AddComponent<dae::RenderComponent>();
-    RenderComp->SetTexture("background.tga");
-    scene.Add(std::move(go));
-
-    go = std::make_unique<dae::GameObject>("logo");
-    RenderComp = go->AddComponent<dae::RenderComponent>();
-    RenderComp->SetTexture("logo.tga");
-    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(LOGO_POS);
-    scene.Add(std::move(go));
-
-    auto& font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf",
-                                                              LARGE_FONT_SIZE);
-    go = std::make_unique<dae::GameObject>("Title");
-    go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
-    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(TEXT_POS);
-    scene.Add(std::move(go));
-
-    auto& smallFont = dae::ResourceManager::GetInstance().LoadFont(
-        "Lingua.otf", SMALL_FONT_SIZE);
-    go = std::make_unique<dae::GameObject>("fps");
-    go->AddComponent<dae::FPSComponent>(smallFont);
-    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(FPS_POS);
-    scene.Add(std::move(go));
-
-    //'use the D-Pad (on the first controller) or the arrow keys to move the frontfacing player'
-    go = std::make_unique<dae::GameObject>("instruction0");
-    go->AddComponent<dae::TextComponent>(
-        "Use the D-Pad to move the frontfacing player, x to inflict damage, A "
-        "and B to pick up pellets",
-        smallFont);
-    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
-        { FPS_POS[0], FPS_POS[1] + INSTRUCTION_OFFSET_1 });
-    scene.Add(std::move(go));
-
-    //'use the D-Pad (on the second controller) or the WASD keys to move the backfacing player'
-    go = std::make_unique<dae::GameObject>("instruction1");
-    go->AddComponent<dae::TextComponent>(
-        "Use the D-Pad to move the backfacing player, C to inflict damage, Z "
-        "and Q to pick up pellets",
-        smallFont);
-    go->GetComponent<dae::TransformComponent>()->SetWorldPosition(
-        { FPS_POS[0], FPS_POS[1] + INSTRUCTION_OFFSET_2 });
-    scene.Add(std::move(go));
-
-    SetupPlayers(windowWidth, windowHeight, RenderComp, scene, smallFont);
+    SetupLevel0();
+    SetupPlayers(windowWidth, windowHeight);
+    SetupInstructions();
+    SetupFPSScene();
 }
 
 auto main(int, char*[]) -> int

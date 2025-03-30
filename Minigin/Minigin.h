@@ -15,12 +15,12 @@ namespace dae
         void Run(const std::function<void()>& load);
         void GameLoop();
 
-        [[nodiscard]] static constexpr int GetWindowWidth()
+        [[nodiscard]] static consteval int GetWindowWidth()
         {
             return m_WindowWidth;
         }
 
-        [[nodiscard]] static constexpr int GetWindowHeight()
+        [[nodiscard]] static consteval int GetWindowHeight()
         {
             return m_WindowHeight;
         }
@@ -32,11 +32,11 @@ namespace dae
 
     private:
         static constexpr int m_msPerFrame{ 16 };
-        static constexpr int m_WindowWidth{ 640 };
+        static constexpr int m_WindowWidth{ 512 };
         static constexpr int m_WindowHeight{ 480 };
 
         SDL_Window* m_window{};
-        bool m_continue{ true };
         float m_lag{};
+        bool m_continue{ true };
     };
 }

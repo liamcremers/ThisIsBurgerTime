@@ -55,6 +55,6 @@ void dae::Scene::LateUpdate()
         object->LateUpdate();
 
     std::erase_if(m_objects,
-                  [](const std::unique_ptr<GameObject>& object)
+                  [](const auto& object)
                   { return object->IsMarkedForDelete(); });
 }

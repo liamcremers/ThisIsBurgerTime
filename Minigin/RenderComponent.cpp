@@ -10,6 +10,8 @@ void dae::RenderComponent::SetTexture(const std::string& filename)
     m_texture = ResourceManager::GetInstance().LoadTexture(filename);
 }
 
+void dae::RenderComponent::Scale(float scale) const { m_texture->Scale(scale); }
+
 void dae::RenderComponent::Render() const
 {
     if (m_texture == nullptr)
