@@ -14,8 +14,10 @@ namespace dae
             -> const std::chrono::high_resolution_clock::time_point&;
 
     private:
-        static constexpr float m_FixedTimeStep{ 1.0f / 60.0f };
+        friend class Singleton<EngineTime>;
+        EngineTime() = default;
 
+        static constexpr float m_FixedTimeStep{ 1.0f / 60.0f };
         std::chrono::high_resolution_clock::time_point m_LastTime{
             std::chrono::high_resolution_clock::now()
         };

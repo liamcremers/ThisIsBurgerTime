@@ -21,6 +21,9 @@ namespace dae
         Font& LoadFont(const std::string& file, uint8_t size);
 
     private:
+        friend class Singleton<ResourceManager>;
+        ResourceManager() = default;
+
         void UnloadUnusedResources();
 
         std::filesystem::path m_dataPath;

@@ -20,6 +20,9 @@ namespace dae
         void AddKeyboardCommand(SDL_Keycode keyboardButton, Command* command);
 
     private:
+        friend class Singleton<InputManager>;
+        InputManager() = default;
+
         std::vector<Controller*> m_ControllerVec;
         std::unordered_map<SDL_Keycode, Command*> m_KeyCommandMap;
     };
