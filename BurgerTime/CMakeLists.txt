@@ -12,7 +12,7 @@ file(GLOB BURGERTIME_SOURCES CONFIGURE_DEPENDS "*.cpp")
 file(GLOB BURGERTIME_HEADERS CONFIGURE_DEPENDS "*.h")
 
 # Add executable using the gathered files
-add_executable(${TARGET_NAME} ${BURGERTIME_SOURCES})
+add_executable(${TARGET_NAME} ${BURGERTIME_SOURCES} "BurgerTimeLayers.h" )
 
 # Set ${TARGET_NAME} as the default startup project
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${TARGET_NAME})

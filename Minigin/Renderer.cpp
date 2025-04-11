@@ -3,6 +3,8 @@
 #include "Renderer.h"
 #include "SceneManager.h"
 #include "Texture2D.h"
+#include "DebugRenderer.h"
+#include "CollisionSystem.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_sdl2.h>
@@ -50,9 +52,11 @@ auto dae::Renderer::Render() const -> void
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
+    CollisionSystem::GetInstance().RenderColliders();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+    DebugRenderer::GetInstance().Flush();
     SDL_RenderPresent(m_renderer);
 }
 

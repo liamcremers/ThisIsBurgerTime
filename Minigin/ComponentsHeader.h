@@ -10,3 +10,5 @@
 #include "LivesUIComponent.h"
 #include "ScoreComponent.h"
 #include "ScoreUIComponent.h"
+#include "PhysicsComponent.h"
+#include "ColliderComponent.h"

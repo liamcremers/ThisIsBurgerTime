@@ -17,6 +17,8 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 #include "EngineTime.h"
+#include "CollisionSystem.h"
+#include "DebugRenderer.h"
 
 static void LogSDLVersion(const std::string& message, const SDL_version& v)
 {
@@ -125,6 +127,7 @@ void dae::Minigin::GameLoop()
         while (m_lag >= engineTime.GetFixedTimeStep())
         {
             sceneManager.FixedUpdate();
+            CollisionSystem::GetInstance().ProcessCollisions();
             m_lag -= engineTime.GetFixedTimeStep();
         }
         sceneManager.LateUpdate();
