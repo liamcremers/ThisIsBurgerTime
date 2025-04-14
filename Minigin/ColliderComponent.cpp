@@ -5,19 +5,19 @@ dae::ColliderComponent::ColliderComponent(GameObject& parent,
                                           const glm::vec2& size) :
     BaseComponent(parent),
     m_Size(size),
-    m_IsStatic{ parent.GetComponent<PhysicsComponent>() == nullptr }
+    m_CollisionType{ parent.GetComponent<PhysicsComponent>() != nullptr ?
+                         CollisionType::Dynamic :
+                         CollisionType::Static }
 {}
 
 void dae::ColliderComponent::OnCollision(const ColliderComponent& other) const
 {
-    if (m_IsStatic && other.m_IsStatic)
+    if (IsStatic() && other.IsStatic())
         return;
 
     // Determine which collider is dynamic
-    ColliderComponent* dynamicCollider =
-        m_IsStatic ? const_cast<ColliderComponent*>(&other) :
-                     const_cast<ColliderComponent*>(this);
-    const ColliderComponent* staticCollider = m_IsStatic ? this : &other;
+    const ColliderComponent* dynamicCollider = IsStatic() ? &other : this;
+    const ColliderComponent* staticCollider = IsStatic() ? this : &other;
 
     // Calculate overlap
     const glm::vec2 staticPos =
@@ -67,6 +67,22 @@ void dae::ColliderComponent::OnCollision(const ColliderComponent& other) const
     }
 }
 
+void dae::ColliderComponent::SubscribeToBeginOverlap(
+    const OverlapEvent& callback)
+{
+    m_BeginOverlapCallbacks.emplace_back(callback);
+}
+
+void dae::ColliderComponent::SubscribeToEndOverlap(const OverlapEvent& callback)
+{
+    m_EndOverlapCallbacks.emplace_back(callback);
+}
+
+void dae::ColliderComponent::AddOverlap(ColliderComponent* other)
+{
+    m_CurrentOverlaps.insert(other);
+}
+
 void dae::ColliderComponent::SetSize(const glm::vec2& size) { m_Size = size; }
 
 void dae::ColliderComponent::SetOffset(const glm::vec2& offset)
@@ -79,11 +95,6 @@ void dae::ColliderComponent::SetCollisionMask(uint16_t mask) { m_Mask = mask; }
 void dae::ColliderComponent::SetCollisionLayer(uint16_t layer)
 {
     m_Layer = layer;
-}
-
-void dae::ColliderComponent::SetIsStatic(bool isStatic)
-{
-    m_IsStatic = isStatic;
 }
 
 [[nodiscard]] auto dae::ColliderComponent::GetWorldPosition() const -> glm::vec2
@@ -101,17 +112,17 @@ void dae::ColliderComponent::SetIsStatic(bool isStatic)
     return m_Offset;
 }
 
-[[nodiscard]] auto dae::ColliderComponent::GetMask() -> uint16_t
+[[nodiscard]] auto dae::ColliderComponent::GetMask() const -> uint16_t
 {
     return m_Mask;
 }
 
-[[nodiscard]] auto dae::ColliderComponent::GetLayer() -> uint16_t
+[[nodiscard]] auto dae::ColliderComponent::GetLayer() const -> uint16_t
 {
     return m_Layer;
 }
 
-[[nodiscard]] auto dae::ColliderComponent::CheckCollision(
+[[nodiscard]] auto dae::ColliderComponent::IsColliding(
     const ColliderComponent& other) const -> bool
 {
     const glm::vec2 thisWorldPos = GetWorldPosition() + m_Offset;
@@ -123,13 +134,13 @@ void dae::ColliderComponent::SetIsStatic(bool isStatic)
             thisWorldPos[1] + m_Size[1] > otherWorldPos[1]);
 }
 
-[[nodiscard]] auto dae::ColliderComponent::IsCollidingWith(
+[[nodiscard]] auto dae::ColliderComponent::TODORemove(
     const ColliderComponent& other) const -> bool
 {
-    return CheckCollision(other);
+    return IsColliding(other);
 }
 
 [[nodiscard]] auto dae::ColliderComponent::IsStatic() const -> bool
 {
-    return m_IsStatic;
+    return m_CollisionType == CollisionType::Static;
 }

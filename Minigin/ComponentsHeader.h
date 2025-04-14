@@ -5,7 +5,6 @@
 #include "FPSComponent.h"
 #include "TextComponent.h"
 #include "RotatorComponent.h"
-#include "PlayerComponent.h"
 #include "LivesComponent.h"
 #include "LivesUIComponent.h"
 #include "ScoreComponent.h"

@@ -1,3 +1,4 @@
+#ifdef DEBUG_RENDER
 #pragma once
 #include "Singleton.h"
 #include "Renderer.h"
@@ -28,3 +29,4 @@ private:
     std::vector<DebugRect> m_DebugRects;
     SDL_Renderer* m_Renderer = nullptr;
 };
+#endif // DEBUG_RENDER

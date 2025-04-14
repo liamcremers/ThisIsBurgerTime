@@ -52,11 +52,15 @@ auto dae::Renderer::Render() const -> void
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
+#ifdef DEBUG_RENDER
     CollisionSystem::GetInstance().RenderColliders();
+#endif // DEBUG_RENDER
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+#ifdef DEBUG_RENDER
     DebugRenderer::GetInstance().Flush();
+#endif // DEBUG_RENDER
     SDL_RenderPresent(m_renderer);
 }
 

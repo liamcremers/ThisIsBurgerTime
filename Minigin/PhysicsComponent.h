@@ -4,7 +4,7 @@
 
 namespace dae
 {
-    class TransformComponent;
+    class ColliderComponent;
 
     class PhysicsComponent : public BaseComponent
     {
@@ -23,6 +23,8 @@ namespace dae
         [[nodiscard]] bool IsUsingGravity() const;
 
     private:
+        ColliderComponent* m_pCollider{ nullptr };
+
         glm::vec2 m_Velocity{ 0, 0 };
         float m_Gravity{ 0.0f };
         float m_MaxFallSpeed{ 1000.f };

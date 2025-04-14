@@ -1,3 +1,4 @@
+#ifdef DEBUG_RENDER
 #include "DebugRenderer.h"
 
 //TODO: optimize this using a better container
@@ -24,15 +25,16 @@ void DebugRenderer::Flush()
         SDL_FRect sdlRect = {
             rect.position[0], rect.position[1], rect.size[0], rect.size[1]
         };
-
+        static constexpr int MAX_VALUE = 255;
         SDL_SetRenderDrawColor(m_Renderer,
-                               static_cast<Uint8>(rect.color[0] * 255),
-                               static_cast<Uint8>(rect.color[1] * 255),
-                               static_cast<Uint8>(rect.color[2] * 255),
-                               static_cast<Uint8>(rect.color[3] * 255));
+                               static_cast<Uint8>(rect.color[0] * MAX_VALUE),
+                               static_cast<Uint8>(rect.color[1] * MAX_VALUE),
+                               static_cast<Uint8>(rect.color[2] * MAX_VALUE),
+                               static_cast<Uint8>(rect.color[3] * MAX_VALUE));
         SDL_RenderDrawRectF(m_Renderer, &sdlRect);
     }
     SDL_SetRenderDrawColor(m_Renderer, r, g, b, a);
 
     m_DebugRects.clear();
 }
+#endif // DEBUG_RENDER

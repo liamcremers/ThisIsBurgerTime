@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseComponent.h"
+#include "Command.h"
 
 #include <memory>
 #include <vector>
@@ -12,6 +13,24 @@ namespace dae
     class MoveCommand;
     class SelfDamageCommand;
     class AddPointsCommand;
+
+    class PlayerMoveCommand : public GameObjectCommand
+    {
+    public:
+        PlayerMoveCommand(GameObject& pGameObject,
+                          glm::i8vec2 direction,
+                          int speed = 100);
+        ~PlayerMoveCommand() = default;
+        void Execute() override;
+        void Undo() override;
+        void SetSpeed(int speed);
+        void SetReady(bool ready);
+
+    private:
+        glm::i8vec2 m_Direction{};
+        int m_Speed{ 100 };
+        bool m_IsReady{};
+    };
 
     class PlayerInputComponent final : public BaseComponent
     {
@@ -42,10 +61,10 @@ namespace dae
         static constexpr int HUNDRED_POINTS = 100;
 
         std::unique_ptr<Controller> m_pController{};
-        std::unique_ptr<MoveCommand> m_pMoveCommandUp{};
-        std::unique_ptr<MoveCommand> m_pMoveCommandDown{};
-        std::unique_ptr<MoveCommand> m_pMoveCommandLeft{};
-        std::unique_ptr<MoveCommand> m_pMoveCommandRight{};
+        std::unique_ptr<PlayerMoveCommand> m_pMoveCommandUp{};
+        std::unique_ptr<PlayerMoveCommand> m_pMoveCommandDown{};
+        std::unique_ptr<PlayerMoveCommand> m_pMoveCommandLeft{};
+        std::unique_ptr<PlayerMoveCommand> m_pMoveCommandRight{};
         std::unique_ptr<SelfDamageCommand> m_pSelfDamageCommand;
         std::unique_ptr<AddPointsCommand> m_pAdd100PointsCommand;
         std::unique_ptr<AddPointsCommand> m_pAdd10PointsCommand;

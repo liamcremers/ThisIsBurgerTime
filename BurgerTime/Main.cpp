@@ -13,6 +13,7 @@
 #include "Scene.h"
 
 #include "ComponentsHeader.h"
+#include "PlayerComponent.h"
 #include "BurgerTimeLayers.h"
 #include "CollisionSystem.h"
 
@@ -48,7 +49,8 @@ static constexpr auto INSTRUCTION_TXT_1 =
 static constexpr int G_SIZE = 16;
 static constexpr float GRAVITY = 9.81f;
 static constexpr glm::vec2 FLOOR_SIZE = { G_SIZE, G_SIZE / 4.f };
-static constexpr glm::vec2 FLOOR_OFFSET = { 0, 10 };
+static constexpr glm::vec2 FLOOR_OFFSET = { 0, 0 };
+static constexpr int TOP_BORDER = 10;
 
 static void SetupPlayers(const int windowWidth, const int windowHeight)
 {
@@ -69,15 +71,14 @@ static void SetupPlayers(const int windowWidth, const int windowHeight)
         renderComp->Scale(2);
         player->SetLocalPosition(playerPos);
 
-        auto* physics = player->AddComponent<dae::PhysicsComponent>();
-        physics->SetGravity(GRAVITY);
-
         auto* collider = player->AddComponent<dae::ColliderComponent>(
             glm::vec2{ 2 * G_SIZE, 2 * G_SIZE });
         collider->SetCollisionLayer(
             static_cast<uint16_t>(BurgerTime::CollisionLayer::Player));
         collider->SetCollisionMask(BurgerTime::PLAYER_COLLISION_MASK);
-        dae::CollisionSystem::GetInstance().RegisterCollider(collider);
+
+        auto* physics = player->AddComponent<dae::PhysicsComponent>();
+        physics->SetGravity(GRAVITY);
 
         auto* livesComp =
             player->AddComponent<dae::LivesComponent>(START_LIVES);
@@ -86,6 +87,8 @@ static void SetupPlayers(const int windowWidth, const int windowHeight)
         auto* inputComp = player->AddComponent<dae::PlayerInputComponent>(
             static_cast<uint8_t>(i));
         inputComp->SetSpeed(BASE_SPEED * (i + 1));
+
+        dae::CollisionSystem::GetInstance().RegisterCollider(collider);
         scene.Add(std::move(player));
 
         // create UI elements
@@ -314,100 +317,126 @@ static void CreateBurgerPlateStack(dae::Scene& scene,
 
 static void SetupLevel0()
 {
-    static constexpr glm::vec2 COUNTER_POS = { G_SIZE * 2, G_SIZE * 6 };
+    static constexpr glm::vec2 COUNTER_POS = { G_SIZE * 2,
+                                               G_SIZE * 5 + TOP_BORDER };
 
-    auto& Level0Scene = dae::SceneManager::GetInstance().CreateScene("Level0");
+    auto& level0Scene = dae::SceneManager::GetInstance().CreateScene("Level0");
+
+    auto grid = std::make_unique<dae::GameObject>("Grid");
+    auto* gridComp = grid->AddComponent<dae::RenderComponent>();
+    gridComp->SetTexture("Grid.png");
+    gridComp->Scale(2);
+    level0Scene.Add(std::move(grid));
 
     auto go = std::make_unique<dae::GameObject>("LevelCounter");
     auto* renderComp = go->AddComponent<dae::RenderComponent>();
     renderComp->SetTexture("LevelCounter.png");
     renderComp->Scale(2);
     go->SetLocalPosition(COUNTER_POS);
-    Level0Scene.Add(std::move(go));
+    level0Scene.Add(std::move(go));
 #pragma region FLOORS
-    static constexpr glm::vec2 TOP_FLOOR_POS = { G_SIZE * 3, G_SIZE * 5 };
+    static constexpr glm::vec2 TOP_FLOOR_POS = { G_SIZE * 3,
+                                                 G_SIZE * 5 + TOP_BORDER };
     static constexpr auto TOP_FLOOR_SEGMENTS = { 26 };
-    static constexpr glm::vec2 MID_FLOOR_1_POS = { G_SIZE * 3, G_SIZE * 9 };
+    static constexpr glm::vec2 MID_FLOOR_1_POS = { G_SIZE * 3,
+                                                   G_SIZE * 9 + TOP_BORDER };
     static constexpr auto MID_FLOOR_1_SEGMENTS = { 8, -4, 14 };
-    static constexpr glm::vec2 MID_FLOOR_2_POS = { G_SIZE * 3, G_SIZE * 11 };
+    static constexpr glm::vec2 MID_FLOOR_2_POS = { G_SIZE * 3,
+                                                   G_SIZE * 11 + TOP_BORDER };
     static constexpr auto MID_FLOOR_2_SEGMENTS = { -6, 8 };
-    static constexpr glm::vec2 MID_FLOOR_3_POS = { G_SIZE * 3, G_SIZE * 13 };
+    static constexpr glm::vec2 MID_FLOOR_3_POS = { G_SIZE * 3,
+                                                   G_SIZE * 13 + TOP_BORDER };
     static constexpr auto MID_FLOOR_3_SEGMENTS = { 8, -10, 8 };
-    static constexpr glm::vec2 MID_FLOOR_4_POS = { G_SIZE * 3, G_SIZE * 15 };
+    static constexpr glm::vec2 MID_FLOOR_4_POS = { G_SIZE * 3,
+                                                   G_SIZE * 15 + TOP_BORDER };
     static constexpr auto MID_FLOOR_4_SEGMENTS = { -6, 14 };
-    static constexpr glm::vec2 MID_FLOOR_5_POS = { G_SIZE * 3, G_SIZE * 17 };
+    static constexpr glm::vec2 MID_FLOOR_5_POS = { G_SIZE * 3,
+                                                   G_SIZE * 17 + TOP_BORDER };
     static constexpr auto MID_FLOOR_5_SEGMENTS = { -18, 8 };
-    static constexpr glm::vec2 MID_FLOOR_6_POS = { G_SIZE * 3, G_SIZE * 19 };
+    static constexpr glm::vec2 MID_FLOOR_6_POS = { G_SIZE * 3,
+                                                   G_SIZE * 19 + TOP_BORDER };
     static constexpr auto MID_FLOOR_6_SEGMENTS = { 20 };
-    static constexpr glm::vec2 BOTTOM_FLOOR_POS = { G_SIZE * 3, G_SIZE * 23 };
+    static constexpr glm::vec2 BOTTOM_FLOOR_POS = { G_SIZE * 3,
+                                                    G_SIZE * 23 + TOP_BORDER };
     static constexpr auto BOTTOM_FLOOR_SEGMENTS = { 26 };
 
     CreateFloorPlane(
-        Level0Scene, TOP_FLOOR_POS, TOP_FLOOR_SEGMENTS, "TopFloor");
+        level0Scene, TOP_FLOOR_POS, TOP_FLOOR_SEGMENTS, "TopFloor");
 
     CreateFloorPlane(
-        Level0Scene, MID_FLOOR_1_POS, MID_FLOOR_1_SEGMENTS, "MidFloor1");
+        level0Scene, MID_FLOOR_1_POS, MID_FLOOR_1_SEGMENTS, "MidFloor1");
     CreateFloorPlane(
-        Level0Scene, MID_FLOOR_2_POS, MID_FLOOR_2_SEGMENTS, "MidFloor2");
+        level0Scene, MID_FLOOR_2_POS, MID_FLOOR_2_SEGMENTS, "MidFloor2");
     CreateFloorPlane(
-        Level0Scene, MID_FLOOR_3_POS, MID_FLOOR_3_SEGMENTS, "MidFloor3");
+        level0Scene, MID_FLOOR_3_POS, MID_FLOOR_3_SEGMENTS, "MidFloor3");
     CreateFloorPlane(
-        Level0Scene, MID_FLOOR_4_POS, MID_FLOOR_4_SEGMENTS, "MidFloor4");
+        level0Scene, MID_FLOOR_4_POS, MID_FLOOR_4_SEGMENTS, "MidFloor4");
     CreateFloorPlane(
-        Level0Scene, MID_FLOOR_5_POS, MID_FLOOR_5_SEGMENTS, "MidFloor5");
+        level0Scene, MID_FLOOR_5_POS, MID_FLOOR_5_SEGMENTS, "MidFloor5");
     CreateFloorPlane(
-        Level0Scene, MID_FLOOR_6_POS, MID_FLOOR_6_SEGMENTS, "MidFloor6");
+        level0Scene, MID_FLOOR_6_POS, MID_FLOOR_6_SEGMENTS, "MidFloor6");
 
     CreateFloorPlane(
-        Level0Scene, BOTTOM_FLOOR_POS, BOTTOM_FLOOR_SEGMENTS, "BottomFloor");
+        level0Scene, BOTTOM_FLOOR_POS, BOTTOM_FLOOR_SEGMENTS, "BottomFloor");
 
 #pragma endregion
 #pragma region STAIRS
-    static constexpr glm::vec2 STAIR_1_POS{ G_SIZE * 3, G_SIZE * 6 };
+    static constexpr glm::vec2 STAIR_1_POS{ G_SIZE * 3,
+                                            G_SIZE * 5 + TOP_BORDER };
     static constexpr int STAIR_1_COUNT{ 4 };
     static constexpr bool STAIR_1_GREEN{ true };
-    static constexpr glm::vec2 STAIR_2_POS{ G_SIZE * 3, G_SIZE * 14 };
+    static constexpr glm::vec2 STAIR_2_POS{ G_SIZE * 3,
+                                            G_SIZE * 13 + TOP_BORDER };
     static constexpr int STAIRS_2_COUNT{ 10 };
     static constexpr bool STAIR_2_GREEN{ true };
-    static constexpr glm::vec2 STAIR_3_POS{ G_SIZE * 6, G_SIZE * 10 };
+    static constexpr glm::vec2 STAIR_3_POS{ G_SIZE * 6,
+                                            G_SIZE * 9 + TOP_BORDER };
     static constexpr int STAIR_3_COUNT{ 10 };
     static constexpr bool STAIR_3_GREEN{ false };
-    static constexpr glm::vec2 STAIR_4_POS{ G_SIZE * 9, G_SIZE * 6 };
+    static constexpr glm::vec2 STAIR_4_POS{ G_SIZE * 9,
+                                            G_SIZE * 5 + TOP_BORDER };
     static constexpr int STAIR_4_COUNT{ 18 };
     static constexpr bool STAIR_4_GREEN{ true };
-    static constexpr glm::vec2 STAIR_5_POS{ G_SIZE * 12, G_SIZE * 6 };
+    static constexpr glm::vec2 STAIR_5_POS{ G_SIZE * 12,
+                                            G_SIZE * 5 + TOP_BORDER };
     static constexpr int STAIR_5_COUNT{ 6 };
     static constexpr bool STAIR_5_GREEN{ false };
-    static constexpr glm::vec2 STAIR_6_POS{ G_SIZE * 15, G_SIZE * 6 };
+    static constexpr glm::vec2 STAIR_6_POS{ G_SIZE * 15,
+                                            G_SIZE * 5 + TOP_BORDER };
     static constexpr int STAIR_6_COUNT{ 18 };
     static constexpr bool STAIR_6_GREEN{ true };
-    static constexpr glm::vec2 STAIR_7_POS{ G_SIZE * 18, G_SIZE * 10 };
+    static constexpr glm::vec2 STAIR_7_POS{ G_SIZE * 18,
+                                            G_SIZE * 9 + TOP_BORDER };
     static constexpr int STAIR_7_COUNT{ 6 };
     static constexpr bool STAIR_7_GREEN{ false };
-    static constexpr glm::vec2 STAIR_8_POS{ G_SIZE * 21, G_SIZE * 6 };
+    static constexpr glm::vec2 STAIR_8_POS{ G_SIZE * 21,
+                                            G_SIZE * 5 + TOP_BORDER };
     static constexpr int STAIR_8_COUNT{ 18 };
     static constexpr bool STAIR_8_GREEN{ true };
-    static constexpr glm::vec2 STAIR_9_POS{ G_SIZE * 24, G_SIZE * 14 };
+    static constexpr glm::vec2 STAIR_9_POS{ G_SIZE * 24,
+                                            G_SIZE * 13 + TOP_BORDER };
     static constexpr int STAIR_9_COUNT{ 10 };
     static constexpr bool STAIR_9_GREEN{ false };
-    static constexpr glm::vec2 STAIR_10_POS{ G_SIZE * 27, G_SIZE * 6 };
+    static constexpr glm::vec2 STAIR_10_POS{ G_SIZE * 27,
+                                             G_SIZE * 5 + TOP_BORDER };
     static constexpr int STAIR_10_COUNT{ 8 };
     static constexpr bool STAIR_10_GREEN{ true };
-    static constexpr glm::vec2 STAIR_11_POS{ G_SIZE * 27, G_SIZE * 18 };
+    static constexpr glm::vec2 STAIR_11_POS{ G_SIZE * 27,
+                                             G_SIZE * 17 + TOP_BORDER };
     static constexpr int STAIR_11_COUNT{ 6 };
     static constexpr bool STAIR_11_GREEN{ true };
 
-    CreateStairs(Level0Scene, STAIR_3_POS, STAIR_3_COUNT, STAIR_3_GREEN);
-    CreateStairs(Level0Scene, STAIR_1_POS, STAIR_1_COUNT, STAIR_1_GREEN);
-    CreateStairs(Level0Scene, STAIR_2_POS, STAIRS_2_COUNT, STAIR_2_GREEN);
-    CreateStairs(Level0Scene, STAIR_4_POS, STAIR_4_COUNT, STAIR_4_GREEN);
-    CreateStairs(Level0Scene, STAIR_5_POS, STAIR_5_COUNT, STAIR_5_GREEN);
-    CreateStairs(Level0Scene, STAIR_6_POS, STAIR_6_COUNT, STAIR_6_GREEN);
-    CreateStairs(Level0Scene, STAIR_7_POS, STAIR_7_COUNT, STAIR_7_GREEN);
-    CreateStairs(Level0Scene, STAIR_8_POS, STAIR_8_COUNT, STAIR_8_GREEN);
-    CreateStairs(Level0Scene, STAIR_9_POS, STAIR_9_COUNT, STAIR_9_GREEN);
-    CreateStairs(Level0Scene, STAIR_10_POS, STAIR_10_COUNT, STAIR_10_GREEN);
-    CreateStairs(Level0Scene, STAIR_11_POS, STAIR_11_COUNT, STAIR_11_GREEN);
+    CreateStairs(level0Scene, STAIR_1_POS, STAIR_1_COUNT, STAIR_1_GREEN);
+    CreateStairs(level0Scene, STAIR_2_POS, STAIRS_2_COUNT, STAIR_2_GREEN);
+    CreateStairs(level0Scene, STAIR_3_POS, STAIR_3_COUNT, STAIR_3_GREEN);
+    CreateStairs(level0Scene, STAIR_4_POS, STAIR_4_COUNT, STAIR_4_GREEN);
+    CreateStairs(level0Scene, STAIR_5_POS, STAIR_5_COUNT, STAIR_5_GREEN);
+    CreateStairs(level0Scene, STAIR_6_POS, STAIR_6_COUNT, STAIR_6_GREEN);
+    CreateStairs(level0Scene, STAIR_7_POS, STAIR_7_COUNT, STAIR_7_GREEN);
+    CreateStairs(level0Scene, STAIR_8_POS, STAIR_8_COUNT, STAIR_8_GREEN);
+    CreateStairs(level0Scene, STAIR_9_POS, STAIR_9_COUNT, STAIR_9_GREEN);
+    CreateStairs(level0Scene, STAIR_10_POS, STAIR_10_COUNT, STAIR_10_GREEN);
+    CreateStairs(level0Scene, STAIR_11_POS, STAIR_11_COUNT, STAIR_11_GREEN);
 #pragma endregion
 #pragma region BURGERPLATE
     static constexpr glm::vec2 BURGERPLATE_POS_1 = { G_SIZE * 4, G_SIZE * 27 };
@@ -415,10 +444,10 @@ static void SetupLevel0()
     static constexpr glm::vec2 BURGERPLATE_POS_3 = { G_SIZE * 16, G_SIZE * 27 };
     static constexpr glm::vec2 BURGERPLATE_POS_4 = { G_SIZE * 22, G_SIZE * 27 };
 
-    CreateBurgerPlateStack(Level0Scene, BURGERPLATE_POS_1);
-    CreateBurgerPlateStack(Level0Scene, BURGERPLATE_POS_2);
-    CreateBurgerPlateStack(Level0Scene, BURGERPLATE_POS_3);
-    CreateBurgerPlateStack(Level0Scene, BURGERPLATE_POS_4);
+    CreateBurgerPlateStack(level0Scene, BURGERPLATE_POS_1);
+    CreateBurgerPlateStack(level0Scene, BURGERPLATE_POS_2);
+    CreateBurgerPlateStack(level0Scene, BURGERPLATE_POS_3);
+    CreateBurgerPlateStack(level0Scene, BURGERPLATE_POS_4);
 #pragma endregion
 }
 

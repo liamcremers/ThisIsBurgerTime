@@ -2,11 +2,17 @@
 #include "GameObject.h"
 #include "EngineTime.h"
 #include "TransformComponent.h"
+#include "ColliderComponent.h"
 
 dae::PhysicsComponent::PhysicsComponent(GameObject& parent, bool useGravity) :
     BaseComponent{ parent },
-    m_UseGravity{ useGravity }
-{}
+    m_UseGravity{ useGravity },
+    m_pCollider{ parent.GetComponent<ColliderComponent>() }
+{
+    assert(m_pCollider != nullptr &&
+           "PhysicsComponent requires a ColliderComponent to function");
+    m_pCollider->SetCollisionType(CollisionType::Dynamic);
+}
 
 void dae::PhysicsComponent::FixedUpdate()
 {
@@ -14,11 +20,16 @@ void dae::PhysicsComponent::FixedUpdate()
 
     if (m_UseGravity)
     {
-        m_Velocity.y += m_Gravity * fixedDelta;
-        m_Velocity.y = std::min(m_Velocity.y, m_MaxFallSpeed);
+        m_Velocity[1] += m_Gravity * fixedDelta;
+        m_Velocity[1] = std::min(m_Velocity[1], m_MaxFallSpeed);
     }
-    GetOwner().SetLocalPosition(GetOwner().GetLocalPosition() +
-                                m_Velocity * fixedDelta);
+    if (m_Velocity != glm::vec2{ 0, 0 })
+    {
+        GetOwner().SetLocalPosition(GetOwner().GetLocalPosition() +
+                                    m_Velocity * fixedDelta);
+
+        m_pCollider->SetHasMoved(true);
+    }
 }
 
 void dae::PhysicsComponent::SetVelocity(const glm::vec2& velocity)

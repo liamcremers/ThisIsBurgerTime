@@ -1,7 +1,12 @@
 #include "PlayerComponent.h"
 #include "InputManager.h"
 #include "Controller.h"
-#include "Command.h"
+
+#include "EngineTime.h"
+#include "GameObject.h"
+#include "PhysicsComponent.h"
+
+#include "BurgerTimeLayers.h"
 
 #include <SDL.h>
 
@@ -11,10 +16,13 @@ namespace dae
                                                unsigned long idx) :
         BaseComponent(parent),
         m_pController{ std::make_unique<Controller>(idx) },
-        m_pMoveCommandUp{ std::make_unique<MoveCommand>(parent, MoveUp) },
-        m_pMoveCommandDown{ std::make_unique<MoveCommand>(parent, MoveDown) },
-        m_pMoveCommandLeft{ std::make_unique<MoveCommand>(parent, MoveLeft) },
-        m_pMoveCommandRight{ std::make_unique<MoveCommand>(parent, MoveRight) },
+        m_pMoveCommandUp{ std::make_unique<PlayerMoveCommand>(parent, MoveUp) },
+        m_pMoveCommandDown{ std::make_unique<PlayerMoveCommand>(parent,
+                                                                MoveDown) },
+        m_pMoveCommandLeft{ std::make_unique<PlayerMoveCommand>(parent,
+                                                                MoveLeft) },
+        m_pMoveCommandRight{ std::make_unique<PlayerMoveCommand>(parent,
+                                                                 MoveRight) },
         m_pSelfDamageCommand{ std::make_unique<SelfDamageCommand>(parent) },
         m_pAdd100PointsCommand{
             std::make_unique<AddPointsCommand>(parent, HUNDRED_POINTS)
@@ -47,6 +55,32 @@ namespace dae
                                   dae::ButtonState::DownThisFrame);
 
         SetUpKeyboardControls(idx);
+
+        GetOwner().GetComponent<ColliderComponent>()->SubscribeToBeginOverlap(
+            [this](const ColliderComponent& other)
+            {
+                if ((other.GetLayer() &
+                     static_cast<uint16_t>(
+                         BurgerTime::CollisionLayer::Floor)) != 0)
+                {
+                    m_pMoveCommandLeft->SetReady(true);
+                    m_pMoveCommandRight->SetReady(true);
+                    GetOwner()
+                        .GetComponent<dae::PhysicsComponent>()
+                        ->SetUseGravity(false);
+                }
+            });
+        GetOwner().GetComponent<ColliderComponent>()->SubscribeToEndOverlap(
+            [this](const ColliderComponent& other)
+            {
+                if ((other.GetLayer() &
+                     static_cast<uint16_t>(
+                         BurgerTime::CollisionLayer::Floor)) != 0)
+                {
+                    //m_pMoveCommandLeft->SetReady(false);
+                    //m_pMoveCommandRight->SetReady(false);
+                }
+            });
     }
 
     PlayerInputComponent::~PlayerInputComponent()
@@ -113,4 +147,32 @@ namespace dae
                                             m_pAdd10PointsCommand.get());
         }
     }
+
+    PlayerMoveCommand::PlayerMoveCommand(GameObject& pGameObject,
+                                         glm::i8vec2 direction,
+                                         int speed) :
+        GameObjectCommand{ &pGameObject },
+        m_Direction{ direction },
+        m_Speed{ speed }
+    {}
+
+    void PlayerMoveCommand::Execute()
+    {
+        if (m_IsReady)
+        {
+            auto deltaTime = EngineTime::GetInstance().GetDeltaTime();
+            const auto& worldPos = GetGameObject()->GetWorldPosition();
+            auto pos = worldPos + glm::vec2{
+                static_cast<float>(m_Direction[0] * m_Speed) * deltaTime,
+                static_cast<float>(m_Direction[1] * m_Speed) * deltaTime
+            };
+            GetGameObject()->SetLocalPosition(pos);
+        }
+    }
+
+    void PlayerMoveCommand::Undo() {}
+
+    void PlayerMoveCommand::SetSpeed(int speed) { m_Speed = speed; }
+
+    inline void PlayerMoveCommand::SetReady(bool ready) { m_IsReady = ready; }
 }
