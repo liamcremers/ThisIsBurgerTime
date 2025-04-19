@@ -134,12 +134,6 @@ void dae::ColliderComponent::SetCollisionLayer(uint16_t layer)
             thisWorldPos[1] + m_Size[1] > otherWorldPos[1]);
 }
 
-[[nodiscard]] auto dae::ColliderComponent::TODORemove(
-    const ColliderComponent& other) const -> bool
-{
-    return IsColliding(other);
-}
-
 [[nodiscard]] auto dae::ColliderComponent::IsStatic() const -> bool
 {
     return m_CollisionType == CollisionType::Static;

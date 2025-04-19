@@ -132,7 +132,7 @@ void dae::GameObject::SetPositionDirty()
         child->SetPositionDirty();
 };
 
-void dae::GameObject::RemoveChild(GameObject* pChild)
+void dae::GameObject::RemoveChild(GameObject* pChild)   
 {
     std::erase_if(m_pChildren, std::bind_front(std::equal_to<>(), pChild));
 }

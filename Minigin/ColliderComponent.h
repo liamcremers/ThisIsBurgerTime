@@ -54,7 +54,6 @@ namespace dae
         [[nodiscard]] uint16_t GetMask() const;
         [[nodiscard]] uint16_t GetLayer() const;
         [[nodiscard]] bool IsColliding(const ColliderComponent& other) const;
-        [[nodiscard]] bool TODORemove(const ColliderComponent&) const;
         [[nodiscard]] bool IsStatic() const;
 
         [[nodiscard]] bool HasMoved() const { return m_HasMoved; };
@@ -63,12 +62,6 @@ namespace dae
         friend class CollisionSystem;
         std::vector<OverlapEvent> m_BeginOverlapCallbacks;
         std::vector<OverlapEvent> m_EndOverlapCallbacks;
-
-        //struct CollisionData
-        //{
-        //    glm::vec2 normal; // Collision direction
-        //    float penetration; // Overlap depth
-        //};
 
         std::unordered_set<ColliderComponent*> m_CurrentOverlaps;
         glm::vec2 m_Size{};

@@ -20,6 +20,17 @@ namespace dae
 
         [[nodiscard]] const std::string& GetName() const { return m_name; }
 
+        [[nodiscard]] std::vector<GameObject*> GetGameObjects() const
+        {
+            std::vector<GameObject*> gameObjects;
+            gameObjects.reserve(m_objects.size());
+            for (const auto& obj : m_objects)
+            {
+                gameObjects.push_back(obj.get());
+            }
+            return gameObjects;
+        }
+
         ~Scene() = default;
         Scene(const Scene& other) = delete;
         Scene(Scene&& other) = delete;

@@ -1,7 +1,7 @@
 #ifdef DEBUG_RENDER
 #include "DebugRenderer.h"
 
-//TODO: optimize this using a better container
+using namespace dae;
 void DebugRenderer::RenderRect(const glm::vec2& position,
                                const glm::vec2& size,
                                const glm::vec4& color)
@@ -20,12 +20,12 @@ void DebugRenderer::Flush()
     Uint8 a = 0;
     SDL_GetRenderDrawColor(m_Renderer, &r, &g, &b, &a);
 
+    static constexpr int MAX_VALUE = 255;
     for (const auto& rect : m_DebugRects)
     {
         SDL_FRect sdlRect = {
             rect.position[0], rect.position[1], rect.size[0], rect.size[1]
         };
-        static constexpr int MAX_VALUE = 255;
         SDL_SetRenderDrawColor(m_Renderer,
                                static_cast<Uint8>(rect.color[0] * MAX_VALUE),
                                static_cast<Uint8>(rect.color[1] * MAX_VALUE),
@@ -33,8 +33,8 @@ void DebugRenderer::Flush()
                                static_cast<Uint8>(rect.color[3] * MAX_VALUE));
         SDL_RenderDrawRectF(m_Renderer, &sdlRect);
     }
-    SDL_SetRenderDrawColor(m_Renderer, r, g, b, a);
 
+    SDL_SetRenderDrawColor(m_Renderer, r, g, b, a);
     m_DebugRects.clear();
 }
 #endif // DEBUG_RENDER

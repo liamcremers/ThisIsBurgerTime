@@ -15,7 +15,6 @@ namespace BurgerTime
     };
 
     constexpr uint16_t PLAYER_COLLISION_MASK =
-        static_cast<uint16_t>(CollisionLayer::Floor) |
         static_cast<uint16_t>(CollisionLayer::BurgerPlate);
 
     constexpr uint16_t FLOOR_COLLISION_MASK =
@@ -25,4 +24,9 @@ namespace BurgerTime
 
     constexpr uint16_t FOOD_COLLISION_MASK =
         static_cast<uint16_t>(CollisionLayer::BurgerPlate);
+
+    constexpr uint16_t LADDER_COLLISION_MASK =
+        static_cast<uint16_t>(CollisionLayer::Player) |
+        static_cast<uint16_t>(CollisionLayer::Enemy) |
+        static_cast<uint16_t>(CollisionLayer::Food);
 }

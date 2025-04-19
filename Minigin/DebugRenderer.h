@@ -6,27 +6,32 @@
 #include <vector>
 #include <SDL.h>
 
-class DebugRenderer : public dae::Singleton<DebugRenderer>
+class LevelGrid;
+
+namespace dae
 {
-    struct DebugRect
+    class DebugRenderer : public dae::Singleton<DebugRenderer>
     {
-        glm::vec2 position;
-        glm::vec2 size;
-        glm::vec4 color;
+        struct DebugRect
+        {
+            glm::vec2 position;
+            glm::vec2 size;
+            glm::vec4 color;
+        };
+
+    public:
+        void RenderRect(const glm::vec2& position,
+                        const glm::vec2& size,
+                        const glm::vec4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+
+        void Flush();
+
+    private:
+        friend class Singleton<DebugRenderer>;
+        DebugRenderer() = default;
+
+        std::vector<DebugRect> m_DebugRects;
+        SDL_Renderer* m_Renderer = nullptr;
     };
-
-public:
-    void RenderRect(const glm::vec2& position,
-                    const glm::vec2& size,
-                    const glm::vec4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
-
-    void Flush();
-
-private:
-    friend class Singleton<DebugRenderer>;
-    DebugRenderer() = default;
-
-    std::vector<DebugRect> m_DebugRects;
-    SDL_Renderer* m_Renderer = nullptr;
-};
+}
 #endif // DEBUG_RENDER

@@ -67,7 +67,7 @@ namespace dae
                 }
                 if (state == ButtonState::UpThisFrame && IsUpThisFrame(key))
                 {
-                    command->Execute();
+                    command->Undo();
                     break;
                 }
                 if (state == ButtonState::Pressed && IsPressed(key))
@@ -77,7 +77,7 @@ namespace dae
                 }
                 if (state == ButtonState::Released && IsReleased(key))
                 {
-                    command->Execute();
+                    command->Undo();
                     break;
                 }
             }

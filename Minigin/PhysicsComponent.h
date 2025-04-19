@@ -26,7 +26,7 @@ namespace dae
         ColliderComponent* m_pCollider{ nullptr };
 
         glm::vec2 m_Velocity{ 0, 0 };
-        float m_Gravity{ 0.0f };
+        float m_Gravity{ 9.81f };
         float m_MaxFallSpeed{ 1000.f };
         bool m_UseGravity{ true };
     };

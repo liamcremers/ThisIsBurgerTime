@@ -16,6 +16,7 @@
 #include "PlayerComponent.h"
 #include "BurgerTimeLayers.h"
 #include "CollisionSystem.h"
+#include "LevelGrid.h"
 
 #include <filesystem>
 #include <memory>
@@ -59,7 +60,7 @@ static void SetupPlayers(const int windowWidth, const int windowHeight)
         "Lingua.otf", SMALL_FONT_SIZE);
     for (int i = 0; i < 2; ++i)
     {
-        glm::vec2 middlePos = { windowWidth / 2, windowHeight / 2 + 20 };
+        glm::vec2 middlePos = { windowWidth / 2, windowHeight / 2 + 106 };
         glm::vec2 playerPos = {
             middlePos[0] + (OFFSET * static_cast<float>(i - 1)), middlePos[1]
         };
@@ -78,13 +79,13 @@ static void SetupPlayers(const int windowWidth, const int windowHeight)
         collider->SetCollisionMask(BurgerTime::PLAYER_COLLISION_MASK);
 
         auto* physics = player->AddComponent<dae::PhysicsComponent>();
-        physics->SetGravity(GRAVITY);
+        physics->SetUseGravity(false);
 
         auto* livesComp =
             player->AddComponent<dae::LivesComponent>(START_LIVES);
         auto* scoreComp = player->AddComponent<dae::ScoreComponent>();
 
-        auto* inputComp = player->AddComponent<dae::PlayerInputComponent>(
+        auto* inputComp = player->AddComponent<PlayerInputComponent>(
             static_cast<uint8_t>(i));
         inputComp->SetSpeed(BASE_SPEED * (i + 1));
 
@@ -167,11 +168,11 @@ static void CreateFloorPlane(dae::Scene& scene,
     }
 }
 
-static void CreateStairs(dae::Scene& scene,
+static void CreateLadder(dae::Scene& scene,
                          const glm::vec2& startPos,
-                         int nrStairs,
+                         int nrLadders,
                          bool bGreen,
-                         const std::string& baseName = "Stair")
+                         const std::string& baseName = "Ladder")
 {
     // Track which textures have been scaled to avoid scaling the same texture multiple times
     static bool hasScaledTextureGL = false;
@@ -179,7 +180,7 @@ static void CreateStairs(dae::Scene& scene,
     static bool hasScaledTextureBL = false;
     static bool hasScaledTextureBR = false;
 
-    for (int i = 0; i < nrStairs; ++i)
+    for (int i = 0; i < nrLadders; ++i)
     {
         // Create left stair piece
         auto goL = std::make_unique<dae::GameObject>(baseName + "L" +
@@ -188,7 +189,7 @@ static void CreateStairs(dae::Scene& scene,
 
         if (bGreen)
         {
-            rendererCompL->SetTexture("Stair_G_L.png");
+            rendererCompL->SetTexture("Ladder_G_L.png");
             if (!hasScaledTextureGL)
             {
                 rendererCompL->Scale(2);
@@ -197,7 +198,7 @@ static void CreateStairs(dae::Scene& scene,
         }
         else
         {
-            rendererCompL->SetTexture("Stair_B_L.png");
+            rendererCompL->SetTexture("Ladder_B_L.png");
             if (!hasScaledTextureBL)
             {
                 rendererCompL->Scale(2);
@@ -214,7 +215,7 @@ static void CreateStairs(dae::Scene& scene,
 
         if (bGreen)
         {
-            rendererCompR->SetTexture("Stair_G_R.png");
+            rendererCompR->SetTexture("Ladder_G_R.png");
             if (!hasScaledTextureGR)
             {
                 rendererCompR->Scale(2);
@@ -223,7 +224,7 @@ static void CreateStairs(dae::Scene& scene,
         }
         else
         {
-            rendererCompR->SetTexture("Stair_B_R.png");
+            rendererCompR->SetTexture("Ladder_B_R.png");
             if (!hasScaledTextureBR)
             {
                 rendererCompR->Scale(2);
@@ -233,6 +234,20 @@ static void CreateStairs(dae::Scene& scene,
 
         // Position the right stair piece next to the left piece
         goR->SetLocalPosition(startPos + glm::vec2(G_SIZE, i * G_SIZE));
+
+        auto colliderL = goL->AddComponent<dae::ColliderComponent>(
+            glm::vec2{ G_SIZE, G_SIZE });
+        colliderL->SetCollisionLayer(
+            static_cast<uint16_t>(BurgerTime::CollisionLayer::Ladder));
+        colliderL->SetCollisionMask(BurgerTime::LADDER_COLLISION_MASK);
+        dae::CollisionSystem::GetInstance().RegisterCollider(colliderL);
+
+        auto colliderR = goR->AddComponent<dae::ColliderComponent>(
+            glm::vec2{ G_SIZE, G_SIZE });
+        colliderR->SetCollisionLayer(
+            static_cast<uint16_t>(BurgerTime::CollisionLayer::Ladder));
+        colliderR->SetCollisionMask(BurgerTime::LADDER_COLLISION_MASK);
+        dae::CollisionSystem::GetInstance().RegisterCollider(colliderR);
 
         scene.Add(std::move(goL));
         scene.Add(std::move(goR));
@@ -380,63 +395,63 @@ static void SetupLevel0()
         level0Scene, BOTTOM_FLOOR_POS, BOTTOM_FLOOR_SEGMENTS, "BottomFloor");
 
 #pragma endregion
-#pragma region STAIRS
-    static constexpr glm::vec2 STAIR_1_POS{ G_SIZE * 3,
-                                            G_SIZE * 5 + TOP_BORDER };
-    static constexpr int STAIR_1_COUNT{ 4 };
-    static constexpr bool STAIR_1_GREEN{ true };
-    static constexpr glm::vec2 STAIR_2_POS{ G_SIZE * 3,
-                                            G_SIZE * 13 + TOP_BORDER };
-    static constexpr int STAIRS_2_COUNT{ 10 };
-    static constexpr bool STAIR_2_GREEN{ true };
-    static constexpr glm::vec2 STAIR_3_POS{ G_SIZE * 6,
-                                            G_SIZE * 9 + TOP_BORDER };
-    static constexpr int STAIR_3_COUNT{ 10 };
-    static constexpr bool STAIR_3_GREEN{ false };
-    static constexpr glm::vec2 STAIR_4_POS{ G_SIZE * 9,
-                                            G_SIZE * 5 + TOP_BORDER };
-    static constexpr int STAIR_4_COUNT{ 18 };
-    static constexpr bool STAIR_4_GREEN{ true };
-    static constexpr glm::vec2 STAIR_5_POS{ G_SIZE * 12,
-                                            G_SIZE * 5 + TOP_BORDER };
-    static constexpr int STAIR_5_COUNT{ 6 };
-    static constexpr bool STAIR_5_GREEN{ false };
-    static constexpr glm::vec2 STAIR_6_POS{ G_SIZE * 15,
-                                            G_SIZE * 5 + TOP_BORDER };
-    static constexpr int STAIR_6_COUNT{ 18 };
-    static constexpr bool STAIR_6_GREEN{ true };
-    static constexpr glm::vec2 STAIR_7_POS{ G_SIZE * 18,
-                                            G_SIZE * 9 + TOP_BORDER };
-    static constexpr int STAIR_7_COUNT{ 6 };
-    static constexpr bool STAIR_7_GREEN{ false };
-    static constexpr glm::vec2 STAIR_8_POS{ G_SIZE * 21,
-                                            G_SIZE * 5 + TOP_BORDER };
-    static constexpr int STAIR_8_COUNT{ 18 };
-    static constexpr bool STAIR_8_GREEN{ true };
-    static constexpr glm::vec2 STAIR_9_POS{ G_SIZE * 24,
-                                            G_SIZE * 13 + TOP_BORDER };
-    static constexpr int STAIR_9_COUNT{ 10 };
-    static constexpr bool STAIR_9_GREEN{ false };
-    static constexpr glm::vec2 STAIR_10_POS{ G_SIZE * 27,
+#pragma region LADDERS
+    static constexpr glm::vec2 LADDER_1_POS{ G_SIZE * 3,
                                              G_SIZE * 5 + TOP_BORDER };
-    static constexpr int STAIR_10_COUNT{ 8 };
-    static constexpr bool STAIR_10_GREEN{ true };
-    static constexpr glm::vec2 STAIR_11_POS{ G_SIZE * 27,
-                                             G_SIZE * 17 + TOP_BORDER };
-    static constexpr int STAIR_11_COUNT{ 6 };
-    static constexpr bool STAIR_11_GREEN{ true };
+    static constexpr int LADDER_1_COUNT{ 4 };
+    static constexpr bool LADDER_1_GREEN{ true };
+    static constexpr glm::vec2 LADDER_2_POS{ G_SIZE * 3,
+                                             G_SIZE * 13 + TOP_BORDER };
+    static constexpr int LADDER_2_COUNT{ 10 };
+    static constexpr bool LADDER_2_GREEN{ true };
+    static constexpr glm::vec2 LADDER_3_POS{ G_SIZE * 6,
+                                             G_SIZE * 9 + TOP_BORDER };
+    static constexpr int LADDER_3_COUNT{ 10 };
+    static constexpr bool LADDER_3_GREEN{ false };
+    static constexpr glm::vec2 LADDER_4_POS{ G_SIZE * 9,
+                                             G_SIZE * 5 + TOP_BORDER };
+    static constexpr int LADDER_4_COUNT{ 18 };
+    static constexpr bool LADDER_4_GREEN{ true };
+    static constexpr glm::vec2 LADDER_5_POS{ G_SIZE * 12,
+                                             G_SIZE * 5 + TOP_BORDER };
+    static constexpr int LADDER_5_COUNT{ 6 };
+    static constexpr bool LADDER_5_GREEN{ false };
+    static constexpr glm::vec2 LADDER_6_POS{ G_SIZE * 15,
+                                             G_SIZE * 5 + TOP_BORDER };
+    static constexpr int LADDER_6_COUNT{ 18 };
+    static constexpr bool LADDER_6_GREEN{ true };
+    static constexpr glm::vec2 LADDER_7_POS{ G_SIZE * 18,
+                                             G_SIZE * 9 + TOP_BORDER };
+    static constexpr int LADDER_7_COUNT{ 6 };
+    static constexpr bool LADDER_7_GREEN{ false };
+    static constexpr glm::vec2 LADDER_8_POS{ G_SIZE * 21,
+                                             G_SIZE * 5 + TOP_BORDER };
+    static constexpr int LADDER_8_COUNT{ 18 };
+    static constexpr bool LADDER_8_GREEN{ true };
+    static constexpr glm::vec2 LADDER_9_POS{ G_SIZE * 24,
+                                             G_SIZE * 13 + TOP_BORDER };
+    static constexpr int LADDER_9_COUNT{ 10 };
+    static constexpr bool LADDER_9_GREEN{ false };
+    static constexpr glm::vec2 LADDER_10_POS{ G_SIZE * 27,
+                                              G_SIZE * 5 + TOP_BORDER };
+    static constexpr int LADDER_10_COUNT{ 8 };
+    static constexpr bool LADDER_10_GREEN{ true };
+    static constexpr glm::vec2 LADDER_11_POS{ G_SIZE * 27,
+                                              G_SIZE * 17 + TOP_BORDER };
+    static constexpr int LADDER_11_COUNT{ 6 };
+    static constexpr bool LADDER_11_GREEN{ true };
 
-    CreateStairs(level0Scene, STAIR_1_POS, STAIR_1_COUNT, STAIR_1_GREEN);
-    CreateStairs(level0Scene, STAIR_2_POS, STAIRS_2_COUNT, STAIR_2_GREEN);
-    CreateStairs(level0Scene, STAIR_3_POS, STAIR_3_COUNT, STAIR_3_GREEN);
-    CreateStairs(level0Scene, STAIR_4_POS, STAIR_4_COUNT, STAIR_4_GREEN);
-    CreateStairs(level0Scene, STAIR_5_POS, STAIR_5_COUNT, STAIR_5_GREEN);
-    CreateStairs(level0Scene, STAIR_6_POS, STAIR_6_COUNT, STAIR_6_GREEN);
-    CreateStairs(level0Scene, STAIR_7_POS, STAIR_7_COUNT, STAIR_7_GREEN);
-    CreateStairs(level0Scene, STAIR_8_POS, STAIR_8_COUNT, STAIR_8_GREEN);
-    CreateStairs(level0Scene, STAIR_9_POS, STAIR_9_COUNT, STAIR_9_GREEN);
-    CreateStairs(level0Scene, STAIR_10_POS, STAIR_10_COUNT, STAIR_10_GREEN);
-    CreateStairs(level0Scene, STAIR_11_POS, STAIR_11_COUNT, STAIR_11_GREEN);
+    CreateLadder(level0Scene, LADDER_1_POS, LADDER_1_COUNT, LADDER_1_GREEN);
+    CreateLadder(level0Scene, LADDER_2_POS, LADDER_2_COUNT, LADDER_2_GREEN);
+    CreateLadder(level0Scene, LADDER_3_POS, LADDER_3_COUNT, LADDER_3_GREEN);
+    CreateLadder(level0Scene, LADDER_4_POS, LADDER_4_COUNT, LADDER_4_GREEN);
+    CreateLadder(level0Scene, LADDER_5_POS, LADDER_5_COUNT, LADDER_5_GREEN);
+    CreateLadder(level0Scene, LADDER_6_POS, LADDER_6_COUNT, LADDER_6_GREEN);
+    CreateLadder(level0Scene, LADDER_7_POS, LADDER_7_COUNT, LADDER_7_GREEN);
+    CreateLadder(level0Scene, LADDER_8_POS, LADDER_8_COUNT, LADDER_8_GREEN);
+    CreateLadder(level0Scene, LADDER_9_POS, LADDER_9_COUNT, LADDER_9_GREEN);
+    CreateLadder(level0Scene, LADDER_10_POS, LADDER_10_COUNT, LADDER_10_GREEN);
+    CreateLadder(level0Scene, LADDER_11_POS, LADDER_11_COUNT, LADDER_11_GREEN);
 #pragma endregion
 #pragma region BURGERPLATE
     static constexpr glm::vec2 BURGERPLATE_POS_1 = { G_SIZE * 4, G_SIZE * 27 };
@@ -449,6 +464,9 @@ static void SetupLevel0()
     CreateBurgerPlateStack(level0Scene, BURGERPLATE_POS_3);
     CreateBurgerPlateStack(level0Scene, BURGERPLATE_POS_4);
 #pragma endregion
+
+    LevelGrid::GetInstance().InitializeLevelGrid(level0Scene,
+                                                 glm::ivec2{ 16, 10 });
 }
 
 static void load(const int windowWidth, const int windowHeight)

@@ -16,7 +16,7 @@ void dae::CollisionSystem::RegisterCollider(dae::ColliderComponent* collider)
         m_DynamicColliders.push_back(collider);
 }
 
-void dae::CollisionSystem::ProcessCollisions()
+void dae::CollisionSystem::ProcessCollisions()// FIXED UPDATE
 {
     for (auto* dynamicCollider :
          m_DynamicColliders | std::views::filter(&ColliderComponent::HasMoved))
@@ -39,18 +39,24 @@ void dae::CollisionSystem::ProcessCollisions()
     CleanupEndedOverlaps();
 }
 
+auto dae::CollisionSystem::GetStaticColliders() const
+    -> const std::vector<ColliderComponent*>&
+{
+    return m_StaticColliders;
+}
+
 #ifdef DEBUG_RENDER
 void dae::CollisionSystem::RenderColliders() const
 {
-    for (const auto& colliderList : { m_DynamicColliders, m_StaticColliders })
-    {
-        for (const auto& collider : colliderList)
-        {
-            DebugRenderer::GetInstance().RenderRect(
-                collider->GetWorldPosition() + collider->GetOffset(),
-                collider->GetSize());
-        }
-    }
+    ///*for (const auto& colliderList : { m_DynamicColliders, m_StaticColliders })
+    //{
+    //    for (const auto& collider : colliderList)
+    //    {
+    //        DebugRenderer::GetInstance().RenderRect(
+    //            collider->GetWorldPosition() + collider->GetOffset(),
+    //            collider->GetSize());
+    //    }
+    //}*/
 }
 #endif // DEBUG_RENDER
 

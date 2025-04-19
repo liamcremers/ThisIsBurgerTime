@@ -17,6 +17,9 @@ namespace dae
 
         void ProcessCollisions();
 
+        [[nodiscard]] const std::vector<ColliderComponent*>&
+        GetStaticColliders() const;
+
 #ifdef DEBUG_RENDER
         void RenderColliders() const;
 #endif // DEBUG_RENDER
