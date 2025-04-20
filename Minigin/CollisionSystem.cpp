@@ -16,13 +16,14 @@ void dae::CollisionSystem::RegisterCollider(dae::ColliderComponent* collider)
         m_DynamicColliders.push_back(collider);
 }
 
-void dae::CollisionSystem::ProcessCollisions()// FIXED UPDATE
+void dae::CollisionSystem::ProcessCollisions() // FIXED UPDATE
 {
     for (auto* dynamicCollider :
          m_DynamicColliders | std::views::filter(&ColliderComponent::HasMoved))
     {
-        for (auto& ColliderList : { m_DynamicColliders, m_StaticColliders })
-            for (auto& other : ColliderList)
+        for (const auto& ColliderList :
+             { m_DynamicColliders, m_StaticColliders })
+            for (const auto& other : ColliderList)
             {
                 if (dynamicCollider == other)
                     continue;
@@ -72,8 +73,9 @@ void dae::CollisionSystem::ResolveCollision(ColliderComponent* a,
     b->OnCollision(*a);
 }
 
-bool dae::CollisionSystem::ShouldCollide(const ColliderComponent& a,
+auto dae::CollisionSystem::ShouldCollide(const ColliderComponent& a,
                                          const ColliderComponent& b) const
+    -> bool
 {
     return (a.GetMask() & b.GetLayer()) && (b.GetMask() & a.GetLayer());
 }

@@ -22,6 +22,8 @@
 #include <memory>
 namespace fs = std::filesystem;
 
+static constexpr int WINDOW_WIDTH = dae::Minigin::GetWindowWidth();
+static constexpr int WINDOW_HEIGHT = dae::Minigin::GetWindowHeight();
 static constexpr glm::vec2 FPS_POS = { 5.0f, 6.0f };
 static constexpr glm::vec2 INSTRUCTION_POS = { 58.0f, 6.0f };
 static constexpr glm::vec2 LIVES_UI_POS = { 5.0f, 20.0f };
@@ -52,18 +54,20 @@ static constexpr float GRAVITY = 9.81f;
 static constexpr glm::vec2 FLOOR_SIZE = { G_SIZE, G_SIZE / 4.f };
 static constexpr glm::vec2 FLOOR_OFFSET = { 0, 0 };
 static constexpr int TOP_BORDER = 10;
+static constexpr glm::ivec2 GRID_OFFSET = { 16, 10 };
+static constexpr glm::vec2 PLAYER_START_POS = { WINDOW_WIDTH / 2,
+                                                WINDOW_HEIGHT / 2 + 106 };
 
-static void SetupPlayers(const int windowWidth, const int windowHeight)
+static void SetupPlayers()
 {
     auto& scene = dae::SceneManager::GetInstance().CreateScene("PlayerScene");
     auto& smallFont = dae::ResourceManager::GetInstance().LoadFont(
         "Lingua.otf", SMALL_FONT_SIZE);
     for (int i = 0; i < 2; ++i)
     {
-        glm::vec2 middlePos = { windowWidth / 2, windowHeight / 2 + 106 };
-        glm::vec2 playerPos = {
-            middlePos[0] + (OFFSET * static_cast<float>(i - 1)), middlePos[1]
-        };
+        glm::vec2 playerPos = { PLAYER_START_POS[0] +
+                                    (OFFSET * static_cast<float>(i - 1)),
+                                PLAYER_START_POS[1] };
         auto player =
             std::make_unique<dae::GameObject>("player" + std::to_string(i));
         auto* renderComp = player->AddComponent<dae::RenderComponent>();
@@ -85,8 +89,8 @@ static void SetupPlayers(const int windowWidth, const int windowHeight)
             player->AddComponent<dae::LivesComponent>(START_LIVES);
         auto* scoreComp = player->AddComponent<dae::ScoreComponent>();
 
-        auto* inputComp = player->AddComponent<PlayerInputComponent>(
-            static_cast<uint8_t>(i));
+        auto* inputComp =
+            player->AddComponent<PlayerInputComponent>(static_cast<uint8_t>(i));
         inputComp->SetSpeed(BASE_SPEED * (i + 1));
 
         dae::CollisionSystem::GetInstance().RegisterCollider(collider);
@@ -235,14 +239,14 @@ static void CreateLadder(dae::Scene& scene,
         // Position the right stair piece next to the left piece
         goR->SetLocalPosition(startPos + glm::vec2(G_SIZE, i * G_SIZE));
 
-        auto colliderL = goL->AddComponent<dae::ColliderComponent>(
+        auto* colliderL = goL->AddComponent<dae::ColliderComponent>(
             glm::vec2{ G_SIZE, G_SIZE });
         colliderL->SetCollisionLayer(
             static_cast<uint16_t>(BurgerTime::CollisionLayer::Ladder));
         colliderL->SetCollisionMask(BurgerTime::LADDER_COLLISION_MASK);
         dae::CollisionSystem::GetInstance().RegisterCollider(colliderL);
 
-        auto colliderR = goR->AddComponent<dae::ColliderComponent>(
+        auto* colliderR = goR->AddComponent<dae::ColliderComponent>(
             glm::vec2{ G_SIZE, G_SIZE });
         colliderR->SetCollisionLayer(
             static_cast<uint16_t>(BurgerTime::CollisionLayer::Ladder));
@@ -465,14 +469,13 @@ static void SetupLevel0()
     CreateBurgerPlateStack(level0Scene, BURGERPLATE_POS_4);
 #pragma endregion
 
-    LevelGrid::GetInstance().InitializeLevelGrid(level0Scene,
-                                                 glm::ivec2{ 16, 10 });
+    LevelGrid::GetInstance().InitializeLevelGrid(level0Scene, GRID_OFFSET);
 }
 
-static void load(const int windowWidth, const int windowHeight)
+static void load()
 {
     SetupLevel0();
-    SetupPlayers(windowWidth, windowHeight);
+    SetupPlayers();
     SetupFPSScene();
 }
 
@@ -486,7 +489,6 @@ auto main(int, char*[]) -> int
         data_location = "../Data/";
 #endif
     dae::Minigin engine(data_location);
-    engine.Run([&engine]()
-               { load(engine.GetWindowWidth(), engine.GetWindowHeight()); });
+    engine.Run([&engine]() { load(); });
     return 0;
 }

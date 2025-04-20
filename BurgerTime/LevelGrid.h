@@ -5,6 +5,7 @@
 #include <DebugRenderer.h>
 #endif // DEBUG_RENDER
 
+#include "BurgerTimeLayers.h"
 #include "Singleton.h"
 #include <Scene.h>
 

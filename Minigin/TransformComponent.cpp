@@ -19,5 +19,5 @@ void dae::TransformComponent::SetWorldPosition(const glm::vec2& pos)
 
 void dae::TransformComponent::SetLocalPosition(const glm::vec2& pos)
 {
-    m_LocalPosition = { std::roundf(pos.x), std::roundf(pos.y) };
+    m_LocalPosition = { std::roundf(pos[0]), std::roundf(pos[1]) };
 }

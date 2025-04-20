@@ -2,6 +2,7 @@
 #include "DebugRenderer.h"
 
 using namespace dae;
+
 void DebugRenderer::RenderRect(const glm::vec2& position,
                                const glm::vec2& size,
                                const glm::vec4& color)
