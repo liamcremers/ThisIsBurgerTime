@@ -25,7 +25,9 @@ public:
     const dae::Controller* GetController() const;
 
     void SetSpeed(int speed);
-
+#ifdef DEBUG_RENDER
+    void Render() const override;
+#endif // DEBUG_RENDER
 private:
     void SetUpKeyboardControls(unsigned long idx);
 

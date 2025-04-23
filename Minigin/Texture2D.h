@@ -17,6 +17,7 @@ namespace dae
         explicit Texture2D(const std::string& fullPath);
         ~Texture2D();
 
+        bool IsScaled() const;
         glm::ivec2 GetSize() const;
         void Scale(float scale);
 
@@ -27,5 +28,6 @@ namespace dae
 
     private:
         SDL_Texture* m_texture;
+        bool m_isScaled{ false };
     };
 }

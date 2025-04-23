@@ -186,7 +186,7 @@ static void CreateLadder(dae::Scene& scene,
 
     for (int i = 0; i < nrLadders; ++i)
     {
-        // Create left stair piece
+        // Create left ladder piece
         auto goL = std::make_unique<dae::GameObject>(baseName + "L" +
                                                      std::to_string(i));
         auto* rendererCompL = goL->AddComponent<dae::RenderComponent>();
@@ -212,7 +212,7 @@ static void CreateLadder(dae::Scene& scene,
 
         goL->SetLocalPosition(startPos + glm::vec2(0, i * G_SIZE));
 
-        // Create right stair piece
+        // Create right ladder piece
         auto goR = std::make_unique<dae::GameObject>(baseName + "R" +
                                                      std::to_string(i));
         auto* rendererCompR = goR->AddComponent<dae::RenderComponent>();
@@ -236,7 +236,7 @@ static void CreateLadder(dae::Scene& scene,
             }
         }
 
-        // Position the right stair piece next to the left piece
+        // Position the right ladder piece next to the left piece
         goR->SetLocalPosition(startPos + glm::vec2(G_SIZE, i * G_SIZE));
 
         auto* colliderL = goL->AddComponent<dae::ColliderComponent>(
@@ -334,6 +334,32 @@ static void CreateBurgerPlateStack(dae::Scene& scene,
     scene.Add(std::move(goTR));
 }
 
+static void CreateFood(dae::Scene& scene,
+                       const glm::vec2& startPos,
+                       const std::string& baseName)
+{
+    const std::vector<std::string> textureSuffixes = {
+        "_L", "_M_L", "_M_R", "_R"
+    };
+
+    for (size_t i = 0; i < textureSuffixes.size(); ++i)
+    {
+        auto go =
+            std::make_unique<dae::GameObject>(baseName + textureSuffixes[i]);
+        auto* rendererComp = go->AddComponent<dae::RenderComponent>();
+        rendererComp->SetTexture(baseName + textureSuffixes[i] + ".png");
+        rendererComp->Scale(2);
+        auto* collider = go->AddComponent<dae::ColliderComponent>(
+            glm::vec2{ G_SIZE, G_SIZE });
+        collider->SetCollisionLayer(
+            static_cast<uint16_t>(BurgerTime::CollisionLayer::Food));
+        collider->SetCollisionMask(BurgerTime::FOOD_COLLISION_MASK);
+        dae::CollisionSystem::GetInstance().RegisterCollider(collider);
+        go->SetLocalPosition(startPos + glm::vec2(i * G_SIZE, 0));
+        scene.Add(std::move(go));
+    }
+}
+
 static void SetupLevel0()
 {
     static constexpr glm::vec2 COUNTER_POS = { G_SIZE * 2,
@@ -341,11 +367,17 @@ static void SetupLevel0()
 
     auto& level0Scene = dae::SceneManager::GetInstance().CreateScene("Level0");
 
-    auto grid = std::make_unique<dae::GameObject>("Grid");
-    auto* gridComp = grid->AddComponent<dae::RenderComponent>();
-    gridComp->SetTexture("Grid.png");
-    gridComp->Scale(2);
-    level0Scene.Add(std::move(grid));
+    //auto grid = std::make_unique<dae::GameObject>("Grid");
+    //auto* gridComp = grid->AddComponent<dae::RenderComponent>();
+    //gridComp->SetTexture("Grid.png");
+    //gridComp->Scale(2);
+    //level0Scene.Add(std::move(grid));
+
+    auto foodGrid = std::make_unique<dae::GameObject>("FoodGrid");
+    auto* foodGridComp = foodGrid->AddComponent<dae::RenderComponent>();
+    foodGridComp->SetTexture("FoodGrid.png");
+    foodGridComp->Scale(2);
+    level0Scene.Add(std::move(foodGrid));
 
     auto go = std::make_unique<dae::GameObject>("LevelCounter");
     auto* renderComp = go->AddComponent<dae::RenderComponent>();
@@ -467,6 +499,61 @@ static void SetupLevel0()
     CreateBurgerPlateStack(level0Scene, BURGERPLATE_POS_2);
     CreateBurgerPlateStack(level0Scene, BURGERPLATE_POS_3);
     CreateBurgerPlateStack(level0Scene, BURGERPLATE_POS_4);
+#pragma endregion
+#pragma region FOOD
+    static constexpr auto FOOD_TYPE_BUN_TOP = "BurgerBunTop";
+    static constexpr glm::vec2 BUN_TOP_POS_1 = { glm::ivec2{ G_SIZE * 5,
+                                                             G_SIZE * 9 - 2 } };
+    static constexpr glm::vec2 BUN_TOP_POS_2 = { glm::ivec2{ G_SIZE * 11,
+                                                             G_SIZE * 5 - 2 } };
+    static constexpr glm::vec2 BUN_TOP_POS_3 = { glm::ivec2{ G_SIZE * 17,
+                                                             G_SIZE * 5 - 2 } };
+    static constexpr glm::vec2 BUN_TOP_POS_4 = { glm::ivec2{ G_SIZE * 23,
+                                                             G_SIZE * 5 - 2 } };
+    static constexpr auto FOOD_TYPE_LETTUCE = "Lettuce";
+    static constexpr glm::vec2 LETTUCE_POS_1 = { glm::ivec2{
+        G_SIZE * 5, G_SIZE * 13 - 2 } };
+    static constexpr glm::vec2 LETTUCE_POS_2 = { glm::ivec2{
+        G_SIZE * 11, G_SIZE * 15 - 2 } };
+    static constexpr glm::vec2 LETTUCE_POS_3 = { glm::ivec2{ G_SIZE * 17,
+                                                             G_SIZE * 9 - 2 } };
+    static constexpr glm::vec2 LETTUCE_POS_4 = { glm::ivec2{ G_SIZE * 23,
+                                                             G_SIZE * 9 - 2 } };
+    static constexpr auto FOOD_TYPE_BURGER = "Burger";
+    static constexpr glm::vec2 BURGER_POS_1 = { glm::ivec2{ G_SIZE * 5,
+                                                            G_SIZE * 19 - 2 } };
+    static constexpr glm::vec2 BURGER_POS_2 = { glm::ivec2{ G_SIZE * 11,
+                                                            G_SIZE * 19 - 2 } };
+    static constexpr glm::vec2 BURGER_POS_3 = { glm::ivec2{ G_SIZE * 17,
+                                                            G_SIZE * 15 - 2 } };
+    static constexpr glm::vec2 BURGER_POS_4 = { glm::ivec2{ G_SIZE * 23,
+                                                            G_SIZE * 13 - 2 } };
+    static constexpr auto FOOD_TYPE_BUN_BOTTOM = "BurgerBunBottom";
+    static constexpr glm::vec2 BUN_BOTTOM_POS_1 = { glm::ivec2{
+        G_SIZE * 5, G_SIZE * 23 - 2 } };
+    static constexpr glm::vec2 BUN_BOTTOM_POS_2 = { glm::ivec2{
+        G_SIZE * 11, G_SIZE * 23 - 2 } };
+    static constexpr glm::vec2 BUN_BOTTOM_POS_3 = { glm::ivec2{
+        G_SIZE * 17, G_SIZE * 23 - 2 } };
+    static constexpr glm::vec2 BUN_BOTTOM_POS_4 = { glm::ivec2{
+        G_SIZE * 23, G_SIZE * 17 - 2 } };
+
+    CreateFood(level0Scene, BUN_TOP_POS_1, FOOD_TYPE_BUN_TOP);
+    CreateFood(level0Scene, BUN_TOP_POS_2, FOOD_TYPE_BUN_TOP);
+    CreateFood(level0Scene, BUN_TOP_POS_3, FOOD_TYPE_BUN_TOP);
+    CreateFood(level0Scene, BUN_TOP_POS_4, FOOD_TYPE_BUN_TOP);
+    CreateFood(level0Scene, LETTUCE_POS_1, FOOD_TYPE_LETTUCE);
+    CreateFood(level0Scene, LETTUCE_POS_2, FOOD_TYPE_LETTUCE);
+    CreateFood(level0Scene, LETTUCE_POS_3, FOOD_TYPE_LETTUCE);
+    CreateFood(level0Scene, LETTUCE_POS_4, FOOD_TYPE_LETTUCE);
+    CreateFood(level0Scene, BURGER_POS_1, FOOD_TYPE_BURGER);
+    CreateFood(level0Scene, BURGER_POS_2, FOOD_TYPE_BURGER);
+    CreateFood(level0Scene, BURGER_POS_3, FOOD_TYPE_BURGER);
+    CreateFood(level0Scene, BURGER_POS_4, FOOD_TYPE_BURGER);
+    CreateFood(level0Scene, BUN_BOTTOM_POS_1, FOOD_TYPE_BUN_BOTTOM);
+    CreateFood(level0Scene, BUN_BOTTOM_POS_2, FOOD_TYPE_BUN_BOTTOM);
+    CreateFood(level0Scene, BUN_BOTTOM_POS_3, FOOD_TYPE_BUN_BOTTOM);
+    CreateFood(level0Scene, BUN_BOTTOM_POS_4, FOOD_TYPE_BUN_BOTTOM);
 #pragma endregion
 
     LevelGrid::GetInstance().InitializeLevelGrid(level0Scene, GRID_OFFSET);

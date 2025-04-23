@@ -13,11 +13,14 @@ auto dae::Texture2D::GetSize() const -> glm::ivec2
     return { dst.w, dst.h };
 }
 
+auto dae::Texture2D::IsScaled() const -> bool { return m_isScaled; }
+
 void dae::Texture2D::Scale(float scale)
 {
     if (scale == 1.0f)
         return; // No scaling needed
 
+    m_isScaled = true;
     auto size = GetSize();
     size[0] = size[0] * static_cast<int>(scale);
     size[1] = size[1] * static_cast<int>(scale);

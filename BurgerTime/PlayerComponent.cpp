@@ -154,3 +154,13 @@ SelfDamageCommand::SelfDamageCommand(dae::GameObject& pGameObject) :
 {}
 
 void SelfDamageCommand::Execute() { m_pLivesComp->LoseLife(); }
+
+#ifdef DEBUG_RENDER
+#include "LevelGrid.h"
+
+void PlayerInputComponent::Render() const
+{
+    auto& levelGrid = LevelGrid::GetInstance();
+    levelGrid.DrawGrid();
+}
+#endif // DEBUG_RENDER

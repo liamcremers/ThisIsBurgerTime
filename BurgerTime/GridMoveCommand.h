@@ -1,6 +1,7 @@
 #pragma once
 #include <Command.h>
 #include <glm.hpp>
+#include <set>
 
 namespace dae
 {
@@ -8,7 +9,8 @@ namespace dae
     class PhysicsComponent;
     class ColliderComponent;
 }
-enum class CellType;
+enum class ECellType;
+using CellTypes = std::set<ECellType>;
 
 class GridMoveCommand : public dae::GameObjectCommand
 {
@@ -26,13 +28,13 @@ public:
 
 private:
     bool IsPositionedForClimbing(const glm::vec2& playerPos,
-                                 const glm::ivec2& playerGridPos,
+                                 glm::ivec2& playerGridPos,
                                  glm::ivec2& targetGridPos);
     bool IsPositionedForWalking(const glm::vec2& playerPos,
-                                const glm::ivec2& playerGridPos,
+                                glm::ivec2& playerGridPos,
                                 glm::ivec2& targetGridPos);
-    bool IsLadder(CellType cell);
-    bool IsFloor(CellType cell);
+    bool IsLadder(std::initializer_list<CellTypes> cellTypeList);
+    bool IsFloor(std::initializer_list<CellTypes> cellTypeList);
 
     dae::PhysicsComponent* m_pPhysics{ nullptr };
     dae::ColliderComponent* m_pCollider{ nullptr };

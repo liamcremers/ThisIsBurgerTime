@@ -25,7 +25,7 @@ GridMoveCommand::GridMoveCommand(dae::GameObject& pGameObject,
 void GridMoveCommand::Execute()
 {
     auto& levelGrid = LevelGrid::GetInstance();
-    auto playerPos = GetGameObject()->GetWorldPosition();
+    const auto& playerPos = GetGameObject()->GetWorldPosition();
     auto playerSize = m_pCollider->GetSize();
 
     glm::vec2 worldPos =
@@ -73,7 +73,7 @@ void GridMoveCommand::Undo()
 }
 
 auto GridMoveCommand::IsPositionedForClimbing(const glm::vec2& playerPos,
-                                              const glm::ivec2& playerGridPos,
+                                              glm::ivec2& playerGridPos,
                                               glm::ivec2& targetGridPos) -> bool
 {
     auto& levelGrid = LevelGrid::GetInstance();
@@ -85,7 +85,10 @@ auto GridMoveCommand::IsPositionedForClimbing(const glm::vec2& playerPos,
     glm::vec2 cellWorldPos = levelGrid.GridToWorld(playerGridPos);
     float xOffset = playerPos[0] - cellWorldPos[0];
     if (std::abs(xOffset - levelGrid.GRID_SIZE) < BUFFER)
+    {
+        playerGridPos[0] += 1;
         targetGridPos[0] += 1;
+    }
     else if (std::abs(xOffset) > BUFFER)
         return false;
 
@@ -116,19 +119,14 @@ auto GridMoveCommand::IsPositionedForClimbing(const glm::vec2& playerPos,
         glm::vec2{ levelGrid.GRID_SIZE, levelGrid.GRID_SIZE },
         { 1, 0, 0, 1 });
 #endif // DEBUG_RENDER
+    bool isCurrentStair = IsLadder({ leftCell, rightCell });
+    bool isTargetStair = IsLadder({ leftTargetCell, rightTargetCell });
 
-    bool isLeftStair = IsLadder(leftCell);
-    bool isRightStair = IsLadder(rightCell);
-
-    bool isLeftTargetStair = IsLadder(leftTargetCell);
-    bool isRightTargetStair = IsLadder(rightTargetCell);
-
-    return (isLeftStair and isRightStair) or
-           (isLeftTargetStair and isRightTargetStair);
+    return isCurrentStair or isTargetStair;
 }
 
 auto GridMoveCommand::IsPositionedForWalking(const glm::vec2& playerPos,
-                                             const glm::ivec2& playerGridPos,
+                                             glm::ivec2& playerGridPos,
                                              glm::ivec2& targetGridPos) -> bool
 {
     auto& levelGrid = LevelGrid::GetInstance();
@@ -139,7 +137,10 @@ auto GridMoveCommand::IsPositionedForWalking(const glm::vec2& playerPos,
     // Adjust target grid position on player position
     float yOffset = playerPos[1] - levelGrid.GridToWorld(playerGridPos)[1];
     if (std::abs(yOffset - levelGrid.GRID_SIZE) < BUFFER)
+    {
+        playerGridPos[1] += 1;
         targetGridPos[1] += 1;
+    }
     else if (std::abs(yOffset) > BUFFER)
         return false;
 
@@ -155,15 +156,21 @@ auto GridMoveCommand::IsPositionedForWalking(const glm::vec2& playerPos,
         { 1, 0, 0, 1 });
 #endif // DEBUG_RENDER
 
-    return IsFloor(targetCell);
+    return IsFloor({ targetCell });
 }
 
-auto GridMoveCommand::IsLadder(CellType cell) -> bool
+bool GridMoveCommand::IsLadder(std::initializer_list<CellTypes> cellTypeList)
 {
-    return (cell == CellType::Ladder or cell == CellType::FloorAndLadder);
+    return std::ranges::all_of(
+        cellTypeList,
+        [](const CellTypes& cellTypes)
+        { return cellTypes.contains(ECellType::Ladder); });
 }
 
-auto GridMoveCommand::IsFloor(CellType cell) -> bool
+bool GridMoveCommand::IsFloor(std::initializer_list<CellTypes> cellTypeList)
 {
-    return (cell == CellType::Floor or cell == CellType::FloorAndLadder);
+    return std::ranges::all_of(
+        cellTypeList,
+        [](const CellTypes& cellTypes)
+        { return cellTypes.contains(ECellType::Floor); });
 }
