@@ -19,11 +19,8 @@ namespace dae
         BaseComponent& operator=(BaseComponent&& other) = delete;
 
     protected:
-        BaseComponent(GameObject& owner) :
-            m_pOwner(owner)
-        {}
-
-        [[nodiscard]] virtual GameObject& GetOwner() const final;
+        explicit BaseComponent(GameObject& owner);
+        [[nodiscard]] virtual auto GetOwner() const -> GameObject& final;
 
     private:
         GameObject& m_pOwner;

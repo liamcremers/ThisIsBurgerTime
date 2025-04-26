@@ -26,37 +26,27 @@ namespace dae
 
         void SubscribeToBeginOverlap(const OverlapEvent& callback);
         void SubscribeToEndOverlap(const OverlapEvent& callback);
-
         void AddOverlap(ColliderComponent* other);
+        void RemoveOverlap(ColliderComponent* other);
 
-        void RemoveOverlap(ColliderComponent* other)
-        {
-            m_CurrentOverlaps.erase(other);
-        }
-
-        bool IsOverlapping(ColliderComponent* other) const
-        {
-            return m_CurrentOverlaps.find(other) != m_CurrentOverlaps.end();
-        }
-
-        void SetCollisionType(CollisionType type) { m_CollisionType = type; }
-
-        void SetHasMoved(bool hasMoved) { m_HasMoved = hasMoved; }
-
+        void SetCollisionType(CollisionType type);
+        void SetHasMoved(bool hasMoved);
         void SetSize(const glm::vec2& size);
         void SetOffset(const glm::vec2& offset);
         void SetCollisionMask(uint16_t mask);
         void SetCollisionLayer(uint16_t layer);
 
-        [[nodiscard]] glm::vec2 GetWorldPosition() const;
-        [[nodiscard]] glm::vec2 GetSize() const;
-        [[nodiscard]] glm::vec2 GetOffset() const;
-        [[nodiscard]] uint16_t GetMask() const;
-        [[nodiscard]] uint16_t GetLayer() const;
-        [[nodiscard]] bool IsColliding(const ColliderComponent& other) const;
-        [[nodiscard]] bool IsStatic() const;
-
-        [[nodiscard]] bool HasMoved() const { return m_HasMoved; };
+        [[nodiscard]] auto GetWorldPosition() const -> glm::vec2;
+        [[nodiscard]] auto GetSize() const -> glm::vec2;
+        [[nodiscard]] auto GetOffset() const -> glm::vec2;
+        [[nodiscard]] auto GetMask() const -> uint16_t;
+        [[nodiscard]] auto GetLayer() const -> uint16_t;
+        [[nodiscard]] auto IsStatic() const -> bool;
+        [[nodiscard]] auto HasMoved() const -> bool;
+        [[nodiscard]]
+        auto IsOverlapping(ColliderComponent* other) const -> bool;
+        [[nodiscard]]
+        auto IsColliding(const ColliderComponent& other) const -> bool;
 
     private:
         friend class CollisionSystem;

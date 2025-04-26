@@ -41,13 +41,13 @@ namespace dae
         // Parent & Children
         void SetParent(GameObject* pParent, bool keepWorldPosition = false);
         void DetechFromParent();
-        [[nodiscard]] auto IsChild(const GameObject* pChild) const -> bool;
-        [[nodiscard]] GameObject* GetParent() const;
-        [[nodiscard]] const glm::vec2& GetWorldPosition();
-        [[nodiscard]] const glm::vec2& GetLocalPosition() const;
         void UpdateWorldPosition();
         void SetLocalPosition(const glm::vec2& position);
         void SetPositionDirty();
+        [[nodiscard]] auto IsChild(const GameObject* pChild) const -> bool;
+        [[nodiscard]] auto GetParent() const -> GameObject*;
+        [[nodiscard]] auto GetWorldPosition() -> const glm::vec2&;
+        [[nodiscard]] auto GetLocalPosition() const -> const glm::vec2&;
 
         // Object state management
         void MarkForDelete();

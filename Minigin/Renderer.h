@@ -25,8 +25,8 @@ namespace dae
                            const float width,
                            const float height) const;
 
-        SDL_Renderer* GetSDLRenderer() const;
-        const SDL_Color& GetBackgroundColor() const;
+        [[nodiscard]] auto GetSDLRenderer() const -> SDL_Renderer*;
+        [[nodiscard]] auto GetBackgroundColor() const -> const SDL_Color&;
         void SetBackgroundColor(const SDL_Color& color);
 
     private:

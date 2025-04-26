@@ -24,12 +24,15 @@ GridMoveCommand::GridMoveCommand(dae::GameObject& pGameObject,
 
 void GridMoveCommand::Execute()
 {
+    static constexpr auto HALF_SIZE_FACTOR = 0.5f;
+
     auto& levelGrid = LevelGrid::GetInstance();
     const auto& playerPos = GetGameObject()->GetWorldPosition();
     auto playerSize = m_pCollider->GetSize();
+    auto halfPlayerSize = playerSize * HALF_SIZE_FACTOR;
 
     glm::vec2 worldPos =
-        playerPos + glm::vec2{ playerSize[0] / 2.f, playerSize[1] };
+        playerPos + glm::vec2{ halfPlayerSize[0], playerSize[1] };
     glm::ivec2 gridPos = levelGrid.WorldToGrid(worldPos);
     glm::ivec2 targetGridPos =
         gridPos + glm::ivec2(m_Direction[0], m_Direction[1]);
@@ -42,14 +45,14 @@ void GridMoveCommand::Execute()
 
     if (canMove)
     {
-        glm::vec2 currentPos = GetGameObject()->GetWorldPosition();
+        glm::vec2 currentPos = playerPos;
 
         if (m_Direction[0] != 0)
-            currentPos[1] = levelGrid.GridToWorld(targetGridPos)[1] -
-                            m_pCollider->GetSize()[1];
+            currentPos[1] =
+                levelGrid.GridToWorld(targetGridPos)[1] - playerSize[1];
         else if (m_Direction[1] != 0)
-            currentPos[0] = levelGrid.GridToWorld(targetGridPos)[0] -
-                            (m_pCollider->GetSize()[0] / 2.f);
+            currentPos[0] =
+                levelGrid.GridToWorld(targetGridPos)[0] - (halfPlayerSize[0]);
         float deltaTime = dae::EngineTime::GetInstance().GetDeltaTime();
         glm::vec2 newPos =
             currentPos +
@@ -71,6 +74,8 @@ void GridMoveCommand::Undo()
         physics->SetVelocity(velocity);
     }
 }
+
+void GridMoveCommand::SetSpeed(int speed) { m_Speed = speed; }
 
 auto GridMoveCommand::IsPositionedForClimbing(const glm::vec2& playerPos,
                                               glm::ivec2& playerGridPos,
@@ -159,7 +164,8 @@ auto GridMoveCommand::IsPositionedForWalking(const glm::vec2& playerPos,
     return IsFloor({ targetCell });
 }
 
-bool GridMoveCommand::IsLadder(std::initializer_list<CellTypes> cellTypeList)
+auto GridMoveCommand::IsLadder(std::initializer_list<CellTypes> cellTypeList)
+    -> bool
 {
     return std::ranges::all_of(
         cellTypeList,
@@ -167,7 +173,8 @@ bool GridMoveCommand::IsLadder(std::initializer_list<CellTypes> cellTypeList)
         { return cellTypes.contains(ECellType::Ladder); });
 }
 
-bool GridMoveCommand::IsFloor(std::initializer_list<CellTypes> cellTypeList)
+auto GridMoveCommand::IsFloor(std::initializer_list<CellTypes> cellTypeList)
+    -> bool
 {
     return std::ranges::all_of(
         cellTypeList,

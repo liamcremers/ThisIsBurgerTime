@@ -17,8 +17,9 @@ namespace dae
     {
     public:
         void Init(const std::filesystem::path& data);
-        Texture2D* LoadTexture(const std::string& file);
-        Font& LoadFont(const std::string& file, uint8_t size);
+        [[nodiscard]] auto LoadTexture(const std::string& file) -> Texture2D*;
+        [[nodiscard]]
+        auto LoadFont(const std::string& file, uint8_t size) -> Font&;
 
     private:
         friend class Singleton<ResourceManager>;

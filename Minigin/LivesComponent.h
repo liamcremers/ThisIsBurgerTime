@@ -9,8 +9,8 @@ namespace dae
     public:
         LivesComponent(GameObject& parent, int lives);
         void LoseLife();
-        Subject& GetLivesSubject();
-        int GetLives() const;
+        [[nodiscard]] auto GetLivesSubject() -> Subject&;
+        [[nodiscard]] auto GetLives() const -> int;
 
     private:
         Subject m_LivesSubject{};

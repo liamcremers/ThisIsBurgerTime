@@ -15,9 +15,9 @@ namespace dae
             BaseComponent(owner)
         {}
 
-        [[nodiscard]] const glm::vec2& GetWorldPosition() const;
+        [[nodiscard]] auto GetWorldPosition() const -> const glm::vec2&;
         void SetWorldPosition(const glm::vec2& pos);
-        [[nodiscard]] const glm::vec2& GetLocalPosition() const;
+        [[nodiscard]] auto GetLocalPosition() const -> const glm::vec2&;
         void SetLocalPosition(const glm::vec2& pos);
 
     private:

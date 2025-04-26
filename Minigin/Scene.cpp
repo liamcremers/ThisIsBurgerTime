@@ -58,3 +58,20 @@ void dae::Scene::LateUpdate()
                   [](const auto& object)
                   { return object->IsMarkedForDelete(); });
 }
+
+[[nodiscard]] auto dae::Scene::GetName() const -> const std::string&
+{
+    return m_name;
+}
+
+[[nodiscard]] auto dae::Scene::GetGameObjects() const
+    -> std::vector<GameObject*>
+{
+    std::vector<GameObject*> gameObjects;
+    gameObjects.reserve(m_objects.size());
+    for (const auto& obj : m_objects)
+    {
+        gameObjects.push_back(obj.get());
+    }
+    return gameObjects;
+}

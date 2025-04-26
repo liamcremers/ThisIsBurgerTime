@@ -17,8 +17,8 @@ namespace dae
         explicit Texture2D(const std::string& fullPath);
         ~Texture2D();
 
-        bool IsScaled() const;
-        glm::ivec2 GetSize() const;
+        [[nodiscard]] auto IsScaled() const -> bool;
+        [[nodiscard]] auto GetSize() const -> glm::ivec2;
         void Scale(float scale);
 
         Texture2D(const Texture2D&) = delete;

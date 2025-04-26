@@ -8,13 +8,6 @@ namespace dae
     public:
         virtual void Execute() = 0;
         virtual void Undo() = 0;
-
-        Command() = default;
-        virtual ~Command() = default;
-        Command(const Command& other) noexcept = default;
-        Command(Command&& other) noexcept = default;
-        Command& operator=(const Command& other) noexcept = default;
-        Command& operator=(Command&& other) noexcept = default;
     };
 
     class GameObject;
@@ -23,12 +16,12 @@ namespace dae
     {
     public:
         GameObjectCommand(GameObject* pGameObject);
-        ~GameObjectCommand() = default;
         void Execute() override = 0;
         void Undo() override = 0;
 
     protected:
-        virtual GameObject* GetGameObject() const final;
+        [[nodiscard]]
+        virtual auto GetGameObject() const -> GameObject* final;
 
     private:
         GameObject* m_pGameObject{};
@@ -40,7 +33,6 @@ namespace dae
         MoveCommand(GameObject& pGameObject,
                     glm::i8vec2 direction,
                     int speed = 100);
-        ~MoveCommand() = default;
         void Execute() override;
         void Undo() override;
         void SetSpeed(int speed);

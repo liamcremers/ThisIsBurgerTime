@@ -1,7 +1,7 @@
 #pragma once
 #include <Command.h>
 #include <glm.hpp>
-#include <set>
+#include <unordered_set>
 
 namespace dae
 {
@@ -10,7 +10,7 @@ namespace dae
     class ColliderComponent;
 }
 enum class ECellType;
-using CellTypes = std::set<ECellType>;
+using CellTypes = std::unordered_set<ECellType>;
 
 class GridMoveCommand : public dae::GameObjectCommand
 {
@@ -20,21 +20,23 @@ public:
     GridMoveCommand(dae::GameObject& pGameObject,
                     glm::i8vec2 direction,
                     int speed = 100);
-    ~GridMoveCommand() = default;
     void Execute() override;
     void Undo() override;
-
-    void SetSpeed(int speed) { m_Speed = speed; };
+    void SetSpeed(int speed);
 
 private:
-    bool IsPositionedForClimbing(const glm::vec2& playerPos,
+    [[nodiscard]]
+    auto IsPositionedForClimbing(const glm::vec2& playerPos,
                                  glm::ivec2& playerGridPos,
-                                 glm::ivec2& targetGridPos);
-    bool IsPositionedForWalking(const glm::vec2& playerPos,
+                                 glm::ivec2& targetGridPos) -> bool;
+    [[nodiscard]]
+    auto IsPositionedForWalking(const glm::vec2& playerPos,
                                 glm::ivec2& playerGridPos,
-                                glm::ivec2& targetGridPos);
-    bool IsLadder(std::initializer_list<CellTypes> cellTypeList);
-    bool IsFloor(std::initializer_list<CellTypes> cellTypeList);
+                                glm::ivec2& targetGridPos) -> bool;
+    [[nodiscard]]
+    auto IsLadder(std::initializer_list<CellTypes> cellTypeList) -> bool;
+    [[nodiscard]]
+    auto IsFloor(std::initializer_list<CellTypes> cellTypeList) -> bool;
 
     dae::PhysicsComponent* m_pPhysics{ nullptr };
     dae::ColliderComponent* m_pCollider{ nullptr };

@@ -83,6 +83,21 @@ void dae::ColliderComponent::AddOverlap(ColliderComponent* other)
     m_CurrentOverlaps.insert(other);
 }
 
+void dae::ColliderComponent::RemoveOverlap(ColliderComponent* other)
+{
+    m_CurrentOverlaps.erase(other);
+}
+
+void dae::ColliderComponent::SetCollisionType(CollisionType type)
+{
+    m_CollisionType = type;
+}
+
+void dae::ColliderComponent::SetHasMoved(bool hasMoved)
+{
+    m_HasMoved = hasMoved;
+}
+
 void dae::ColliderComponent::SetSize(const glm::vec2& size) { m_Size = size; }
 
 void dae::ColliderComponent::SetOffset(const glm::vec2& offset)
@@ -122,6 +137,12 @@ void dae::ColliderComponent::SetCollisionLayer(uint16_t layer)
     return m_Layer;
 }
 
+[[nodiscard]] auto dae::ColliderComponent::IsOverlapping(
+    ColliderComponent* other) const -> bool
+{
+    return m_CurrentOverlaps.find(other) != m_CurrentOverlaps.end();
+}
+
 [[nodiscard]] auto dae::ColliderComponent::IsColliding(
     const ColliderComponent& other) const -> bool
 {
@@ -137,4 +158,9 @@ void dae::ColliderComponent::SetCollisionLayer(uint16_t layer)
 [[nodiscard]] auto dae::ColliderComponent::IsStatic() const -> bool
 {
     return m_CollisionType == CollisionType::Static;
+}
+
+[[nodiscard]] auto dae::ColliderComponent::HasMoved() const -> bool
+{
+    return m_HasMoved;
 }

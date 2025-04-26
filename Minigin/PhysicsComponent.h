@@ -17,10 +17,10 @@ namespace dae
         void SetMaxFallSpeed(float speed);
         void SetUseGravity(bool useGravity);
 
-        [[nodiscard]] glm::vec2 GetVelocity() const;
-        [[nodiscard]] float GetGravity() const;
-        [[nodiscard]] float GetMaxFallSpeed() const;
-        [[nodiscard]] bool IsUsingGravity() const;
+        [[nodiscard]] auto GetVelocity() const -> glm::vec2;
+        [[nodiscard]] auto GetGravity() const -> float;
+        [[nodiscard]] auto GetMaxFallSpeed() const -> float;
+        [[nodiscard]] auto IsUsingGravity() const -> bool;
 
     private:
         ColliderComponent* m_pCollider{ nullptr };

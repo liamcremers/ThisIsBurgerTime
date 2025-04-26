@@ -9,8 +9,8 @@ namespace dae
     public:
         ScoreComponent(GameObject& parent);
         void AddScore(int addedScore);
-        Subject& GetScoreSubject();
-        int GetScore() const;
+        [[nodiscard]] auto GetScoreSubject() -> Subject&;
+        [[nodiscard]] auto GetScore() const -> int;
 
     private:
         Subject m_pScoreSubject;

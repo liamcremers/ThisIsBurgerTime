@@ -121,3 +121,13 @@ void dae::CollisionSystem::CleanupEndedOverlaps()
             });
     }
 }
+
+auto dae::CollisionSystem::CollisionPair::operator<(
+    const CollisionPair& other) const -> bool
+{
+    auto [min1, max1] =
+        std::minmax(a, b, [](auto* x, auto* y) { return std::less<>{}(x, y); });
+    auto [min2, max2] = std::minmax(
+        other.a, other.b, [](auto* x, auto* y) { return std::less<>{}(x, y); });
+    return std::tie(min1, max1) < std::tie(min2, max2);
+}

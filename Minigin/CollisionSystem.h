@@ -17,8 +17,8 @@ namespace dae
 
         void ProcessCollisions();
 
-        [[nodiscard]] const std::vector<ColliderComponent*>&
-        GetStaticColliders() const;
+        [[nodiscard]] auto GetStaticColliders() const
+            -> const std::vector<ColliderComponent*>&;
 
 #ifdef DEBUG_RENDER
         void RenderColliders() const;
@@ -29,10 +29,11 @@ namespace dae
         CollisionSystem() = default;
 
         void ResolveCollision(ColliderComponent* a, ColliderComponent* b) const;
-        bool ShouldCollide(const ColliderComponent& a,
-                           const ColliderComponent& b) const;
         void HandleCollision(ColliderComponent* a, ColliderComponent* b);
         void CleanupEndedOverlaps();
+        [[nodiscard]]
+        auto ShouldCollide(const ColliderComponent& a,
+                           const ColliderComponent& b) const -> bool;
 
         std::vector<ColliderComponent*> m_StaticColliders;
         std::vector<ColliderComponent*> m_DynamicColliders;
@@ -42,16 +43,7 @@ namespace dae
             ColliderComponent* a;
             ColliderComponent* b;
 
-            bool operator<(const CollisionPair& other) const
-            {
-                auto [min1, max1] = std::minmax(
-                    a, b, [](auto* x, auto* y) { return std::less<>{}(x, y); });
-                auto [min2, max2] = std::minmax(
-                    other.a,
-                    other.b,
-                    [](auto* x, auto* y) { return std::less<>{}(x, y); });
-                return std::tie(min1, max1) < std::tie(min2, max2);
-            }
+            bool operator<(const CollisionPair& other) const;
         };
 
         std::set<CollisionPair> m_PrevCollisions;

@@ -15,12 +15,12 @@ namespace dae
         void Run(const std::function<void()>& load);
         void GameLoop();
 
-        [[nodiscard]] static consteval int GetWindowWidth()
+        [[nodiscard]] static consteval auto GetWindowWidth() -> int
         {
             return m_WindowWidth;
         }
 
-        [[nodiscard]] static consteval int GetWindowHeight()
+        [[nodiscard]] static consteval auto GetWindowHeight() -> int
         {
             return m_WindowHeight;
         }

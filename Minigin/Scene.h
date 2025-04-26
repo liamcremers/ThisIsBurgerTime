@@ -18,18 +18,8 @@ namespace dae
         void Render() const;
         void LateUpdate();
 
-        [[nodiscard]] const std::string& GetName() const { return m_name; }
-
-        [[nodiscard]] std::vector<GameObject*> GetGameObjects() const
-        {
-            std::vector<GameObject*> gameObjects;
-            gameObjects.reserve(m_objects.size());
-            for (const auto& obj : m_objects)
-            {
-                gameObjects.push_back(obj.get());
-            }
-            return gameObjects;
-        }
+        [[nodiscard]] auto GetName() const -> const std::string&;
+        [[nodiscard]] auto GetGameObjects() const -> std::vector<GameObject*>;
 
         ~Scene() = default;
         Scene(const Scene& other) = delete;

@@ -10,7 +10,7 @@ namespace dae
         void Update();
         float GetDeltaTime() const;
         float GetFixedTimeStep() const;
-        auto GetLastTime() const
+        [[nodiscard]] auto GetLastTime() const
             -> const std::chrono::high_resolution_clock::time_point&;
 
     private:

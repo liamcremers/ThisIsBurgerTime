@@ -14,7 +14,7 @@ namespace dae
     class InputManager final : public Singleton<InputManager>
     {
     public:
-        bool ProcessInput();
+        [[nodiscard]] auto ProcessInput() -> bool;
 
         void AddController(Controller* controller);
         void AddKeyboardCommand(SDL_Keycode keyboardButton, Command* command);
