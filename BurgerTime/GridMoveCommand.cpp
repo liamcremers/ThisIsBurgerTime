@@ -58,6 +58,7 @@ void GridMoveCommand::Execute()
             currentPos +
             glm::vec2(static_cast<float>(m_Direction[0] * m_Speed) * deltaTime,
                       static_cast<float>(m_Direction[1] * m_Speed) * deltaTime);
+        m_pCollider->SetHasMoved(true);
         GetGameObject()->SetLocalPosition(newPos);
     }
 }

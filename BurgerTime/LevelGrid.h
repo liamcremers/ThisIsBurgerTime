@@ -34,6 +34,8 @@ public:
     [[nodiscard]]
     auto GetCellType(const int gridX, const int gridY) const -> CellTypes;
     [[nodiscard]]
+    bool IsInBounds(const int gridX, const int gridY) const;
+    [[nodiscard]]
     auto WorldToGrid(const glm::vec2& worldPos) const -> glm::ivec2;
     [[nodiscard]]
     auto GridToWorld(const glm::ivec2& gridPos) const -> glm::vec2;

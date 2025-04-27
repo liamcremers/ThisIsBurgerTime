@@ -16,6 +16,7 @@
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
+#include "ServiceLocator.h"
 #include "EngineTime.h"
 #include "CollisionSystem.h"
 #include "DebugRenderer.h"
@@ -89,6 +90,7 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 
     Renderer::GetInstance().Init(m_window);
     ResourceManager::GetInstance().Init(dataPath);
+    ServiceLocator::GetInstance().Init(dataPath);
 }
 
 dae::Minigin::~Minigin()

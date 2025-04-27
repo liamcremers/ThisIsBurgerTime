@@ -7,16 +7,20 @@
 #endif
 #endif
 
-#include "Minigin.h"
-#include "ResourceManager.h"
-#include "InputManager.h"
-#include "Scene.h"
+#include <ComponentsHeader.h>
+#include <Minigin.h>
+#include <ResourceManager.h>
+#include <InputManager.h>
+#include <CollisionSystem.h>
+#include <Scene.h>
+#include <ServiceLocator.h>
+#include <SoundSystem.h>
 
-#include "ComponentsHeader.h"
 #include "PlayerComponent.h"
 #include "BurgerTimeLayers.h"
-#include "CollisionSystem.h"
 #include "LevelGrid.h"
+#include "BurgerPartComponent.h"
+#include "BurgerTimeSoundIds.h"
 
 #include <filesystem>
 #include <memory>
@@ -79,8 +83,9 @@ static void SetupPlayers()
         auto* collider = player->AddComponent<dae::ColliderComponent>(
             glm::vec2{ 2 * G_SIZE, 2 * G_SIZE });
         collider->SetCollisionLayer(
-            static_cast<uint16_t>(BurgerTime::CollisionLayer::Player));
-        collider->SetCollisionMask(BurgerTime::PLAYER_COLLISION_MASK);
+            static_cast<uint16_t>(CollisionLayer::Player));
+        collider->SetCollisionType(CollisionType::Trigger);
+        collider->SetCollisionMask(PLAYER_COLLISION_MASK);
 
         auto* physics = player->AddComponent<dae::PhysicsComponent>();
         physics->SetUseGravity(false);
@@ -147,9 +152,9 @@ static void CreateFloorPlane(dae::Scene& scene,
                 colliderComp->SetSize(FLOOR_SIZE);
                 colliderComp->SetOffset(FLOOR_OFFSET);
                 colliderComp->SetCollisionLayer(
-                    static_cast<uint16_t>(BurgerTime::CollisionLayer::Floor));
-                colliderComp->SetCollisionMask(
-                    BurgerTime::FLOOR_COLLISION_MASK);
+                    static_cast<uint16_t>(CollisionLayer::Floor));
+                colliderComp->SetCollisionMask(FLOOR_COLLISION_MASK);
+                colliderComp->SetCollisionType(CollisionType::Trigger);
                 go->SetLocalPosition(
                     startPos + glm::vec2((positionOffset + i) * G_SIZE, 0));
                 dae::CollisionSystem::GetInstance().RegisterCollider(
@@ -242,15 +247,17 @@ static void CreateLadder(dae::Scene& scene,
         auto* colliderL = goL->AddComponent<dae::ColliderComponent>(
             glm::vec2{ G_SIZE, G_SIZE });
         colliderL->SetCollisionLayer(
-            static_cast<uint16_t>(BurgerTime::CollisionLayer::Ladder));
-        colliderL->SetCollisionMask(BurgerTime::LADDER_COLLISION_MASK);
+            static_cast<uint16_t>(CollisionLayer::Ladder));
+        colliderL->SetCollisionMask(LADDER_COLLISION_MASK);
+        colliderL->SetCollisionType(CollisionType::Trigger);
         dae::CollisionSystem::GetInstance().RegisterCollider(colliderL);
 
         auto* colliderR = goR->AddComponent<dae::ColliderComponent>(
             glm::vec2{ G_SIZE, G_SIZE });
         colliderR->SetCollisionLayer(
-            static_cast<uint16_t>(BurgerTime::CollisionLayer::Ladder));
-        colliderR->SetCollisionMask(BurgerTime::LADDER_COLLISION_MASK);
+            static_cast<uint16_t>(CollisionLayer::Ladder));
+        colliderR->SetCollisionMask(LADDER_COLLISION_MASK);
+        colliderR->SetCollisionType(CollisionType::Trigger);
         dae::CollisionSystem::GetInstance().RegisterCollider(colliderR);
 
         scene.Add(std::move(goL));
@@ -352,10 +359,15 @@ static void CreateFood(dae::Scene& scene,
         auto* collider = go->AddComponent<dae::ColliderComponent>(
             glm::vec2{ G_SIZE, G_SIZE });
         collider->SetCollisionLayer(
-            static_cast<uint16_t>(BurgerTime::CollisionLayer::Food));
-        collider->SetCollisionMask(BurgerTime::FOOD_COLLISION_MASK);
-        dae::CollisionSystem::GetInstance().RegisterCollider(collider);
+            static_cast<uint16_t>(CollisionLayer::Food));
+        collider->SetCollisionMask(FOOD_COLLISION_MASK);
+        collider->SetCollisionType(CollisionType::Trigger);
+        go->AddComponent<BurgerPartComponent>();
         go->SetLocalPosition(startPos + glm::vec2(i * G_SIZE, 0));
+
+        dae::ServiceLocator::GetInstance().GetSoundSystem().Load(
+            SoundIds::BurgerStep, "Sound/BurgerStep.wav");
+        dae::CollisionSystem::GetInstance().RegisterCollider(collider);
         scene.Add(std::move(go));
     }
 }
@@ -366,18 +378,6 @@ static void SetupLevel0()
                                                G_SIZE * 5 + TOP_BORDER };
 
     auto& level0Scene = dae::SceneManager::GetInstance().CreateScene("Level0");
-
-    //auto grid = std::make_unique<dae::GameObject>("Grid");
-    //auto* gridComp = grid->AddComponent<dae::RenderComponent>();
-    //gridComp->SetTexture("Grid.png");
-    //gridComp->Scale(2);
-    //level0Scene.Add(std::move(grid));
-
-    auto foodGrid = std::make_unique<dae::GameObject>("FoodGrid");
-    auto* foodGridComp = foodGrid->AddComponent<dae::RenderComponent>();
-    foodGridComp->SetTexture("FoodGrid.png");
-    foodGridComp->Scale(2);
-    level0Scene.Add(std::move(foodGrid));
 
     auto go = std::make_unique<dae::GameObject>("LevelCounter");
     auto* renderComp = go->AddComponent<dae::RenderComponent>();
@@ -555,12 +555,18 @@ static void SetupLevel0()
     CreateFood(level0Scene, BUN_BOTTOM_POS_3, FOOD_TYPE_BUN_BOTTOM);
     CreateFood(level0Scene, BUN_BOTTOM_POS_4, FOOD_TYPE_BUN_BOTTOM);
 #pragma endregion
-
+#pragma region AUDIO
+    auto& soundSystem = dae::ServiceLocator::GetSoundSystem();
+    soundSystem.Load(SoundIds::Bgm, "Sound/BGM.wav");
+    soundSystem.Play(SoundIds::Bgm, 0.1f, true);
+#pragma endregion
     LevelGrid::GetInstance().InitializeLevelGrid(level0Scene, GRID_OFFSET);
 }
 
 static void load()
 {
+    dae::ServiceLocator::GetInstance().RegisterSoundSystem(
+        std::make_unique<dae::SDLSoundSystem>());
     SetupLevel0();
     SetupPlayers();
     SetupFPSScene();

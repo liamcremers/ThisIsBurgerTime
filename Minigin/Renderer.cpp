@@ -53,7 +53,9 @@ auto dae::Renderer::Render() const -> void
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 #ifdef DEBUG_RENDER
+#ifdef DEBUG_COLLIDER
     CollisionSystem::GetInstance().RenderColliders();
+#endif //DEBUG_COLLIDER
 #endif // DEBUG_RENDER
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -160,6 +160,11 @@ void dae::ColliderComponent::SetCollisionLayer(uint16_t layer)
     return m_CollisionType == CollisionType::Static;
 }
 
+[[nodiscard]] auto dae::ColliderComponent::IsTrigger() const -> bool
+{
+    return m_CollisionType == CollisionType::Trigger;
+}
+
 [[nodiscard]] auto dae::ColliderComponent::HasMoved() const -> bool
 {
     return m_HasMoved;

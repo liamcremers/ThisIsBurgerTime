@@ -21,7 +21,9 @@ namespace dae
             -> const std::vector<ColliderComponent*>&;
 
 #ifdef DEBUG_RENDER
+#ifdef DEBUG_COLLIDER
         void RenderColliders() const;
+#endif // DDEBUG_COLLIDER
 #endif // DEBUG_RENDER
 
     private:

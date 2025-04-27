@@ -1,16 +1,25 @@
 #ifdef DEBUG_RENDER
 #include "DebugRenderer.h"
 
-using namespace dae;
+#include <SDL_ttf.h>
+#include <algorithm>
+#include <chrono>
+#include <ranges>
 
-void DebugRenderer::RenderRect(const glm::vec2& position,
-                               const glm::vec2& size,
-                               const glm::vec4& color)
+void dae::DebugRenderer::RenderRect(const glm::vec2& position,
+                                    const glm::vec2& size,
+                                    const glm::vec4& color)
 {
-    m_DebugRects.emplace_back(position, size, color);
+    m_DebugRects.emplace_back(
+        DebugRect{ .position = position, .size = size, .color = color });
 }
 
-void DebugRenderer::Flush()
+void dae::DebugRenderer::RenderText(const std::string& text)
+{
+    m_DebugTexts.emplace_back(text, std::chrono::steady_clock::now());
+}
+
+void dae::DebugRenderer::Flush()
 {
     if (!m_Renderer)
         m_Renderer = dae::Renderer::GetInstance().GetSDLRenderer();
@@ -22,6 +31,9 @@ void DebugRenderer::Flush()
     SDL_GetRenderDrawColor(m_Renderer, &r, &g, &b, &a);
 
     static constexpr int MAX_VALUE = 255;
+    auto now = std::chrono::steady_clock::now();
+
+    // Render Rectangles
     for (const auto& rect : m_DebugRects)
     {
         SDL_FRect sdlRect = {
@@ -34,6 +46,33 @@ void DebugRenderer::Flush()
                                static_cast<Uint8>(rect.color[3] * MAX_VALUE));
         SDL_RenderDrawRectF(m_Renderer, &sdlRect);
     }
+
+    // Render Texts
+    for (size_t i = 0; i < m_DebugTexts.size(); ++i)
+    {
+        const auto& text = m_DebugTexts[i].text;
+        SDL_Surface* surface = TTF_RenderText_Solid(
+            m_Font.GetFont(), text.c_str(), { 0, 170, 255, 255 });
+        SDL_Texture* texture =
+            SDL_CreateTextureFromSurface(m_Renderer, surface);
+        SDL_FreeSurface(surface);
+
+        SDL_Rect dstRect = { 10, static_cast<int>(10 + i * 20), 0, 0 };
+        SDL_QueryTexture(texture, nullptr, nullptr, &dstRect.w, &dstRect.h);
+        SDL_RenderCopy(m_Renderer, texture, nullptr, &dstRect);
+        SDL_DestroyTexture(texture);
+    }
+
+    // Remove expired texts
+    auto [new_end, old_end] = std::ranges::remove_if(
+        m_DebugTexts,
+        [now](const DebugText& text)
+        {
+            return std::chrono::duration_cast<std::chrono::seconds>(now -
+                                                                    text.time)
+                       .count() > 5;
+        });
+    m_DebugTexts.erase(new_end, m_DebugTexts.end());
 
     SDL_SetRenderDrawColor(m_Renderer, r, g, b, a);
     m_DebugRects.clear();

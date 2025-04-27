@@ -19,8 +19,8 @@ target_compile_options(BurgerTime PRIVATE
 
 # Define DEBUG_RENDER for Debug builds
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(Minigin PRIVATE DEBUG_RENDER)
-    target_compile_definitions(BurgerTime PRIVATE DEBUG_RENDER)
+    target_compile_definitions(Minigin PRIVATE DEBUG_RENDER DEBUG_SOUND)
+    target_compile_definitions(BurgerTime PRIVATE DEBUG_RENDER DEBUG_SOUND)
 endif()
 
 if(WIN32)

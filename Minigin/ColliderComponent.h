@@ -42,6 +42,7 @@ namespace dae
         [[nodiscard]] auto GetMask() const -> uint16_t;
         [[nodiscard]] auto GetLayer() const -> uint16_t;
         [[nodiscard]] auto IsStatic() const -> bool;
+        [[nodiscard]] auto IsTrigger() const -> bool;
         [[nodiscard]] auto HasMoved() const -> bool;
         [[nodiscard]]
         auto IsOverlapping(ColliderComponent* other) const -> bool;

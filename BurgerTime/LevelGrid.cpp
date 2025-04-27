@@ -10,37 +10,31 @@ void LevelGrid::InitializeLevelGrid(const dae::Scene& scene,
         for (auto& x : y)
             x = { ECellType::Empty };
 
-    // Process objects from the scene
     for (auto* obj : scene.GetGameObjects())
     {
         auto* collider = obj->GetComponent<dae::ColliderComponent>();
         if (!collider)
             continue;
 
-        // Convert world position to grid position (accounting for offset)
         glm::vec2 pos = obj->GetWorldPosition();
-
         const auto gridPos = WorldToGrid(pos);
 
-        // Check if position is in bounds
-        if (gridPos[0] >= 0 && gridPos[0] < GRID_WIDTH && gridPos[1] >= 0 &&
-            gridPos[1] < GRID_HEIGHT)
+        if (IsInBounds(gridPos[0], gridPos[1]))
         {
             auto& cell = m_LevelGrid.at(static_cast<size_t>(gridPos[1]))
                              .at(static_cast<size_t>(gridPos[0]));
 
             uint16_t layer = collider->GetLayer();
 
-            // For each possible layer, check and insert the corresponding cell type
-            switch (static_cast<BurgerTime::CollisionLayer>(layer))
+            switch (static_cast<CollisionLayer>(layer))
             {
-            case BurgerTime::CollisionLayer::Floor:
+            case CollisionLayer::Floor:
                 cell.insert(ECellType::Floor);
                 break;
-            case BurgerTime::CollisionLayer::Ladder:
+            case CollisionLayer::Ladder:
                 cell.insert(ECellType::Ladder);
                 break;
-            case BurgerTime::CollisionLayer::Food:
+            case CollisionLayer::Food:
                 cell.insert(ECellType::Food);
                 break;
             // Add more cases as needed
@@ -54,13 +48,19 @@ void LevelGrid::InitializeLevelGrid(const dae::Scene& scene,
 [[nodiscard]]
 auto LevelGrid::GetCellType(const int gridX, const int gridY) const -> CellTypes
 {
-    // Check bounds
-    if (gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT)
+    if (IsInBounds(gridX, gridY))
         return m_LevelGrid.at(static_cast<size_t>(gridY))
             .at(static_cast<size_t>(gridX));
 
     // Return Empty for out-of-bounds access
     return CellTypes{ ECellType::Empty };
+}
+
+[[nodiscard]] auto LevelGrid::IsInBounds(const int gridX, const int gridY) const
+    -> bool
+{
+    return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 &&
+           gridY < GRID_HEIGHT;
 }
 
 [[nodiscard]] auto LevelGrid::WorldToGrid(const glm::vec2& worldPos) const

@@ -47,18 +47,20 @@ auto dae::CollisionSystem::GetStaticColliders() const
 }
 
 #ifdef DEBUG_RENDER
+#ifdef DEBUG_COLLIDER
 void dae::CollisionSystem::RenderColliders() const
 {
-    ///*for (const auto& colliderList : { m_DynamicColliders, m_StaticColliders })
-    //{
-    //    for (const auto& collider : colliderList)
-    //    {
-    //        DebugRenderer::GetInstance().RenderRect(
-    //            collider->GetWorldPosition() + collider->GetOffset(),
-    //            collider->GetSize());
-    //    }
-    //}*/
+    for (const auto& colliderList : { m_DynamicColliders, m_StaticColliders })
+    {
+        for (const auto& collider : colliderList)
+        {
+            DebugRenderer::GetInstance().RenderRect(
+                collider->GetWorldPosition() + collider->GetOffset(),
+                collider->GetSize());
+        }
+    }
 }
+#endif // DEBUG_COLLIDER
 #endif // DEBUG_RENDER
 
 void dae::CollisionSystem::ResolveCollision(ColliderComponent* a,
@@ -67,6 +69,8 @@ void dae::CollisionSystem::ResolveCollision(ColliderComponent* a,
     if (!a || !b)
         return;
     if (a->IsStatic() && b->IsStatic())
+        return;
+    if (a->IsTrigger() or b->IsTrigger())
         return;
 
     a->OnCollision(*b);
