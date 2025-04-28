@@ -41,7 +41,11 @@ namespace dae
         friend class Singleton<DebugRenderer>;
         DebugRenderer() = default;
 
-        static constexpr int SMALL_FONT_SIZE = 11;
+        static constexpr int SMALL_FONT_SIZE = 14;
+        static constexpr int DEBUG_TEXT_DURATION = 2;
+        static constexpr int DEBUG_TEXT_PADDING = 15;
+        static constexpr int DEBUG_TEXT_PADDING_X = 55;
+        static constexpr auto DEBUG_TEXT_COLOR = SDL_Color{ 0, 170, 255, 255 };
 
         std::vector<DebugRect> m_DebugRects;
         std::vector<DebugText> m_DebugTexts;

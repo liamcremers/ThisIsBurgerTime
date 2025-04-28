@@ -556,9 +556,10 @@ static void SetupLevel0()
     CreateFood(level0Scene, BUN_BOTTOM_POS_4, FOOD_TYPE_BUN_BOTTOM);
 #pragma endregion
 #pragma region AUDIO
+    static constexpr float BGM_VOlUME = 0.1f;
     auto& soundSystem = dae::ServiceLocator::GetSoundSystem();
     soundSystem.Load(SoundIds::Bgm, "Sound/BGM.wav");
-    soundSystem.Play(SoundIds::Bgm, 0.1f, true);
+    soundSystem.Play(SoundIds::Bgm, BGM_VOlUME, true);
 #pragma endregion
     LevelGrid::GetInstance().InitializeLevelGrid(level0Scene, GRID_OFFSET);
 }

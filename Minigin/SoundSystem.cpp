@@ -28,40 +28,43 @@ public:
     ~SDLSoundImpl();
 
     void Play(SoundId id, const float volume, bool doRepeat);
-
     void Load(SoundId id, const std::string& path);
-
     void Unload(SoundId id);
-
-    void ProcessQueue();
-
+    void ProcessQueue(std::stop_token& st);
     auto GetSoundClip(SoundId id) -> Mix_Chunk*;
+
+    SDLSoundImpl(const SDLSoundImpl&) = delete;
+    SDLSoundImpl(SDLSoundImpl&&) = delete;
+    auto operator=(const SDLSoundImpl&) -> SDLSoundImpl& = delete;
+    auto operator=(SDLSoundImpl&&) -> SDLSoundImpl& = delete;
 
 private:
     std::mutex m_QueueMutex;
     std::queue<SoundRequest> m_SoundQueue;
     std::unordered_map<SoundId, Mix_Chunk*> m_SoundMap;
     std::jthread m_SoundThread;
-    bool m_IsRunning = true;
+    std::condition_variable_any m_CondVar;
 };
 
 dae::SDLSoundSystem::SDLSoundImpl::SDLSoundImpl()
 {
     Mix_Init(MIX_INIT_OGG | MIX_INIT_MP3 | MIX_INIT_WAVPACK);
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
+    if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY,
+                      MIX_DEFAULT_FORMAT,
+                      MIX_DEFAULT_CHANNELS,
+                      MIX_MAX_VOLUME) == -1)
     {
         throw std::runtime_error("Failed to initialize SDL audio");
     }
-    m_SoundThread = std::jthread(
-        [this](std::stop_token st)
-        {
-            while (!st.stop_requested() || !m_SoundQueue.empty())
-                ProcessQueue();
-        });
+    m_SoundThread =
+        std::jthread([this](std::stop_token st) { ProcessQueue(st); });
 }
 
 dae::SDLSoundSystem::SDLSoundImpl::~SDLSoundImpl()
 {
+    m_SoundThread.request_stop();
+    m_CondVar.notify_one();
+
     Mix_HaltChannel(-1);
     for (auto& [id, chunk] : m_SoundMap)
     {
@@ -75,11 +78,14 @@ void dae::SDLSoundSystem::SDLSoundImpl::Play(SoundId id,
                                              const float volume,
                                              bool doRepeat)
 {
-    std::lock_guard lock{ m_QueueMutex };
-    if (m_SoundMap.contains(id))
-        m_SoundQueue.push({ id, volume, doRepeat });
-    else
-        assert("Sound not loaded");
+    {
+        std::lock_guard lock{ m_QueueMutex };
+        if (m_SoundMap.contains(id))
+            m_SoundQueue.push({ id, volume, doRepeat });
+        else
+            assert("Sound not loaded");
+    }
+    m_CondVar.notify_one();
 }
 
 void dae::SDLSoundSystem::SDLSoundImpl::Load(SoundId id,
@@ -101,26 +107,52 @@ void dae::SDLSoundSystem::SDLSoundImpl::Unload(SoundId id)
     }
 }
 
-void dae::SDLSoundSystem::SDLSoundImpl::ProcessQueue()
+void dae::SDLSoundSystem::SDLSoundImpl::ProcessQueue(std::stop_token& st)
 {
-    std::unique_lock lock(m_QueueMutex);
-    if (m_SoundQueue.empty())
-        return;
-
-    auto& [id, vol, loop] = m_SoundQueue.front();
-    m_SoundQueue.pop();
-    lock.unlock();
-
-    if (m_SoundMap.contains(id))
+    while (!st.stop_requested())
     {
-        const int channel = Mix_PlayChannel(-1, m_SoundMap[id], loop ? -1 : 0);
-        Mix_Volume(channel, static_cast<int>(vol * MIX_MAX_VOLUME));
+        SoundRequest req{};
+
+        {
+            std::lock_guard lock{ m_QueueMutex };
+            if (!m_SoundQueue.empty())
+            {
+                req = m_SoundQueue.front();
+                m_SoundQueue.pop();
+            }
+            else
+            {
+                m_CondVar.wait(m_QueueMutex);
+                continue;
+            }
+        }
+
+        auto [id, volume, repeat] = req;
+        if (m_SoundMap.contains(id))
+        {
+            const int channel =
+                Mix_PlayChannel(-1, m_SoundMap[id], repeat ? -1 : 0);
+            Mix_Volume(channel, static_cast<int>(volume * MIX_MAX_VOLUME));
+        }
     }
 }
 
+[[nodiscard]]
 auto dae::SDLSoundSystem::SDLSoundImpl::GetSoundClip(SoundId id) -> Mix_Chunk*
 {
     return m_SoundMap[id];
+}
+
+// SoundSystem
+[[nodiscard]]
+auto dae::SoundSystem::GetDataPath() const -> std::filesystem::path
+{
+    return m_DataPath;
+}
+
+void dae::SoundSystem::SetDataPath(const std::filesystem::path& dataPath)
+{
+    m_DataPath = dataPath;
 }
 
 // SDLSoundSystem
@@ -131,6 +163,7 @@ dae::SDLSoundSystem::SDLSoundSystem() :
 void dae::SDLSoundSystem::Play(SoundId id, const float volume, bool doRepeat)
 {
     m_pImpl->Play(id, volume, doRepeat);
+
 #ifdef DEBUG_SOUND
     dae::DebugRenderer::GetInstance().RenderText("Playing sound: " +
                                                  std::to_string(id));
@@ -145,6 +178,7 @@ void dae::SDLSoundSystem::Load(SoundId id, const std::string& path)
     if (GetDataPath().empty())
         SetDataPath(ServiceLocator::GetDataPath());
     m_pImpl->Load(id, GetDataPath().string() + path);
+
 #ifdef DEBUG_SOUND
     dae::DebugRenderer::GetInstance().RenderText("Loading sound: " +
                                                  std::to_string(id));
@@ -154,19 +188,9 @@ void dae::SDLSoundSystem::Load(SoundId id, const std::string& path)
 void dae::SDLSoundSystem::Unload(SoundId id)
 {
     m_pImpl->Unload(id);
+
 #ifdef DEBUG_SOUND
     dae::DebugRenderer::GetInstance().RenderText("Unloading sound: " +
                                                  std::to_string(id));
 #endif // DEBUG_SOUND
-}
-
-[[nodiscard]]
-auto dae::SoundSystem::GetDataPath() const -> std::filesystem::path
-{
-    return m_DataPath;
-}
-
-void dae::SoundSystem::SetDataPath(const std::filesystem::path& dataPath)
-{
-    m_DataPath = dataPath;
 }

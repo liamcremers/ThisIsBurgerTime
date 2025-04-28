@@ -52,12 +52,16 @@ void dae::DebugRenderer::Flush()
     {
         const auto& text = m_DebugTexts[i].text;
         SDL_Surface* surface = TTF_RenderText_Solid(
-            m_Font.GetFont(), text.c_str(), { 0, 170, 255, 255 });
+            m_Font.GetFont(), text.c_str(), DEBUG_TEXT_COLOR);
         SDL_Texture* texture =
             SDL_CreateTextureFromSurface(m_Renderer, surface);
         SDL_FreeSurface(surface);
 
-        SDL_Rect dstRect = { 10, static_cast<int>(10 + i * 20), 0, 0 };
+        SDL_Rect dstRect = { DEBUG_TEXT_PADDING_X,
+                             static_cast<int>(DEBUG_TEXT_PADDING +
+                                              i * DEBUG_TEXT_PADDING),
+                             0,
+                             0 };
         SDL_QueryTexture(texture, nullptr, nullptr, &dstRect.w, &dstRect.h);
         SDL_RenderCopy(m_Renderer, texture, nullptr, &dstRect);
         SDL_DestroyTexture(texture);
@@ -70,7 +74,7 @@ void dae::DebugRenderer::Flush()
         {
             return std::chrono::duration_cast<std::chrono::seconds>(now -
                                                                     text.time)
-                       .count() > 5;
+                       .count() > DEBUG_TEXT_DURATION;
         });
     m_DebugTexts.erase(new_end, m_DebugTexts.end());
 
