@@ -566,8 +566,6 @@ static void SetupLevel0()
 
 static void load()
 {
-    dae::ServiceLocator::GetInstance().RegisterSoundSystem(
-        std::make_unique<dae::SDLSoundSystem>());
     SetupLevel0();
     SetupPlayers();
     SetupFPSScene();

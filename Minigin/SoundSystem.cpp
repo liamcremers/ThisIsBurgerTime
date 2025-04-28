@@ -24,7 +24,7 @@ class dae::SDLSoundSystem::SDLSoundImpl
     };
 
 public:
-    SDLSoundImpl();
+    explicit SDLSoundImpl(std::filesystem::path path);
     ~SDLSoundImpl();
 
     void Play(SoundId id, const float volume, bool doRepeat);
@@ -43,10 +43,12 @@ private:
     std::queue<SoundRequest> m_SoundQueue;
     std::unordered_map<SoundId, Mix_Chunk*> m_SoundMap;
     std::jthread m_SoundThread;
-    std::condition_variable_any m_CondVar;
+    std::condition_variable_any m_SoundRequested_CV;
+
+    std::filesystem::path m_DataPath;
 };
 
-dae::SDLSoundSystem::SDLSoundImpl::SDLSoundImpl()
+dae::SDLSoundSystem::SDLSoundImpl::SDLSoundImpl(std::filesystem::path path)
 {
     Mix_Init(MIX_INIT_OGG | MIX_INIT_MP3 | MIX_INIT_WAVPACK);
     if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY,
@@ -58,12 +60,13 @@ dae::SDLSoundSystem::SDLSoundImpl::SDLSoundImpl()
     }
     m_SoundThread =
         std::jthread([this](std::stop_token st) { ProcessQueue(st); });
+    m_DataPath = path;
 }
 
 dae::SDLSoundSystem::SDLSoundImpl::~SDLSoundImpl()
 {
     m_SoundThread.request_stop();
-    m_CondVar.notify_one();
+    m_SoundRequested_CV.notify_one();
 
     Mix_HaltChannel(-1);
     for (auto& [id, chunk] : m_SoundMap)
@@ -85,7 +88,7 @@ void dae::SDLSoundSystem::SDLSoundImpl::Play(SoundId id,
         else
             assert("Sound not loaded");
     }
-    m_CondVar.notify_one();
+    m_SoundRequested_CV.notify_one();
 }
 
 void dae::SDLSoundSystem::SDLSoundImpl::Load(SoundId id,
@@ -93,7 +96,7 @@ void dae::SDLSoundSystem::SDLSoundImpl::Load(SoundId id,
 {
     std::lock_guard lock{ m_QueueMutex };
     if (!m_SoundMap.contains(id))
-        if (auto* chunk = Mix_LoadWAV(path.c_str()))
+        if (auto* chunk = Mix_LoadWAV((m_DataPath / path).string().c_str()))
             m_SoundMap[id] = chunk;
 }
 
@@ -112,27 +115,23 @@ void dae::SDLSoundSystem::SDLSoundImpl::ProcessQueue(std::stop_token& st)
     while (!st.stop_requested())
     {
         SoundRequest req{};
-
+        std::lock_guard lock{ m_QueueMutex };
+        if (!m_SoundQueue.empty())
         {
-            std::lock_guard lock{ m_QueueMutex };
-            if (!m_SoundQueue.empty())
+            req = m_SoundQueue.front();
+            m_SoundQueue.pop();
+
+            auto [id, volume, repeat] = req;
+            if (m_SoundMap.contains(id))
             {
-                req = m_SoundQueue.front();
-                m_SoundQueue.pop();
-            }
-            else
-            {
-                m_CondVar.wait(m_QueueMutex);
-                continue;
+                const int channel =
+                    Mix_PlayChannel(-1, m_SoundMap[id], repeat ? -1 : 0);
+                Mix_Volume(channel, static_cast<int>(volume * MIX_MAX_VOLUME));
             }
         }
-
-        auto [id, volume, repeat] = req;
-        if (m_SoundMap.contains(id))
+        else
         {
-            const int channel =
-                Mix_PlayChannel(-1, m_SoundMap[id], repeat ? -1 : 0);
-            Mix_Volume(channel, static_cast<int>(volume * MIX_MAX_VOLUME));
+            m_SoundRequested_CV.wait(m_QueueMutex);
         }
     }
 }
@@ -143,21 +142,9 @@ auto dae::SDLSoundSystem::SDLSoundImpl::GetSoundClip(SoundId id) -> Mix_Chunk*
     return m_SoundMap[id];
 }
 
-// SoundSystem
-[[nodiscard]]
-auto dae::SoundSystem::GetDataPath() const -> std::filesystem::path
-{
-    return m_DataPath;
-}
-
-void dae::SoundSystem::SetDataPath(const std::filesystem::path& dataPath)
-{
-    m_DataPath = dataPath;
-}
-
 // SDLSoundSystem
-dae::SDLSoundSystem::SDLSoundSystem() :
-    m_pImpl{ new SDLSoundImpl() }
+dae::SDLSoundSystem::SDLSoundSystem(std::filesystem::path path) :
+    m_pImpl{ new SDLSoundImpl(path) }
 {}
 
 void dae::SDLSoundSystem::Play(SoundId id, const float volume, bool doRepeat)
@@ -175,9 +162,7 @@ void dae::SDLSoundSystem::Play(SoundId id, const float volume, bool doRepeat)
 
 void dae::SDLSoundSystem::Load(SoundId id, const std::string& path)
 {
-    if (GetDataPath().empty())
-        SetDataPath(ServiceLocator::GetDataPath());
-    m_pImpl->Load(id, GetDataPath().string() + path);
+    m_pImpl->Load(id, path);
 
 #ifdef DEBUG_SOUND
     dae::DebugRenderer::GetInstance().RenderText("Loading sound: " +

@@ -13,18 +13,18 @@ namespace dae
     class SoundSystem
     {
     public:
-        virtual ~SoundSystem() = default;
         virtual void Play(SoundId id,
                           const float volume = 1.f,
                           bool doRepeat = false) = 0;
         virtual void Load(SoundId id, const std::string& path) = 0;
         virtual void Unload(SoundId id) = 0;
-        [[nodiscard]]
-        virtual auto GetDataPath() const -> std::filesystem::path final;
-        virtual void SetDataPath(const std::filesystem::path& dataPath) final;
 
-    private:
-        std::filesystem::path m_DataPath;
+        SoundSystem() = default;
+        virtual ~SoundSystem() = default;
+        SoundSystem(const SoundSystem&) = delete;
+        SoundSystem(SoundSystem&&) = delete;
+        SoundSystem& operator=(const SoundSystem&) = delete;
+        SoundSystem& operator=(SoundSystem&&) = delete;
     };
 
     class NullSoundSystem final : public SoundSystem
@@ -33,15 +33,29 @@ namespace dae
         void Play(SoundId, const float, bool) override {};
         void Load(SoundId, const std::string&) override {};
         void Unload(SoundId) override{};
+
+        NullSoundSystem() = default;
+        virtual ~NullSoundSystem() = default;
+        NullSoundSystem(const NullSoundSystem&) = delete;
+        NullSoundSystem(NullSoundSystem&&) = delete;
+        NullSoundSystem& operator=(const NullSoundSystem&) = delete;
+        NullSoundSystem& operator=(NullSoundSystem&&) = delete;
     };
 
     class SDLSoundSystem final : public SoundSystem
     {
     public:
-        SDLSoundSystem();
+        explicit SDLSoundSystem(std::filesystem::path path);
         void Play(SoundId id, const float volume, bool doRepeat) override;
         void Load(SoundId id, const std::string& path) override;
         void Unload(SoundId id) override;
+
+        SDLSoundSystem() = delete;
+        virtual ~SDLSoundSystem() = default;
+        SDLSoundSystem(const SDLSoundSystem&) = delete;
+        SDLSoundSystem(SDLSoundSystem&&) = delete;
+        SDLSoundSystem& operator=(const SDLSoundSystem&) = delete;
+        SDLSoundSystem& operator=(SDLSoundSystem&&) = delete;
 
     private:
         class SDLSoundImpl;
