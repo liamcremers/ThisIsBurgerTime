@@ -29,32 +29,15 @@ namespace fs = std::filesystem;
 static constexpr int WINDOW_WIDTH = dae::Minigin::GetWindowWidth();
 static constexpr int WINDOW_HEIGHT = dae::Minigin::GetWindowHeight();
 static constexpr glm::vec2 FPS_POS = { 5.0f, 6.0f };
-static constexpr glm::vec2 INSTRUCTION_POS = { 58.0f, 6.0f };
 static constexpr glm::vec2 LIVES_UI_POS = { 5.0f, 20.0f };
 static constexpr glm::vec2 SCORE_UI_POS = { 5.0f, 30.0f };
-static constexpr glm::vec2 LOGO_POS = { 216.0f, 180.0f };
-static constexpr glm::vec2 TEXT_POS = { 80.0f, 20.0f };
 static constexpr float OFFSET = 20.0f;
-static constexpr float RADIUS = 40.0f;
-static constexpr float INSTRUCTION_OFFSET_1 = 0.0f;
-static constexpr float INSTRUCTION_OFFSET_2 = 20.0f;
-static constexpr float DIVISOR = 2.0f;
 static constexpr int BASE_SPEED = 100;
 static constexpr int START_LIVES = 3;
-static constexpr int SCORE_TEN = 10;
 static constexpr int LIVES_UI_OFFSET_Y = 25;
 static constexpr int SCORE_UI_OFFSET_Y = 25;
-static constexpr uint8_t LARGE_FONT_SIZE = 36;
 static constexpr uint8_t SMALL_FONT_SIZE = 14;
-static constexpr uint8_t INSTRUCTION_FONT_SIZE = 11;
-static constexpr auto INSTRUCTION_TXT_0 =
-    "Use the D-Pad to move the frontfacing player, x to inflict damage, A and "
-    "B to pick up pellets";
-static constexpr auto INSTRUCTION_TXT_1 =
-    "Use the D-Pad to move the backfacing player, C to inflict damage, Z "
-    "and Q to pick up pellets";
 static constexpr int G_SIZE = 16;
-static constexpr float GRAVITY = 9.81f;
 static constexpr glm::vec2 FLOOR_SIZE = { G_SIZE, G_SIZE / 4.f };
 static constexpr glm::vec2 FLOOR_OFFSET = { 0, 0 };
 static constexpr int TOP_BORDER = 10;
@@ -339,6 +322,7 @@ static void CreateBurgerPlateStack(dae::Scene& scene,
     }
     goTR->SetLocalPosition(startPos + glm::vec2(PLATE_LENGTH * G_SIZE, 0));
     scene.Add(std::move(goTR));
+
 }
 
 static void CreateFood(dae::Scene& scene,
@@ -581,6 +565,6 @@ auto main(int, char*[]) -> int
         data_location = "../Data/";
 #endif
     dae::Minigin engine(data_location);
-    engine.Run([&engine]() { load(); });
+    engine.Run([]() { load(); });
     return 0;
 }

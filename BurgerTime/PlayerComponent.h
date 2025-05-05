@@ -1,7 +1,9 @@
 #pragma once
 #include <BaseComponent.h>
 #include <Command.h>
+
 #include <glm.hpp>
+//#include <glm.hpp>
 
 #include <memory>
 #include <vector>
@@ -14,14 +16,37 @@ namespace dae
 }
 
 class GridMoveCommand;
-class SelfDamageCommand;
-class AddPointsCommand;
+
+class SelfDamageCommand : public dae::GameObjectCommand
+{
+public:
+    SelfDamageCommand(dae::GameObject& pGameObject);
+    virtual ~SelfDamageCommand() = default;
+    void Execute() override;
+    void Undo() override {};
+
+private:
+    dae::LivesComponent* m_pLivesComp;
+};
+
+class AddPointsCommand : public dae::GameObjectCommand
+{
+public:
+    AddPointsCommand(dae::GameObject& pGameObject, int pointsAdded);
+    virtual ~AddPointsCommand() = default;
+    void Execute() override;
+    void Undo() override {};
+
+private:
+    dae::ScoreComponent* m_pScoreComp;
+    int m_PointsAdded{};
+};
 
 class PlayerInputComponent final : public dae::BaseComponent
 {
 public:
     PlayerInputComponent(dae::GameObject& parent, unsigned long idx);
-    ~PlayerInputComponent();
+    virtual ~PlayerInputComponent();
     const dae::Controller* GetController() const;
 
     void SetSpeed(int speed);
@@ -55,27 +80,4 @@ private:
     std::unique_ptr<SelfDamageCommand> m_pSelfDamageCommand;
     std::unique_ptr<AddPointsCommand> m_pAdd100PointsCommand;
     std::unique_ptr<AddPointsCommand> m_pAdd10PointsCommand;
-};
-
-class SelfDamageCommand : public dae::GameObjectCommand
-{
-public:
-    SelfDamageCommand(dae::GameObject& pGameObject);
-    void Execute() override;
-    void Undo() override {};
-
-private:
-    dae::LivesComponent* m_pLivesComp;
-};
-
-class AddPointsCommand : public dae::GameObjectCommand
-{
-public:
-    AddPointsCommand(dae::GameObject& pGameObject, int pointsAdded);
-    void Execute() override;
-    void Undo() override {};
-
-private:
-    dae::ScoreComponent* m_pScoreComp;
-    int m_PointsAdded{};
 };

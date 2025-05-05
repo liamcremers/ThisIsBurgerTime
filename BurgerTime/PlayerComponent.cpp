@@ -9,6 +9,7 @@
 
 #ifdef DEBUG_RENDER
 #include <DebugRenderer.h>
+#include "LevelGrid.h"
 #endif // DEBUG_RENDER
 
 #include <SDL.h>
@@ -156,8 +157,6 @@ SelfDamageCommand::SelfDamageCommand(dae::GameObject& pGameObject) :
 void SelfDamageCommand::Execute() { m_pLivesComp->LoseLife(); }
 
 #ifdef DEBUG_RENDER
-#include "LevelGrid.h"
-
 void PlayerInputComponent::Render() const
 {
     auto& levelGrid = LevelGrid::GetInstance();

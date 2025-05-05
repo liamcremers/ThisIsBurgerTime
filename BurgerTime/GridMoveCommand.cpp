@@ -12,10 +12,10 @@ GridMoveCommand::GridMoveCommand(dae::GameObject& pGameObject,
                                  glm::i8vec2 m_Direction,
                                  int speed) :
     GameObjectCommand{ &pGameObject },
-    m_Direction{ m_Direction },
-    m_Speed{ speed },
     m_pPhysics{ GetGameObject()->GetComponent<dae::PhysicsComponent>() },
-    m_pCollider{ GetGameObject()->GetComponent<dae::ColliderComponent>() }
+    m_pCollider{ GetGameObject()->GetComponent<dae::ColliderComponent>() },
+    m_Speed{ speed },
+    m_Direction{ m_Direction }
 {
     assert(m_pPhysics and m_pCollider and
            "GridMoveCommand requires a ColliderComponent/PhysicsComponent "
