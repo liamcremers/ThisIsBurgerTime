@@ -1,7 +1,8 @@
 #pragma once
 #include <BaseComponent.h>
 #include <Command.h>
-#include <glm.hpp>
+
+#include <glm/glm.hpp>
 
 #include <memory>
 #include <vector>

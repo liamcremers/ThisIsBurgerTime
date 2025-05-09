@@ -20,11 +20,12 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT $
 # Link with the Minigin library
 if(EMSCRIPTEN)
 target_link_directories(${TARGET_NAME} PRIVATE MiniginWeb)
+get_target_property(BURGERTIME_DLLS MiniginWeb RUNTIME_DLLS)
 else()
 target_link_libraries(${TARGET_NAME} PRIVATE Minigin)
+get_target_property(BURGERTIME_DLLS Minigin RUNTIME_DLLS)
 endif()
 
-get_target_property(BURGERTIME_DLLS Minigin RUNTIME_DLLS)
 add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different
         ${BURGERTIME_DLLS}
@@ -51,7 +52,9 @@ find_package(OpenGL REQUIRED)
 target_link_libraries(${TARGET_NAME} PUBLIC OpenGL::GL)
 
 # Link with XInput
+if (WIN32)
 target_link_libraries(${TARGET_NAME} PUBLIC XInput)
+endif()
 
 # Link with glm
 target_link_libraries(${TARGET_NAME} PUBLIC glm::glm)

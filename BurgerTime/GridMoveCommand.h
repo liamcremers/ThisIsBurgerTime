@@ -1,6 +1,7 @@
 #pragma once
 #include <Command.h>
-#include <glm.hpp>
+
+#include <glm/glm.hpp>
 #include <unordered_set>
 
 namespace dae
