@@ -2,7 +2,8 @@
 #include <BaseComponent.h>
 #include <Command.h>
 
-#include <glm/glm.hpp>
+#include <glm.hpp>
+//#include <glm.hpp>
 
 #include <memory>
 #include <vector>

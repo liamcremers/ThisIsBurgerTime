@@ -1,4 +1,0 @@
-[submodule "Minigin"]
-	path = Minigin
-	url = https://github.com/liamcremers/ThisIsEngine.git
-	branch = feature/cmake
