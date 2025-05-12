@@ -24,6 +24,9 @@ GridMoveCommand::GridMoveCommand(dae::GameObject& pGameObject,
 
 void GridMoveCommand::Execute()
 {
+    if (!m_CanMove)
+        return;
+
     static constexpr auto HALF_SIZE_FACTOR = 0.5f;
 
     auto& levelGrid = LevelGrid::GetInstance();
@@ -37,13 +40,16 @@ void GridMoveCommand::Execute()
     glm::ivec2 targetGridPos =
         gridPos + glm::ivec2(m_Direction[0], m_Direction[1]);
 
-    bool canMove{};
+    bool walked = IsPositionedForWalking(worldPos, gridPos, targetGridPos);
 
-    if (IsPositionedForWalking(worldPos, gridPos, targetGridPos) or
-        IsPositionedForClimbing(worldPos, gridPos, targetGridPos))
-        canMove = true;
+    bool climbed = IsPositionedForClimbing(worldPos, gridPos, targetGridPos);
 
-    if (canMove)
+    if (walked)
+        m_GridMoveSubject.Notify("Walked");
+    if (climbed)
+        m_GridMoveSubject.Notify("Climbed");
+
+    if (walked or climbed)
     {
         glm::vec2 currentPos = playerPos;
 
@@ -65,6 +71,9 @@ void GridMoveCommand::Execute()
 
 void GridMoveCommand::Undo()
 {
+    if (!m_CanMove)
+        return;
+
     if (auto* physics = GetGameObject()->GetComponent<dae::PhysicsComponent>())
     {
         auto velocity = physics->GetVelocity();
@@ -77,6 +86,8 @@ void GridMoveCommand::Undo()
 }
 
 void GridMoveCommand::SetSpeed(int speed) { m_Speed = speed; }
+
+void GridMoveCommand::SetCanMove(bool canMove) { m_CanMove = canMove; }
 
 auto GridMoveCommand::IsPositionedForClimbing(const glm::vec2& playerPos,
                                               glm::ivec2& playerGridPos,

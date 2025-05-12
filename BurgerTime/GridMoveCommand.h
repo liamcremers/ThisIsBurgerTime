@@ -1,9 +1,8 @@
 #pragma once
 #include <Command.h>
-
 #include <glm.hpp>
-//#include <glm.hpp>
 #include <unordered_set>
+#include <Observer.h>
 
 namespace dae
 {
@@ -25,8 +24,12 @@ public:
     void Execute() override;
     void Undo() override;
     void SetSpeed(int speed);
+    void SetCanMove(bool isMoving);
+
+    dae::Subject& GetMoveCommandSubject() { return m_GridMoveSubject; }
 
 private:
+    dae::Subject m_GridMoveSubject{};
     [[nodiscard]]
     auto IsPositionedForClimbing(const glm::vec2& playerPos,
                                  glm::ivec2& playerGridPos,
@@ -44,4 +47,5 @@ private:
     dae::ColliderComponent* m_pCollider{ nullptr };
     int m_Speed{ 100 };
     glm::i8vec2 m_Direction{};
+    bool m_CanMove{ true };
 };

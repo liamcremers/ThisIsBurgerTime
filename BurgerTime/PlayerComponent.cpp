@@ -1,165 +1,103 @@
 #include "PlayerComponent.h"
+#include "PlayerState.h"
+#include "PlayerInputComponent.h"
 #include "GridMoveCommand.h"
-
-#include <InputManager.h>
-#include <Controller.h>
-#include <GameObject.h>
-#include <ScoreComponent.h>
-#include <LivesComponent.h>
-
-#ifdef DEBUG_RENDER
-#include <DebugRenderer.h>
 #include "LevelGrid.h"
-#endif // DEBUG_RENDER
 
-#include <SDL.h>
+#include <EngineTime.h>
 
-PlayerInputComponent::PlayerInputComponent(dae::GameObject& parent,
-                                           unsigned long idx) :
-    BaseComponent(parent),
-    m_pController{ std::make_unique<dae::Controller>(idx) },
-    m_pMoveCommandUp{ std::make_unique<GridMoveCommand>(parent, MoveUp) },
-    m_pMoveCommandDown{ std::make_unique<GridMoveCommand>(parent, MoveDown) },
-    m_pMoveCommandLeft{ std::make_unique<GridMoveCommand>(parent, MoveLeft) },
-    m_pMoveCommandRight{ std::make_unique<GridMoveCommand>(parent, MoveRight) },
-    m_pSelfDamageCommand{ std::make_unique<SelfDamageCommand>(parent) },
-    m_pAdd100PointsCommand{
-        std::make_unique<AddPointsCommand>(parent, HUNDRED_POINTS)
-    },
-    m_pAdd10PointsCommand{ std::make_unique<AddPointsCommand>(parent,
-                                                              TEN_POINTS) }
-
+PlayerComponent::PlayerComponent(dae::GameObject& parent) :
+    BaseComponent{ parent },
+    m_pCurrentState{ std::make_unique<IdleState>() },
+    m_pInputComponent{ parent.GetComponent<PlayerInputComponent>() }
 {
-    dae::InputManager::GetInstance().AddController(m_pController.get());
-    m_pController->AddCommand(
-        *m_pMoveCommandUp, XINPUT_GAMEPAD_DPAD_UP, dae::ButtonState::Pressed);
-    m_pController->AddCommand(*m_pMoveCommandDown,
-                              XINPUT_GAMEPAD_DPAD_DOWN,
-                              dae::ButtonState::Pressed);
-    m_pController->AddCommand(*m_pMoveCommandLeft,
-                              XINPUT_GAMEPAD_DPAD_LEFT,
-                              dae::ButtonState::Pressed);
-    m_pController->AddCommand(*m_pMoveCommandRight,
-                              XINPUT_GAMEPAD_DPAD_RIGHT,
-                              dae::ButtonState::Pressed);
-    m_pController->AddCommand(*m_pSelfDamageCommand,
-                              XINPUT_GAMEPAD_X,
-                              dae::ButtonState::DownThisFrame);
-    m_pController->AddCommand(*m_pAdd100PointsCommand,
-                              XINPUT_GAMEPAD_A,
-                              dae::ButtonState::DownThisFrame);
-    m_pController->AddCommand(*m_pAdd10PointsCommand,
-                              XINPUT_GAMEPAD_B,
-                              dae::ButtonState::DownThisFrame);
+    assert(m_pInputComponent && "PlayerComponent requires a "
+                                "PlayerInputComponent to function properly.");
 
-    SetUpKeyboardControls(idx);
-
-    //GetOwner().GetComponent<ColliderComponent>()->SubscribeToBeginOverlap(
-    //    [this](const ColliderComponent& other)
-    //    {
-    //        if ((other.GetLayer() &
-    //             static_cast<uint16_t>(
-    //                 BurgerTime::CollisionLayer::Floor)) != 0)
-    //        {
-    //            m_pMoveCommandLeft->SetReady(true);
-    //            m_pMoveCommandRight->SetReady(true);
-    //            GetOwner()
-    //                .GetComponent<dae::PhysicsComponent>()
-    //                ->SetUseGravity(false);
-    //        }
-    //    });
-    //GetOwner().GetComponent<ColliderComponent>()->SubscribeToEndOverlap(
-    //    [this](const ColliderComponent& other)
-    //    {
-    //        if ((other.GetLayer() &
-    //             static_cast<uint16_t>(
-    //                 BurgerTime::CollisionLayer::Floor)) != 0)
-    //        {
-    //            //m_pMoveCommandLeft->SetReady(false);
-    //            //m_pMoveCommandRight->SetReady(false);
-    //        }
-    //    });
+    m_pInputComponent->GetMoveCommandDown()
+        ->GetMoveCommandSubject()
+        .AddObserver(this);
+    m_pInputComponent->GetMoveCommandLeft()
+        ->GetMoveCommandSubject()
+        .AddObserver(this);
+    m_pInputComponent->GetMoveCommandRight()
+        ->GetMoveCommandSubject()
+        .AddObserver(this);
+    /**/ m_pInputComponent->GetMoveCommandUp()
+        ->GetMoveCommandSubject()
+        .AddObserver(this);
 }
 
-PlayerInputComponent::~PlayerInputComponent()
+PlayerComponent::~PlayerComponent()
 {
-    m_pController->RemoveCommand(
-        *m_pMoveCommandUp, XINPUT_GAMEPAD_DPAD_UP, dae::ButtonState::Pressed);
-    m_pController->RemoveCommand(*m_pMoveCommandDown,
-                                 XINPUT_GAMEPAD_DPAD_DOWN,
-                                 dae::ButtonState::Pressed);
-    m_pController->RemoveCommand(*m_pMoveCommandLeft,
-                                 XINPUT_GAMEPAD_DPAD_LEFT,
-                                 dae::ButtonState::Pressed);
-    m_pController->RemoveCommand(*m_pMoveCommandRight,
-                                 XINPUT_GAMEPAD_DPAD_RIGHT,
-                                 dae::ButtonState::Pressed);
-    m_pController->RemoveCommand(*m_pSelfDamageCommand,
-                                 XINPUT_GAMEPAD_X,
-                                 dae::ButtonState::DownThisFrame);
-    m_pController->RemoveCommand(*m_pAdd100PointsCommand,
-                                 XINPUT_GAMEPAD_A,
-                                 dae::ButtonState::DownThisFrame);
-    m_pController->RemoveCommand(*m_pAdd10PointsCommand,
-                                 XINPUT_GAMEPAD_B,
-                                 dae::ButtonState::DownThisFrame);
-}
-
-auto PlayerInputComponent::GetController() const -> const dae::Controller*
-{
-    return m_pController.get();
-}
-
-void PlayerInputComponent::SetSpeed(int speed)
-{
-    m_pMoveCommandUp->SetSpeed(speed);
-    m_pMoveCommandDown->SetSpeed(speed);
-    m_pMoveCommandLeft->SetSpeed(speed);
-    m_pMoveCommandRight->SetSpeed(speed);
-}
-
-void PlayerInputComponent::SetUpKeyboardControls(unsigned long idx)
-{
-    auto& inputManager = dae::InputManager::GetInstance();
-    if (idx == 0)
+    if (m_pInputComponent)
     {
-        inputManager.AddKeyboardCommand(SDLK_UP, m_pMoveCommandUp.get());
-        inputManager.AddKeyboardCommand(SDLK_DOWN, m_pMoveCommandDown.get());
-        inputManager.AddKeyboardCommand(SDLK_LEFT, m_pMoveCommandLeft.get());
-        inputManager.AddKeyboardCommand(SDLK_RIGHT, m_pMoveCommandRight.get());
-    }
-    if (idx == 1)
-    {
-        inputManager.AddKeyboardCommand(SDLK_w, m_pMoveCommandUp.get());
-        inputManager.AddKeyboardCommand(SDLK_s, m_pMoveCommandDown.get());
-        inputManager.AddKeyboardCommand(SDLK_a, m_pMoveCommandLeft.get());
-        inputManager.AddKeyboardCommand(SDLK_d, m_pMoveCommandRight.get());
-        inputManager.AddKeyboardCommand(SDLK_c, m_pSelfDamageCommand.get());
-        inputManager.AddKeyboardCommand(SDLK_z, m_pAdd100PointsCommand.get());
-        inputManager.AddKeyboardCommand(SDLK_q, m_pAdd10PointsCommand.get());
+        m_pInputComponent->GetMoveCommandDown()
+            ->GetMoveCommandSubject()
+            .RemoveObserver(this);
+        m_pInputComponent->GetMoveCommandLeft()
+            ->GetMoveCommandSubject()
+            .RemoveObserver(this);
+        m_pInputComponent->GetMoveCommandRight()
+            ->GetMoveCommandSubject()
+            .RemoveObserver(this);
+        m_pInputComponent->GetMoveCommandUp()
+            ->GetMoveCommandSubject()
+            .RemoveObserver(this);
     }
 }
 
-AddPointsCommand::AddPointsCommand(dae::GameObject& pGameObject,
-                                   int pointsAdded) :
-    GameObjectCommand{ &pGameObject },
-    m_pScoreComp{ GetGameObject()->GetComponent<dae::ScoreComponent>() },
-    m_PointsAdded{ pointsAdded }
-{}
-
-void AddPointsCommand::Execute() { m_pScoreComp->AddScore(m_PointsAdded); }
-
-SelfDamageCommand::SelfDamageCommand(dae::GameObject& pGameObject) :
-    dae::GameObjectCommand{ &pGameObject },
-    m_pLivesComp{ GetGameObject()->GetComponent<dae::LivesComponent>() }
-{}
-
-void SelfDamageCommand::Execute() { m_pLivesComp->LoseLife(); }
-
-#ifdef DEBUG_RENDER
-void PlayerInputComponent::Render() const
+void PlayerComponent::Update()
 {
-    auto& levelGrid = LevelGrid::GetInstance();
-    levelGrid.DrawGrid();
+    m_IdleTime += dae::EngineTime::GetInstance().GetDeltaTime();
+    m_pCurrentState->Update(*this);
 }
-#endif // DEBUG_RENDER
+
+void PlayerComponent::LateUpdate()
+{
+    m_IsClimbing = false;
+    m_IsWalking = false;
+}
+
+void PlayerComponent::ChangeState(std::unique_ptr<PlayerState> pNewState)
+{
+    if (m_pCurrentState)
+        m_pCurrentState->Exit(*this);
+    m_pCurrentState = std::move(pNewState);
+    m_pCurrentState->Enter(*this);
+
+#ifdef DEBUG_STATES
+#include <typeinfo>
+    dae::DebugRenderer::GetInstance().RenderText(
+        "Loading state: " + std::string(typeid(*m_pCurrentState).name()));
+#endif // DEBUG_STATES
+}
+
+void PlayerComponent::SetAnimation(const std::string&) {}
+
+void PlayerComponent::SetCanMove(bool canMove)
+{
+    m_pInputComponent->SetCanMove(canMove);
+}
+
+bool PlayerComponent::IsMoving() const
+{
+    return m_IdleTime < m_IdleTimeThreshold;
+}
+
+bool PlayerComponent::IsWalking() const { return m_IsWalking; }
+
+bool PlayerComponent::IsClimbing() const { return m_IsClimbing; }
+
+void PlayerComponent::OnNotify(const std::string& eventId)
+{
+    if (eventId == "Walked")
+        m_IsWalking = true;
+    else if (eventId == "Climbed")
+        m_IsClimbing = true;
+    else
+        return;
+    m_IdleTime = 0.f;
+}
+
+void PlayerComponent::OnDestroy() { m_pInputComponent = nullptr; }

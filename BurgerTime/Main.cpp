@@ -21,6 +21,7 @@
 #include "LevelGrid.h"
 #include "BurgerPartComponent.h"
 #include "BurgerTimeSoundIds.h"
+#include "PlayerInputComponent.h"
 
 #include <filesystem>
 #include <memory>
@@ -77,9 +78,8 @@ static void SetupPlayers()
             player->AddComponent<dae::LivesComponent>(START_LIVES);
         auto* scoreComp = player->AddComponent<dae::ScoreComponent>();
 
-        auto* inputComp =
-            player->AddComponent<PlayerInputComponent>(static_cast<uint8_t>(i));
-        inputComp->SetSpeed(BASE_SPEED * (i + 1));
+        player->AddComponent<PlayerInputComponent>(static_cast<uint8_t>(i));
+        player->AddComponent<PlayerComponent>();
 
         dae::CollisionSystem::GetInstance().RegisterCollider(collider);
         scene.Add(std::move(player));
@@ -322,7 +322,6 @@ static void CreateBurgerPlateStack(dae::Scene& scene,
     }
     goTR->SetLocalPosition(startPos + glm::vec2(PLATE_LENGTH * G_SIZE, 0));
     scene.Add(std::move(goTR));
-
 }
 
 static void CreateFood(dae::Scene& scene,

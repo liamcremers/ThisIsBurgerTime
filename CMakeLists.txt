@@ -45,9 +45,10 @@ target_compile_options(${TARGET_NAME_BURGERTIME} PRIVATE
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>)
 
 # Define DEBUG_RENDER for Debug builds
+# DEBUG_SOUND
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(${TARGET_NAME_MINIGIN} PRIVATE DEBUG_RENDER DEBUG_SOUND)
-    target_compile_definitions(${TARGET_NAME_BURGERTIME} PRIVATE DEBUG_RENDER DEBUG_SOUND)
+    target_compile_definitions(${TARGET_NAME_MINIGIN} PRIVATE DEBUG_RENDER DEBUG_STATES)
+    target_compile_definitions(${TARGET_NAME_BURGERTIME} PRIVATE DEBUG_RENDER DEBUG_STATES)
 endif ()
 
 if(EMSCRIPTEN)
