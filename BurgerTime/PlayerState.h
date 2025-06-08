@@ -26,7 +26,6 @@ public:
                              PlayerInputKeys& input) override;
 };
 
-
 class MoveState : public PlayerState
 {
 public:
@@ -47,6 +46,10 @@ public:
     PlayerState& Update(PlayerComponent& player) override;
     PlayerState& HandleInput(PlayerComponent& player,
                              PlayerInputKeys& input) override;
+
+private:
+    float m_AttackTimer{};
+    const float m_AttackDuration{ 0.5f };
 };
 
 class DieState : public PlayerState
@@ -58,4 +61,8 @@ public:
     PlayerState& Update(PlayerComponent& player) override;
     PlayerState& HandleInput(PlayerComponent& player,
                              PlayerInputKeys&) override;
+
+private:
+    float m_DeathTimer{};
+    const float m_DeathDuration{ 2.0f };
 };

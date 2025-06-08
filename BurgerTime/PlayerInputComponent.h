@@ -34,4 +34,9 @@ private:
     std::unique_ptr<PlayerCommand> m_pPlayerCommandDown{};
     std::unique_ptr<PlayerCommand> m_pPlayerCommandLeft{};
     std::unique_ptr<PlayerCommand> m_pPlayerCommandRight{};
+    std::unique_ptr<PlayerCommand> m_pPlayerCommandAttack{};
+#ifdef _DEBUG
+    std::unique_ptr<PlayerCommand>
+        m_pPlayerCommandDie{}; // todo: remove this is for testing purposes only
+#endif // DEBUG
 };

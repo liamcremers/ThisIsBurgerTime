@@ -23,6 +23,55 @@ GridMoveCommand::GridMoveCommand(dae::GameObject& pGameObject,
            "to function");
 }
 
+bool GridMoveCommand::ExecuteWithCheck()
+{
+    if (!m_CanMove)
+        return false;
+
+    static constexpr auto HALF_SIZE_FACTOR = 0.5f;
+
+    auto& levelGrid = LevelGrid::GetInstance();
+    const auto& playerPos = GetGameObject()->GetWorldPosition();
+    auto playerSize = m_pCollider->GetSize();
+    auto halfPlayerSize = playerSize * HALF_SIZE_FACTOR;
+
+    glm::vec2 worldPos =
+        playerPos + glm::vec2{ halfPlayerSize[0], playerSize[1] };
+    glm::ivec2 gridPos = levelGrid.WorldToGrid(worldPos);
+    glm::ivec2 targetGridPos =
+        gridPos + glm::ivec2(m_Direction[0], m_Direction[1]);
+
+    bool walked = IsPositionedForWalking(worldPos, gridPos, targetGridPos);
+
+    bool climbed = IsPositionedForClimbing(worldPos, gridPos, targetGridPos);
+
+    if (walked)
+        m_GridMoveSubject.Notify("Walked");
+    if (climbed)
+        m_GridMoveSubject.Notify("Climbed");
+
+    if (walked or climbed)
+    {
+        glm::vec2 currentPos = playerPos;
+
+        if (m_Direction[0] != 0)
+            currentPos[1] =
+                levelGrid.GridToWorld(targetGridPos)[1] - playerSize[1];
+        else if (m_Direction[1] != 0)
+            currentPos[0] =
+                levelGrid.GridToWorld(targetGridPos)[0] - (halfPlayerSize[0]);
+        float deltaTime = dae::EngineTime::GetInstance().GetDeltaTime();
+        glm::vec2 newPos =
+            currentPos +
+            glm::vec2(static_cast<float>(m_Direction[0] * m_Speed) * deltaTime,
+                      static_cast<float>(m_Direction[1] * m_Speed) * deltaTime);
+        m_pCollider->SetHasMoved(true);
+        GetGameObject()->SetLocalPosition(newPos);
+        return (newPos != playerPos);
+    }
+    return false;
+}
+
 void GridMoveCommand::Execute()
 {
     if (!m_CanMove)

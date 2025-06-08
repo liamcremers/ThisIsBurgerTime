@@ -57,10 +57,6 @@ static void SetupPlayers()
                                 PLAYER_START_POS[1] };
         auto player =
             std::make_unique<dae::GameObject>("player" + std::to_string(i));
-        auto* renderComp = player->AddComponent<dae::RenderComponent>();
-        renderComp->SetTexture(i == 0 ? "ChefPeterPepperF.png" :
-                                        "ChefPeterPepperB.png");
-        renderComp->Scale(2);
         player->SetLocalPosition(playerPos);
 
         auto* collider = player->AddComponent<dae::ColliderComponent>(

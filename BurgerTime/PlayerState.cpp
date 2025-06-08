@@ -5,15 +5,29 @@
 #include <BaseComponent.h>
 #include <glm.hpp>
 
+static constexpr glm::vec2 InputToDirection(PlayerInputKeys input)
+{
+    switch (input)
+    {
+    case PlayerInputKeys::MoveLeft:
+        return DirectionVec::Left;
+    case PlayerInputKeys::MoveRight:
+        return DirectionVec::Right;
+    case PlayerInputKeys::MoveUp:
+        return DirectionVec::Up;
+    case PlayerInputKeys::MoveDown:
+        return DirectionVec::Down;
+    default:
+        return {};
+    }
+}
+
 // IDLE STATE
 void IdleState::Enter(PlayerComponent&) {}
 
 void IdleState::Exit(PlayerComponent&) {}
 
-PlayerState& IdleState::Update(PlayerComponent& player)
-{
-    return player.GetIdleState();
-}
+PlayerState& IdleState::Update(PlayerComponent&) { return *this; }
 
 PlayerState& IdleState::HandleInput(PlayerComponent& player,
                                     PlayerInputKeys& input)
@@ -21,27 +35,20 @@ PlayerState& IdleState::HandleInput(PlayerComponent& player,
     switch (input)
     {
     case PlayerInputKeys::MoveLeft:
-        player.Move(PlayerDirection::Left);
-    case PlayerInputKeys::MoveRight:
-        player.Move(PlayerDirection::Right);
-    case PlayerInputKeys::MoveUp:
-        player.Move(PlayerDirection::Up);
-    case PlayerInputKeys::MoveDown:
-        player.Move(PlayerDirection::Down);
-    };
-
-    switch (input)
-    {
-    case PlayerInputKeys::MoveLeft:
     case PlayerInputKeys::MoveRight:
     case PlayerInputKeys::MoveUp:
     case PlayerInputKeys::MoveDown:
+        player.OnMove(InputToDirection(input));
         return player.GetMoveState();
     case PlayerInputKeys::Attack:
         return player.GetAttackState();
+#ifdef _DEBUG
+    case PlayerInputKeys::Die:
+        return player.GetDieState();
+#endif // _DEBUG
     default:
-        return player.GetIdleState();
-    }
+        return *this;
+    };
 }
 
 // MOVE STATE
@@ -51,13 +58,10 @@ void MoveState::Exit(PlayerComponent&) {}
 
 PlayerState& MoveState::Update(PlayerComponent& player)
 {
-    if (!player.HasMoved())
-    {
+    if (player.HasMoved())
+        return *this;
 
-        return player.GetIdleState();
-    }
-
-    return player.GetMoveState();
+    return player.GetIdleState();
 }
 
 PlayerState& MoveState::HandleInput(PlayerComponent& player,
@@ -66,50 +70,58 @@ PlayerState& MoveState::HandleInput(PlayerComponent& player,
     switch (input)
     {
     case PlayerInputKeys::MoveUp:
-        player.Move(PlayerDirection::Up);
-        return player.GetMoveState();
     case PlayerInputKeys::MoveDown:
-        player.Move(PlayerDirection::Down);
-        return player.GetMoveState();
     case PlayerInputKeys::MoveLeft:
-        player.Move(PlayerDirection::Left);
-        return player.GetMoveState();
     case PlayerInputKeys::MoveRight:
-        player.Move(PlayerDirection::Right);
-        return player.GetMoveState();
+        player.OnMove(InputToDirection(input));
+        return *this;
     case PlayerInputKeys::Attack:
         return player.GetAttackState();
+#ifdef _DEBUG
+    case PlayerInputKeys::Die:
+        return player.GetDieState();
+#endif // _DEBUG
     default:
-        return player.GetIdleState();
+        return *this;
     }
 }
 
 // ATTACK STATE
-void AttackState::Enter(PlayerComponent&) {}
+void AttackState::Enter(PlayerComponent&) { m_AttackTimer = 0.0f; }
 
 void AttackState::Exit(PlayerComponent&) {}
 
 PlayerState& AttackState::Update(PlayerComponent& player)
 {
-    return player.GetAttackState();
+    m_AttackTimer += dae::EngineTime::GetInstance().GetDeltaTime();
+    if (m_AttackTimer < m_AttackDuration)
+        return player.GetIdleState();
+    return *this;
 }
 
-PlayerState& AttackState::HandleInput(PlayerComponent& player, PlayerInputKeys&)
+PlayerState& AttackState::HandleInput(PlayerComponent&, PlayerInputKeys&)
 {
-    return player.GetAttackState();
+    return *this;
 }
 
 // DIE STATE
-void DieState::Enter(PlayerComponent&) {}
+void DieState::Enter(PlayerComponent&) { m_DeathTimer = 0.0f; }
 
 void DieState::Exit(PlayerComponent&) {}
 
 PlayerState& DieState::Update(PlayerComponent& player)
 {
-    return player.GetDieState();
+    m_DeathTimer += dae::EngineTime::GetInstance().GetDeltaTime();
+
+    if (m_DeathTimer >= m_DeathDuration)
+    {
+        player.OnDeath();
+        return player.GetIdleState();
+    }
+    return *this;
 }
 
-PlayerState& DieState::HandleInput(PlayerComponent& player, PlayerInputKeys&)
+PlayerState& DieState::HandleInput(PlayerComponent&, PlayerInputKeys&)
 {
-    return player.GetDieState();
+    return *this;
 }

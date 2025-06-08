@@ -6,4 +6,8 @@ enum class PlayerInputKeys
     MoveUp,
     MoveDown,
     Attack
+#ifdef _DEBUG
+        ,
+    Die
+#endif // _DEBUG
 };
