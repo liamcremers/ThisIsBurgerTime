@@ -23,7 +23,7 @@ GridMoveCommand::GridMoveCommand(dae::GameObject& pGameObject,
            "to function");
 }
 
-bool GridMoveCommand::ExecuteWithCheck()
+auto GridMoveCommand::ExecuteWithCheck() -> bool
 {
     if (!m_CanMove)
         return false;

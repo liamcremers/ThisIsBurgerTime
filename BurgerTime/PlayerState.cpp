@@ -5,7 +5,7 @@
 #include <BaseComponent.h>
 #include <glm.hpp>
 
-static constexpr glm::vec2 InputToDirection(PlayerInputKeys input)
+static constexpr auto InputToDirection(PlayerInputKeys input) -> glm::vec2
 {
     switch (input)
     {
@@ -27,10 +27,10 @@ void IdleState::Enter(PlayerComponent&) {}
 
 void IdleState::Exit(PlayerComponent&) {}
 
-PlayerState& IdleState::Update(PlayerComponent&) { return *this; }
+auto IdleState::Update(PlayerComponent&) -> PlayerState& { return *this; }
 
-PlayerState& IdleState::HandleInput(PlayerComponent& player,
-                                    PlayerInputKeys& input)
+auto IdleState::HandleInput(PlayerComponent& player, PlayerInputKeys& input)
+    -> PlayerState&
 {
     switch (input)
     {
@@ -56,7 +56,7 @@ void MoveState::Enter(PlayerComponent&) {}
 
 void MoveState::Exit(PlayerComponent&) {}
 
-PlayerState& MoveState::Update(PlayerComponent& player)
+auto MoveState::Update(PlayerComponent& player) -> PlayerState&
 {
     if (player.HasMoved())
         return *this;
@@ -64,8 +64,8 @@ PlayerState& MoveState::Update(PlayerComponent& player)
     return player.GetIdleState();
 }
 
-PlayerState& MoveState::HandleInput(PlayerComponent& player,
-                                    PlayerInputKeys& input)
+auto MoveState::HandleInput(PlayerComponent& player, PlayerInputKeys& input)
+    -> PlayerState&
 {
     switch (input)
     {
@@ -91,7 +91,7 @@ void AttackState::Enter(PlayerComponent&) { m_AttackTimer = 0.0f; }
 
 void AttackState::Exit(PlayerComponent&) {}
 
-PlayerState& AttackState::Update(PlayerComponent& player)
+auto AttackState::Update(PlayerComponent& player) -> PlayerState&
 {
     m_AttackTimer += dae::EngineTime::GetInstance().GetDeltaTime();
     if (m_AttackTimer < m_AttackDuration)
@@ -99,7 +99,8 @@ PlayerState& AttackState::Update(PlayerComponent& player)
     return *this;
 }
 
-PlayerState& AttackState::HandleInput(PlayerComponent&, PlayerInputKeys&)
+auto AttackState::HandleInput(PlayerComponent&, PlayerInputKeys&)
+    -> PlayerState&
 {
     return *this;
 }
@@ -109,7 +110,7 @@ void DieState::Enter(PlayerComponent&) { m_DeathTimer = 0.0f; }
 
 void DieState::Exit(PlayerComponent&) {}
 
-PlayerState& DieState::Update(PlayerComponent& player)
+auto DieState::Update(PlayerComponent& player) -> PlayerState&
 {
     m_DeathTimer += dae::EngineTime::GetInstance().GetDeltaTime();
 
@@ -121,7 +122,7 @@ PlayerState& DieState::Update(PlayerComponent& player)
     return *this;
 }
 
-PlayerState& DieState::HandleInput(PlayerComponent&, PlayerInputKeys&)
+auto DieState::HandleInput(PlayerComponent&, PlayerInputKeys&) -> PlayerState&
 {
     return *this;
 }

@@ -1,4 +1,3 @@
-#pragma once
 #include "PlayerComponent.h"
 #include "PlayerInputComponent.h"
 #include "BurgerTimeLayers.h"
@@ -79,7 +78,7 @@ void PlayerComponent::UpdateTimers()
     m_TimeSinceMoved += dae::EngineTime::GetInstance().GetDeltaTime();
 }
 
-Direction PlayerComponent::DirectionToEnum(glm::vec2 dir)
+auto PlayerComponent::DirectionToEnum(glm::vec2 dir) -> Direction
 {
     if (dir == DirectionVec::Left)
         return Direction::Left;
@@ -99,13 +98,13 @@ void PlayerComponent::HandleInput(PlayerInputKeys input)
         ChangeState(&newState);
 }
 
-IdleState& PlayerComponent::GetIdleState() { return m_IdleState; }
+auto PlayerComponent::GetIdleState() -> IdleState& { return m_IdleState; }
 
-MoveState& PlayerComponent::GetMoveState() { return m_MoveState; }
+auto PlayerComponent::GetMoveState() -> MoveState& { return m_MoveState; }
 
-AttackState& PlayerComponent::GetAttackState() { return m_AttackState; }
+auto PlayerComponent::GetAttackState() -> AttackState& { return m_AttackState; }
 
-DieState& PlayerComponent::GetDieState() { return m_DieState; }
+auto PlayerComponent::GetDieState() -> DieState& { return m_DieState; }
 
 void PlayerComponent::OnMove(glm::vec2 direction)
 {
@@ -134,7 +133,7 @@ void PlayerComponent::OnDeath()
     GetOwner().GetComponent<dae::LivesComponent>()->LoseLife();
 }
 
-bool PlayerComponent::HasMoved() const
+auto PlayerComponent::HasMoved() const -> bool
 {
     return m_TimeSinceMoved < MOVED_BUFFER;
 }
