@@ -1,47 +1,62 @@
 #pragma once
 #include "PlayerState.h"
-
-#include <BaseComponent.h>
+#include "GridMoveCommand.h"
 #include <GameObject.h>
-#include <Command.h>
-#include <Observer.h>
-#include <glm.hpp>
+#include <BaseComponent.h>
 
 #include <memory>
-#include <vector>
-#include <string>
+#include <glm.hpp>
 
-class PlayerInputComponent;
+struct PlayerDirection
+{
+    static constexpr glm::vec2 Left{ -1, 0 };
+    static constexpr glm::vec2 Right{ 1, 0 };
+    static constexpr glm::vec2 Up{ 0, -1 };
+    static constexpr glm::vec2 Down{ 0, 1 };
+};
 
-class PlayerComponent final : public dae::BaseComponent, public dae::Observer
+using playerId = int;
+
+class PlayerComponent : public dae::BaseComponent
 {
 public:
     PlayerComponent(dae::GameObject& parent);
-    virtual ~PlayerComponent();
+    virtual ~PlayerComponent() = default;
     void Update() override;
-    void LateUpdate() override;
+    void HandleInput(PlayerInputKeys input);
 
-    void ChangeState(std::unique_ptr<PlayerState> pNewState);
-    void SetAnimation(const std::string& animationName);
-    void SetCanMove(bool canMove);
+    IdleState& GetIdleState();
+    MoveState& GetMoveState();
+    AttackState& GetAttackState();
+    DieState& GetDieState();
 
-    bool IsMoving() const;
-    bool IsWalking() const;
-    bool IsClimbing() const;
-
-protected:
-    void OnNotify(const std::string& eventId) override;
-    void OnDestroy() override;
+    void Move(glm::vec2 direction);
+    bool HasMoved() const;
 
 private:
-    std::unique_ptr<PlayerState> m_pCurrentState;
-    PlayerInputComponent* m_pInputComponent;
-    dae::ColliderComponent* m_pCollider{
-        GetOwner().GetComponent<dae::ColliderComponent>()
-    };
-    float m_IdleTime{ 0.f };
-    const float m_IdleTimeThreshold{ 0.15f };
+    void ChangeState(PlayerState* const state);
+    void UpdateTimers();
 
-    bool m_IsWalking{ false };
-    bool m_IsClimbing{ false };
+    static constexpr auto MOVED_BUFFER{ 0.1f };
+
+    IdleState m_IdleState{};
+    MoveState m_MoveState{};
+    AttackState m_AttackState{};
+    DieState m_DieState{};
+
+    PlayerState* m_pCurrentState{ &m_IdleState };
+    std::unique_ptr<GridMoveCommand> m_MoveCommandLeft{
+        std::make_unique<GridMoveCommand>(GetOwner(), PlayerDirection::Left)
+    };
+    std::unique_ptr<GridMoveCommand> m_MoveCommandRight{
+        std::make_unique<GridMoveCommand>(GetOwner(), PlayerDirection::Right)
+    };
+    std::unique_ptr<GridMoveCommand> m_MoveCommandUp{
+        std::make_unique<GridMoveCommand>(GetOwner(), PlayerDirection::Up)
+    };
+    std::unique_ptr<GridMoveCommand> m_MoveCommandDown{
+        std::make_unique<GridMoveCommand>(GetOwner(), PlayerDirection::Down)
+    };
+
+    float m_TimeSinceMoved{ 0.0f };
 };

@@ -1,84 +1,115 @@
 #include "PlayerState.h"
 #include "PlayerComponent.h"
 
-#include <BaseComponent.h>
 #include <GameObject.h>
-#include "PlayerInputComponent.h"
+#include <BaseComponent.h>
+#include <glm.hpp>
 
-void IdleState::Enter(PlayerComponent& player) { player.SetAnimation("Idle"); }
-
-void IdleState::HandleInput(PlayerComponent&) {}
-
-void IdleState::Update(PlayerComponent& player)
-{
-    //if (player.IsMoving())
-    if (player.IsClimbing())
-        player.ChangeState(std::make_unique<ClimbState>());
-    else if (player.IsWalking())
-        player.ChangeState(std::make_unique<WalkState>());
-}
+// IDLE STATE
+void IdleState::Enter(PlayerComponent&) {}
 
 void IdleState::Exit(PlayerComponent&) {}
 
-PlayerStateType IdleState::GetStateType() const { return PlayerStateType::Idle; }
-
-void WalkState::Enter(PlayerComponent& player) { player.SetAnimation("Walk"); }
-
-void WalkState::HandleInput(PlayerComponent&) {}
-
-void WalkState::Update(PlayerComponent& player)
+PlayerState& IdleState::Update(PlayerComponent& player)
 {
-    if (not player.IsMoving())
-        player.ChangeState(std::make_unique<IdleState>());
-    else if (player.IsClimbing())
-        player.ChangeState(std::make_unique<ClimbState>());
+    return player.GetIdleState();
 }
 
-void WalkState::Exit(PlayerComponent&) {}
-
-PlayerStateType WalkState::GetStateType() const { return PlayerStateType::Walk; }
-
-void ClimbState::Enter(PlayerComponent& player)
+PlayerState& IdleState::HandleInput(PlayerComponent& player,
+                                    PlayerInputKeys& input)
 {
-    player.SetAnimation("Climb");
+    switch (input)
+    {
+    case PlayerInputKeys::MoveLeft:
+        player.Move(PlayerDirection::Left);
+    case PlayerInputKeys::MoveRight:
+        player.Move(PlayerDirection::Right);
+    case PlayerInputKeys::MoveUp:
+        player.Move(PlayerDirection::Up);
+    case PlayerInputKeys::MoveDown:
+        player.Move(PlayerDirection::Down);
+    };
+
+    switch (input)
+    {
+    case PlayerInputKeys::MoveLeft:
+    case PlayerInputKeys::MoveRight:
+    case PlayerInputKeys::MoveUp:
+    case PlayerInputKeys::MoveDown:
+        return player.GetMoveState();
+    case PlayerInputKeys::Attack:
+        return player.GetAttackState();
+    default:
+        return player.GetIdleState();
+    }
 }
 
-void ClimbState::HandleInput(PlayerComponent&) {}
+// MOVE STATE
+void MoveState::Enter(PlayerComponent&) {}
 
-void ClimbState::Update(PlayerComponent& player)
+void MoveState::Exit(PlayerComponent&) {}
+
+PlayerState& MoveState::Update(PlayerComponent& player)
 {
-    if (player.IsWalking())
-        player.ChangeState(std::make_unique<WalkState>());
+    if (!player.HasMoved())
+    {
+
+        return player.GetIdleState();
+    }
+
+    return player.GetMoveState();
 }
 
-void ClimbState::Exit(PlayerComponent&) {}
-
-PlayerStateType ClimbState::GetStateType() const { return PlayerStateType::Climb; }
-
-void AttackState::Enter(PlayerComponent& player)
+PlayerState& MoveState::HandleInput(PlayerComponent& player,
+                                    PlayerInputKeys& input)
 {
-    player.SetAnimation("Attack");
-    player.SetCanMove(false);
+    switch (input)
+    {
+    case PlayerInputKeys::MoveUp:
+        player.Move(PlayerDirection::Up);
+        return player.GetMoveState();
+    case PlayerInputKeys::MoveDown:
+        player.Move(PlayerDirection::Down);
+        return player.GetMoveState();
+    case PlayerInputKeys::MoveLeft:
+        player.Move(PlayerDirection::Left);
+        return player.GetMoveState();
+    case PlayerInputKeys::MoveRight:
+        player.Move(PlayerDirection::Right);
+        return player.GetMoveState();
+    case PlayerInputKeys::Attack:
+        return player.GetAttackState();
+    default:
+        return player.GetIdleState();
+    }
 }
 
-void AttackState::HandleInput(PlayerComponent&) {}
-
-void AttackState::Update(PlayerComponent&) {}
+// ATTACK STATE
+void AttackState::Enter(PlayerComponent&) {}
 
 void AttackState::Exit(PlayerComponent&) {}
 
-PlayerStateType AttackState::GetStateType() const { return PlayerStateType::Attack; }
-
-void DieState::Enter(PlayerComponent& player)
+PlayerState& AttackState::Update(PlayerComponent& player)
 {
-    player.SetAnimation("Die");
-    player.SetCanMove(false);
+    return player.GetAttackState();
 }
 
-void DieState::HandleInput(PlayerComponent&) {}
+PlayerState& AttackState::HandleInput(PlayerComponent& player, PlayerInputKeys&)
+{
+    return player.GetAttackState();
+}
 
-void DieState::Update(PlayerComponent&) {}
+// DIE STATE
+void DieState::Enter(PlayerComponent&) {}
 
 void DieState::Exit(PlayerComponent&) {}
 
-PlayerStateType DieState::GetStateType() const { return PlayerStateType::Die; }
+PlayerState& DieState::Update(PlayerComponent& player)
+{
+    return player.GetDieState();
+}
+
+PlayerState& DieState::HandleInput(PlayerComponent& player, PlayerInputKeys&)
+{
+    return player.GetDieState();
+}

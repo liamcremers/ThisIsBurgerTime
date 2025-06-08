@@ -33,7 +33,6 @@ static constexpr glm::vec2 FPS_POS = { 5.0f, 6.0f };
 static constexpr glm::vec2 LIVES_UI_POS = { 5.0f, 20.0f };
 static constexpr glm::vec2 SCORE_UI_POS = { 5.0f, 30.0f };
 static constexpr float OFFSET = 20.0f;
-static constexpr int BASE_SPEED = 100;
 static constexpr int START_LIVES = 3;
 static constexpr int LIVES_UI_OFFSET_Y = 25;
 static constexpr int SCORE_UI_OFFSET_Y = 25;
@@ -78,8 +77,8 @@ static void SetupPlayers()
             player->AddComponent<dae::LivesComponent>(START_LIVES);
         auto* scoreComp = player->AddComponent<dae::ScoreComponent>();
 
-        player->AddComponent<PlayerInputComponent>(static_cast<uint8_t>(i));
         player->AddComponent<PlayerComponent>();
+        player->AddComponent<PlayerInputComponent>(static_cast<uint8_t>(i));
 
         dae::CollisionSystem::GetInstance().RegisterCollider(collider);
         scene.Add(std::move(player));

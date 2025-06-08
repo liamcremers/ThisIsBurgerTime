@@ -407,3 +407,4 @@ cpp.hint
 .idea
 cmake-build-debug
 out
+cmake-build-debug-msvc

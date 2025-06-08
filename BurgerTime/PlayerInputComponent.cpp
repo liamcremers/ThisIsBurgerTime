@@ -1,33 +1,39 @@
 #include "PlayerInputComponent.h"
-#include "GridMoveCommand.h"
+#include "PlayerComponent.h"
+#include "PlayerCommand.h"
 
 #include <InputManager.h>
 #include <Controller.h>
 #include <GameObject.h>
-#include <ScoreComponent.h>
-#include <LivesComponent.h>
 
 #include <SDL.h>
+
+using PlayerInputKeys::Attack;
+using PlayerInputKeys::MoveDown;
+using PlayerInputKeys::MoveLeft;
+using PlayerInputKeys::MoveRight;
+using PlayerInputKeys::MoveUp;
 
 PlayerInputComponent::PlayerInputComponent(dae::GameObject& parent,
                                            unsigned long idx) :
     BaseComponent(parent),
     m_pController{ std::make_unique<dae::Controller>(idx) },
-    m_pMoveCommandUp{ std::make_unique<GridMoveCommand>(parent, MoveUp) },
-    m_pMoveCommandDown{ std::make_unique<GridMoveCommand>(parent, MoveDown) },
-    m_pMoveCommandLeft{ std::make_unique<GridMoveCommand>(parent, MoveLeft) },
-    m_pMoveCommandRight{ std::make_unique<GridMoveCommand>(parent, MoveRight) }
+    m_pPlayerCommandUp{ std::make_unique<PlayerCommand>(parent, MoveUp) },
+    m_pPlayerCommandDown{ std::make_unique<PlayerCommand>(parent, MoveDown) },
+    m_pPlayerCommandLeft{ std::make_unique<PlayerCommand>(parent, MoveLeft) },
+    m_pPlayerCommandRight{ std::make_unique<PlayerCommand>(parent, MoveRight) }
 {
     dae::InputManager::GetInstance().AddController(m_pController.get());
-    m_pController->AddCommand(
-        *m_pMoveCommandUp, XINPUT_GAMEPAD_DPAD_UP, dae::ButtonState::Pressed);
-    m_pController->AddCommand(*m_pMoveCommandDown,
+    m_pController->AddCommand(*m_pPlayerCommandUp, //
+                              XINPUT_GAMEPAD_DPAD_UP,
+                              dae::ButtonState::Pressed);
+    m_pController->AddCommand(*m_pPlayerCommandDown,
                               XINPUT_GAMEPAD_DPAD_DOWN,
                               dae::ButtonState::Pressed);
-    m_pController->AddCommand(*m_pMoveCommandLeft,
+    m_pController->AddCommand(*m_pPlayerCommandLeft,
                               XINPUT_GAMEPAD_DPAD_LEFT,
                               dae::ButtonState::Pressed);
-    m_pController->AddCommand(*m_pMoveCommandRight,
+    m_pController->AddCommand(*m_pPlayerCommandRight,
                               XINPUT_GAMEPAD_DPAD_RIGHT,
                               dae::ButtonState::Pressed);
     SetUpKeyboardControls(idx);
@@ -35,15 +41,16 @@ PlayerInputComponent::PlayerInputComponent(dae::GameObject& parent,
 
 PlayerInputComponent::~PlayerInputComponent()
 {
-    m_pController->RemoveCommand(
-        *m_pMoveCommandUp, XINPUT_GAMEPAD_DPAD_UP, dae::ButtonState::Pressed);
-    m_pController->RemoveCommand(*m_pMoveCommandDown,
+    m_pController->RemoveCommand(*m_pPlayerCommandUp, //
+                                 XINPUT_GAMEPAD_DPAD_UP,
+                                 dae::ButtonState::Pressed);
+    m_pController->RemoveCommand(*m_pPlayerCommandDown,
                                  XINPUT_GAMEPAD_DPAD_DOWN,
                                  dae::ButtonState::Pressed);
-    m_pController->RemoveCommand(*m_pMoveCommandLeft,
+    m_pController->RemoveCommand(*m_pPlayerCommandLeft,
                                  XINPUT_GAMEPAD_DPAD_LEFT,
                                  dae::ButtonState::Pressed);
-    m_pController->RemoveCommand(*m_pMoveCommandRight,
+    m_pController->RemoveCommand(*m_pPlayerCommandRight,
                                  XINPUT_GAMEPAD_DPAD_RIGHT,
                                  dae::ButtonState::Pressed);
 }
@@ -53,49 +60,21 @@ auto PlayerInputComponent::GetController() const -> const dae::Controller*
     return m_pController.get();
 }
 
-void PlayerInputComponent::SetCanMove(bool canMove)
-{
-    m_pMoveCommandUp->SetCanMove(canMove);
-    m_pMoveCommandDown->SetCanMove(canMove);
-    m_pMoveCommandLeft->SetCanMove(canMove);
-    m_pMoveCommandRight->SetCanMove(canMove);
-}
-
-GridMoveCommand* PlayerInputComponent::GetMoveCommandUp() const
-{
-    return m_pMoveCommandUp.get();
-}
-
-GridMoveCommand* PlayerInputComponent::GetMoveCommandDown() const
-{
-    return m_pMoveCommandDown.get();
-}
-
-GridMoveCommand* PlayerInputComponent::GetMoveCommandLeft() const
-{
-    return m_pMoveCommandLeft.get();
-}
-
-GridMoveCommand* PlayerInputComponent::GetMoveCommandRight() const
-{
-    return m_pMoveCommandRight.get();
-}
-
 void PlayerInputComponent::SetUpKeyboardControls(unsigned long idx)
 {
-    auto& inputManager = dae::InputManager::GetInstance();
+    auto& inputMgr = dae::InputManager::GetInstance();
     if (idx == 0)
     {
-        inputManager.AddKeyboardCommand(SDLK_UP, m_pMoveCommandUp.get());
-        inputManager.AddKeyboardCommand(SDLK_DOWN, m_pMoveCommandDown.get());
-        inputManager.AddKeyboardCommand(SDLK_LEFT, m_pMoveCommandLeft.get());
-        inputManager.AddKeyboardCommand(SDLK_RIGHT, m_pMoveCommandRight.get());
+        inputMgr.AddKeyboardCommand(SDLK_UP, m_pPlayerCommandUp.get());
+        inputMgr.AddKeyboardCommand(SDLK_DOWN, m_pPlayerCommandDown.get());
+        inputMgr.AddKeyboardCommand(SDLK_LEFT, m_pPlayerCommandLeft.get());
+        inputMgr.AddKeyboardCommand(SDLK_RIGHT, m_pPlayerCommandRight.get());
     }
     if (idx == 1)
     {
-        inputManager.AddKeyboardCommand(SDLK_w, m_pMoveCommandUp.get());
-        inputManager.AddKeyboardCommand(SDLK_s, m_pMoveCommandDown.get());
-        inputManager.AddKeyboardCommand(SDLK_a, m_pMoveCommandLeft.get());
-        inputManager.AddKeyboardCommand(SDLK_d, m_pMoveCommandRight.get());
+        inputMgr.AddKeyboardCommand(SDLK_w, m_pPlayerCommandUp.get());
+        inputMgr.AddKeyboardCommand(SDLK_s, m_pPlayerCommandDown.get());
+        inputMgr.AddKeyboardCommand(SDLK_a, m_pPlayerCommandLeft.get());
+        inputMgr.AddKeyboardCommand(SDLK_d, m_pPlayerCommandRight.get());
     }
 }

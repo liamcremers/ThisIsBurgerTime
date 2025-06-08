@@ -1,69 +1,68 @@
+#pragma once
 #include "PlayerComponent.h"
-#include "PlayerState.h"
 #include "PlayerInputComponent.h"
-#include "GridMoveCommand.h"
-#include "LevelGrid.h"
 
-#include <EngineTime.h>
+#ifdef DEBUG_STATES
+#include <DebugRenderer.h>
+#endif // DEBUG_STATES
 
 PlayerComponent::PlayerComponent(dae::GameObject& parent) :
-    BaseComponent{ parent },
-    m_pCurrentState{ std::make_unique<IdleState>() },
-    m_pInputComponent{ parent.GetComponent<PlayerInputComponent>() }
-{
-    assert(m_pInputComponent && "PlayerComponent requires a "
-                                "PlayerInputComponent to function properly.");
-
-    m_pInputComponent->GetMoveCommandDown()
-        ->GetMoveCommandSubject()
-        .AddObserver(this);
-    m_pInputComponent->GetMoveCommandLeft()
-        ->GetMoveCommandSubject()
-        .AddObserver(this);
-    m_pInputComponent->GetMoveCommandRight()
-        ->GetMoveCommandSubject()
-        .AddObserver(this);
-    /**/ m_pInputComponent->GetMoveCommandUp()
-        ->GetMoveCommandSubject()
-        .AddObserver(this);
-}
-
-PlayerComponent::~PlayerComponent()
-{
-    if (m_pInputComponent)
-    {
-        m_pInputComponent->GetMoveCommandDown()
-            ->GetMoveCommandSubject()
-            .RemoveObserver(this);
-        m_pInputComponent->GetMoveCommandLeft()
-            ->GetMoveCommandSubject()
-            .RemoveObserver(this);
-        m_pInputComponent->GetMoveCommandRight()
-            ->GetMoveCommandSubject()
-            .RemoveObserver(this);
-        m_pInputComponent->GetMoveCommandUp()
-            ->GetMoveCommandSubject()
-            .RemoveObserver(this);
-    }
-}
+    BaseComponent{ parent }
+{}
 
 void PlayerComponent::Update()
 {
-    m_IdleTime += dae::EngineTime::GetInstance().GetDeltaTime();
-    m_pCurrentState->Update(*this);
+    auto& newState = m_pCurrentState->Update(*this);
+    if (&newState != m_pCurrentState)
+        ChangeState(&newState);
+
+    UpdateTimers();
 }
 
-void PlayerComponent::LateUpdate()
+void PlayerComponent::UpdateTimers()
 {
-    m_IsClimbing = false;
-    m_IsWalking = false;
+    m_TimeSinceMoved += dae::EngineTime::GetInstance().GetDeltaTime();
 }
 
-void PlayerComponent::ChangeState(std::unique_ptr<PlayerState> pNewState)
+void PlayerComponent::HandleInput(PlayerInputKeys input)
+{
+    auto& newState = m_pCurrentState->HandleInput(*this, input);
+    if (&newState != m_pCurrentState)
+        ChangeState(&newState);
+}
+
+IdleState& PlayerComponent::GetIdleState() { return m_IdleState; }
+
+MoveState& PlayerComponent::GetMoveState() { return m_MoveState; }
+
+AttackState& PlayerComponent::GetAttackState() { return m_AttackState; }
+
+DieState& PlayerComponent::GetDieState() { return m_DieState; }
+
+void PlayerComponent::Move(glm::vec2 direction)
+{
+    if (direction == PlayerDirection::Left)
+        m_MoveCommandLeft->Execute();
+    if (direction == PlayerDirection::Up)
+        m_MoveCommandUp->Execute();
+    if (direction == PlayerDirection::Right)
+        m_MoveCommandRight->Execute();
+    if (direction == PlayerDirection::Down)
+        m_MoveCommandDown->Execute();
+
+    m_TimeSinceMoved = 0.f;
+}
+
+bool PlayerComponent::HasMoved() const
+{
+    return m_TimeSinceMoved < MOVED_BUFFER;
+}
+
+void PlayerComponent::ChangeState(PlayerState* const state)
 {
     if (m_pCurrentState)
         m_pCurrentState->Exit(*this);
-    m_pCurrentState = std::move(pNewState);
+    m_pCurrentState = state;
     m_pCurrentState->Enter(*this);
 
 #ifdef DEBUG_STATES
@@ -72,32 +71,3 @@ void PlayerComponent::ChangeState(std::unique_ptr<PlayerState> pNewState)
         "Loading state: " + std::string(typeid(*m_pCurrentState).name()));
 #endif // DEBUG_STATES
 }
-
-void PlayerComponent::SetAnimation(const std::string&) {}
-
-void PlayerComponent::SetCanMove(bool canMove)
-{
-    m_pInputComponent->SetCanMove(canMove);
-}
-
-bool PlayerComponent::IsMoving() const
-{
-    return m_IdleTime < m_IdleTimeThreshold;
-}
-
-bool PlayerComponent::IsWalking() const { return m_IsWalking; }
-
-bool PlayerComponent::IsClimbing() const { return m_IsClimbing; }
-
-void PlayerComponent::OnNotify(const std::string& eventId)
-{
-    if (eventId == "Walked")
-        m_IsWalking = true;
-    else if (eventId == "Climbed")
-        m_IsClimbing = true;
-    else
-        return;
-    m_IdleTime = 0.f;
-}
-
-void PlayerComponent::OnDestroy() { m_pInputComponent = nullptr; }
