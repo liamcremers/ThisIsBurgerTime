@@ -1,5 +1,5 @@
 #pragma once
-#include "PlayerState.h"
+#include "EnemyState.h"
 #include "GridMoveCommand.h"
 #include <SpriteComponent.h>
 #include <GameObject.h>
@@ -9,38 +9,40 @@
 #include <unordered_map>
 #include <glm.hpp>
 
-enum class Direction
+namespace EnemyComp
 {
-    Left,
-    Right,
-    Up,
-    Down
-};
-
-struct DirectionVec
-{
-    static constexpr glm::vec2 Left{ -1, 0 };
-    static constexpr glm::vec2 Right{ 1, 0 };
-    static constexpr glm::vec2 Up{ 0, -1 };
-    static constexpr glm::vec2 Down{ 0, 1 };
-};
-
-namespace PlayerComp
-{
-    class PlayerComponent : public dae::BaseComponent
+    enum class Direction
     {
-        using playerId = int;
-        using IdleState = PlayerStates::IdleState;
-        using MoveState = PlayerStates::MoveState;
-        using AttackState = PlayerStates::AttackState;
-        using DieState = PlayerStates::DieState;
-        using PlayerState = PlayerStates::PlayerState;
+        Left,
+        Right,
+        Up,
+        Down
+    };
 
+    struct DirectionVec
+    {
+        static constexpr glm::vec2 Left{ -1, 0 };
+        static constexpr glm::vec2 Right{ 1, 0 };
+        static constexpr glm::vec2 Up{ 0, -1 };
+        static constexpr glm::vec2 Down{ 0, 1 };
+    };
+
+    using EnemyId = int;
+    using IdleState = EnemyStates::IdleState;
+    using MoveState = EnemyStates::MoveState;
+    using AttackState = EnemyStates::AttackState;
+    using DieState = EnemyStates::DieState;
+    using EnemyState = EnemyStates::EnemyState;
+
+    class EnemyComponent : public dae::BaseComponent
+    {
     public:
-        PlayerComponent(dae::GameObject& parent);
-        virtual ~PlayerComponent() = default;
+        EnemyComponent(dae::GameObject& parent);
+        void CreateOverlapEvent(dae::GameObject& parent);
+        void SetupStateTextures();
+        virtual ~EnemyComponent() = default;
         void Update() override;
-        void HandleInput(PlayerInputKeys input);
+        void HandleInput(EnemyInputKeys input);
 
         IdleState& GetIdleState();
         MoveState& GetMoveState();
@@ -53,14 +55,12 @@ namespace PlayerComp
         bool HasMoved() const;
 
     private:
-        void CreateOverlapEvent(dae::GameObject& parent);
-        void SetupStateTextures();
         void UpdateSprite();
         void SetSpriteDirection(glm::vec2 directionVec);
-        void LoadStateTexture(PlayerState* stateT,
+        void LoadStateTexture(EnemyState* stateT,
                               glm::vec2 direction,
                               const std::string& texturePath);
-        void ChangeState(PlayerState* const state);
+        void ChangeState(EnemyState* const state);
         void UpdateTimers();
         Direction DirectionToEnum(glm::vec2 direction);
 
@@ -69,7 +69,7 @@ namespace PlayerComp
         static constexpr glm::vec2 SPRITE_SIZE{ 16, 16 };
         static constexpr Direction DEFAULT_DIRECTION{ Direction::Down };
 
-        std::unordered_map<PlayerState*,
+        std::unordered_map<EnemyState*,
                            std::unordered_map<Direction, std::string>>
             m_TexturePath;
 
@@ -78,7 +78,7 @@ namespace PlayerComp
         AttackState m_AttackState{};
         DieState m_DieState{};
 
-        PlayerState* m_pCurrentState{ &m_IdleState };
+        EnemyState* m_pCurrentState{ &m_IdleState };
         std::unique_ptr<GridMoveCommand> m_MoveCommandLeft{
             std::make_unique<GridMoveCommand>(GetOwner(), DirectionVec::Left)
         };
@@ -98,5 +98,4 @@ namespace PlayerComp
         Direction m_Direction{ DEFAULT_DIRECTION };
         float m_TimeSinceMoved{};
     };
-
 }

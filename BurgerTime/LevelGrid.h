@@ -16,7 +16,8 @@ enum class ECellType
     Empty,
     Floor,
     Ladder,
-    Food
+    Food,
+    BurgerPlate
 };
 using CellTypes = std::unordered_set<ECellType>;
 

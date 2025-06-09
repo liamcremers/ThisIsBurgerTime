@@ -43,14 +43,15 @@ void PlayerComponent::SetupStateTextures()
     LoadStateTexture(&m_MoveState, DirectionVec::Right, "ChefPeterPepperR.png");
     LoadStateTexture(&m_MoveState, DirectionVec::Up, "ChefPeterPepperB.png");
 
+    //TODO FIX
     LoadStateTexture(
-        &m_IdleState, DirectionVec::Down, "ChefPeterPepperIdleF.png");
+        &m_AttackState, DirectionVec::Down, "ChefPeterPepperIdleF.png");
     LoadStateTexture(
-        &m_IdleState, DirectionVec::Left, "ChefPeterPepperIdleF.png");
+        &m_AttackState, DirectionVec::Left, "ChefPeterPepperIdleF.png");
     LoadStateTexture(
-        &m_IdleState, DirectionVec::Right, "ChefPeterPepperIdleF.png");
+        &m_AttackState, DirectionVec::Right, "ChefPeterPepperIdleF.png");
     LoadStateTexture(
-        &m_IdleState, DirectionVec::Up, "ChefPeterPepperIdleB.png");
+        &m_AttackState, DirectionVec::Up, "ChefPeterPepperIdleB.png");
 
     LoadStateTexture(
         &m_DieState, DirectionVec::Down, "ChefPeterPepperDead.png");
@@ -67,10 +68,11 @@ void PlayerComponent::Update()
 {
     auto& newState = m_pCurrentState->Update(*this);
     if (&newState != m_pCurrentState)
+    {
         ChangeState(&newState);
-
+        UpdateSprite();
+    }
     UpdateTimers();
-    UpdateSprite();
 }
 
 void PlayerComponent::UpdateTimers()
@@ -95,7 +97,10 @@ void PlayerComponent::HandleInput(PlayerInputKeys input)
 {
     auto& newState = m_pCurrentState->HandleInput(*this, input);
     if (&newState != m_pCurrentState)
+    {
         ChangeState(&newState);
+        UpdateSprite();
+    }
 }
 
 auto PlayerComponent::GetIdleState() -> IdleState& { return m_IdleState; }
@@ -111,22 +116,29 @@ void PlayerComponent::OnMove(glm::vec2 direction)
     bool didExecute{};
 
     if (direction == DirectionVec::Left)
-        didExecute = m_MoveCommandLeft->ExecuteWithCheck();
+        didExecute = m_MoveCommandLeft->TryExecute();
     else if (direction == DirectionVec::Up)
-        didExecute = m_MoveCommandUp->ExecuteWithCheck();
+        didExecute = m_MoveCommandUp->TryExecute();
     else if (direction == DirectionVec::Right)
-        didExecute = m_MoveCommandRight->ExecuteWithCheck();
+        didExecute = m_MoveCommandRight->TryExecute();
     else if (direction == DirectionVec::Down)
-        didExecute = m_MoveCommandDown->ExecuteWithCheck();
+        didExecute = m_MoveCommandDown->TryExecute();
 
     if (didExecute)
     {
+        auto oldDir = m_Direction;
         SetSpriteDirection(direction);
+        if (oldDir != m_Direction)
+            UpdateSprite();
         m_TimeSinceMoved = 0.f;
     }
 }
 
-void PlayerComponent::OnHitByEnemy() { ChangeState(&m_DieState); }
+void PlayerComponent::OnHitByEnemy()
+{
+    ChangeState(&m_DieState);
+    UpdateSprite();
+}
 
 void PlayerComponent::OnDeath()
 {
@@ -140,6 +152,7 @@ auto PlayerComponent::HasMoved() const -> bool
 
 void PlayerComponent::UpdateSprite()
 {
+    m_pSpriteComponent->Reset();
     m_pSpriteComponent->SetTexture(m_TexturePath[m_pCurrentState][m_Direction]);
 }
 

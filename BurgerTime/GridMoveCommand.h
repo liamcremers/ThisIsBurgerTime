@@ -21,7 +21,7 @@ public:
     GridMoveCommand(dae::GameObject& pGameObject,
                     glm::i8vec2 direction,
                     int speed = 100);
-    bool ExecuteWithCheck();
+    [[nodiscard]] auto TryExecute() -> bool;
     void Execute() override;
     void Undo() override;
     void SetSpeed(int speed);

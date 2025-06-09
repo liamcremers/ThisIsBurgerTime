@@ -1,28 +1,179 @@
 #include "BurgerPartComponent.h"
-
 #include "BurgerTimeLayers.h"
 #include "BurgerTimeSoundIds.h"
+#include "BurgerGroup.h"
+#include "LevelGrid.h"
+
 #include <GameObject.h>
 #include <ColliderComponent.h>
+#include <PhysicsComponent.h>
 #include <ServiceLocator.h>
 
-BurgerPartComponent::BurgerPartComponent(dae::GameObject& parent) :
-    BaseComponent{ parent }
+using namespace BurgerComp;
+
+BurgerPartComponent::BurgerPartComponent(dae::GameObject& parent,
+                                         BurgerGroupComponent* burgerGroup) :
+    BaseComponent{ parent },
+    m_pBurgerGroup{ burgerGroup }
 {
-    if (auto* collider = parent.GetComponent<dae::ColliderComponent>())
+    m_pPhysics = GetOwner().GetComponent<dae::PhysicsComponent>();
+    m_pCollider = GetOwner().GetComponent<dae::ColliderComponent>();
+    assert((m_pPhysics && m_pCollider) &&
+           "BurgerPartComponent requires a PhysicsComponent and a "
+           "ColliderComponent");
+
+    m_pCollider->SetCollisionType(CollisionType::Trigger);
+    m_pCollider->SubscribeToOverlap([this](const dae::ColliderComponent& other)
+                                    { OnOverlap(other); });
+    m_pCollider->SubscribeToBeginOverlap(
+        [this](const dae::ColliderComponent& other) { OnBeginOverlap(other); });
+    m_pCollider->SubscribeToEndOverlap(
+        [this](const dae::ColliderComponent& other) { OnEndOverlap(other); });
+}
+
+void BurgerComp::BurgerPartComponent::Update()
+{
+    auto& newState = m_pCurrentState->Update(*this);
+    if (&newState != m_pCurrentState)
     {
-        collider->SubscribeToBeginOverlap(
-            [this](const dae::ColliderComponent& other)
-            { OnBeginOverlap(other); });
+        ChangeState(&newState);
     }
+    m_Overlaps.clear();
+    m_BeginOverlaps.clear();
+    m_EndOverlaps.clear();
+}
+
+auto IsLayerType = [](const dae::ColliderComponent& other,
+                      CollisionLayer layer) -> bool
+{ return other.GetLayer() & static_cast<uint16_t>(layer); };
+
+void BurgerPartComponent::OnOverlap(const dae::ColliderComponent& other)
+{
+    if (IsLayerType(other, CollisionLayer::Player) && IsAligned(other))
+        m_Overlaps.insert(CollisionLayer::Player);
 }
 
 void BurgerPartComponent::OnBeginOverlap(const dae::ColliderComponent& other)
 {
-    static constexpr float SOUND_VOLUME = 0.4f;
-    if ((other.GetLayer() & static_cast<uint16_t>(CollisionLayer::Player)) != 0)
+    if ((other.GetLayer() & static_cast<uint16_t>(CollisionLayer::Floor)) or
+        (other.GetLayer() & static_cast<uint16_t>(CollisionLayer::BurgerPlate)))
     {
-        dae::ServiceLocator::GetInstance().GetSoundSystem().Play(
-            SoundIds::BurgerStep, SOUND_VOLUME);
+        m_BeginOverlaps.insert(static_cast<CollisionLayer>(other.GetLayer()));
     }
+
+    if (IsLayerType(other, CollisionLayer::Enemy))
+        m_pBurgerGroup->EnemyOnBurger();
+}
+
+void BurgerComp::BurgerPartComponent::OnEndOverlap(
+    const dae::ColliderComponent& other)
+{
+    if ((other.GetLayer() & static_cast<uint16_t>(CollisionLayer::Floor)) or
+        (other.GetLayer() & static_cast<uint16_t>(CollisionLayer::BurgerPlate)))
+    {
+        m_EndOverlaps.insert(static_cast<CollisionLayer>(other.GetLayer()));
+    }
+
+    if (IsLayerType(other, CollisionLayer::Enemy))
+        m_pBurgerGroup->EnemyOffBurger();
+}
+
+auto BurgerPartComponent::IsAligned(const dae::ColliderComponent& other) -> bool
+{
+    const auto& otherSize = other.GetSize();
+    const auto& otherPos = other.GetWorldPosition() + otherSize.y / 2.0f;
+    const auto& burgerPos = GetOwner().GetWorldPosition();
+
+    return (std::abs(otherPos.x - burgerPos.x) < 0.1f &&
+            std::abs(otherPos.y - burgerPos.y) < 6.f);
+}
+
+auto BurgerPartComponent::GetIdleState() -> IdleState& { return m_IdleState; }
+
+auto BurgerPartComponent::GetWalkedOnState() -> WalkedOnState&
+{
+    return m_WalkedOnState;
+}
+
+auto BurgerPartComponent::GetFallingState() -> FallingState&
+{
+    return m_FallingState;
+}
+
+bool BurgerComp::BurgerPartComponent::HasAllPartsWalkedOn() const
+{
+    return m_pBurgerGroup->IsFullyWalkedOn();
+}
+
+auto BurgerComp::BurgerPartComponent::HasEnemyOnTop() const -> bool
+{
+    return m_pBurgerGroup->HasEnemyOnBurger();
+}
+
+auto BurgerComp::BurgerPartComponent::GetOverlaps() -> std::set<CollisionLayer>
+{
+    return m_Overlaps;
+}
+
+auto BurgerComp::BurgerPartComponent::GetBeginOverlaps()
+    -> std::set<CollisionLayer>
+{
+    return m_BeginOverlaps;
+}
+
+auto BurgerComp::BurgerPartComponent::GetEndOverlaps()
+    -> std::set<CollisionLayer>
+{
+    return m_EndOverlaps;
+}
+
+auto BurgerComp::BurgerPartComponent::GetBurgerGroup() -> BurgerGroupComponent*
+{
+    return m_pBurgerGroup;
+}
+
+void BurgerComp::BurgerPartComponent::GoDownOnePixel()
+{
+    auto& pos = GetOwner().GetWorldPosition();
+    GetOwner().SetLocalPosition({ pos.x, pos.y + 1.0f });
+}
+
+void BurgerComp::BurgerPartComponent::OnWalkedOn()
+{
+    m_pBurgerGroup->IncrementWalkedOnCounter();
+    GoDownOnePixel();
+}
+
+void BurgerComp::BurgerPartComponent::OnIdle()
+{
+    m_pBurgerGroup->Reset();
+    Freeze();
+}
+
+void BurgerComp::BurgerPartComponent::OnFalling()
+{
+    Fall();
+}
+
+void BurgerComp::BurgerPartComponent::Fall()
+{
+    m_pPhysics->SetUseGravity(true);
+}
+
+void BurgerComp::BurgerPartComponent::Freeze()
+{
+    m_pPhysics->SetUseGravity(false);
+}
+
+void BurgerComp::BurgerPartComponent::ChangeState(BurgerState* newState)
+{
+    if (m_pCurrentState)
+        m_pCurrentState->Exit(*this);
+    m_pCurrentState = newState;
+    m_pCurrentState->Enter(*this);
+}
+
+void BurgerComp::BurgerPartComponent::ResetOverlapChecks()
+{
+    m_Overlaps.clear();
 }

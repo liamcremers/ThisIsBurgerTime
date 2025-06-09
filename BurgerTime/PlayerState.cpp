@@ -5,6 +5,9 @@
 #include <BaseComponent.h>
 #include <glm.hpp>
 
+using namespace PlayerComp;
+using namespace PlayerStates;
+
 static constexpr auto InputToDirection(PlayerInputKeys input) -> glm::vec2
 {
     switch (input)

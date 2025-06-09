@@ -1,4 +1,6 @@
 #include "LevelGrid.h"
+#include <ranges>
+#include <algorithm>
 
 void LevelGrid::InitializeLevelGrid(const dae::Scene& scene,
                                     glm::ivec2 startPos)
@@ -34,10 +36,12 @@ void LevelGrid::InitializeLevelGrid(const dae::Scene& scene,
             case CollisionLayer::Ladder:
                 cell.insert(ECellType::Ladder);
                 break;
-            case CollisionLayer::Food:
+            case CollisionLayer::BurgerPart:
                 cell.insert(ECellType::Food);
                 break;
-            // Add more cases as needed
+            case CollisionLayer::BurgerPlate:
+                cell.insert(ECellType::BurgerPlate);
+                break;
             default:
                 break;
             }
@@ -92,32 +96,15 @@ void LevelGrid::DrawGrid() const
     for (int y = 0; y < GRID_HEIGHT; ++y)
         for (int x = 0; x < GRID_WIDTH; ++x)
         {
-            //auto cellType = m_LevelGrid[y][x];
-            //glm::vec2 worldPos = GridToWorld({ x, y });
-            //auto color = glm::vec4{ 1.f, 1.f, 1.f, 1.f };
-            //switch (cellType)
-            //{
-            ////case CellType::Empty:
-            ////    color = glm::vec4{ 1.f, 1.f, 1.f, 1.f };
-            ////    break;
-            ////case CellType::Floor:
-            ////    color = glm::vec4{ 0.f, 1.f, 0.f, 1.f };
-            ////    break;
-            ////case CellType::Ladder:
-            ////    color = glm::vec4{ 0.f, 0.f, 1.f, 1.f };
-            ////    break;
-            ////case CellType::FloorAndLadder:
-            ////    color = glm::vec4{ 1.f, 1.f, 0.f, 1.f };
-            ////    break;
-            //case CellType::Food:
-            //    color = glm::vec4{ 0.f, 0.f, 1.f, 1.f };
-            //    break;
-            //default:
-            //    continue;
-            //    break;
-            //}
-            //dae::DebugRenderer::GetInstance().RenderRect(
-            //    worldPos, { GRID_SIZE, GRID_SIZE }, color);
+            const auto& cellTypes = m_LevelGrid[y][x];
+            glm::vec2 worldPos = GridToWorld({ x, y });
+            auto color = glm::vec4{ 1.f, 1.f, 1.f, 1.f };
+            if (cellTypes.contains(ECellType::BurgerPlate))
+            {
+                color = { 1.f, 1.f, 1.f, 1.f };
+                dae::DebugRenderer::GetInstance().RenderRect(
+                    worldPos, { GRID_SIZE, GRID_SIZE }, color);
+            }
         }
 }
 #endif // DEBUG_RENDER

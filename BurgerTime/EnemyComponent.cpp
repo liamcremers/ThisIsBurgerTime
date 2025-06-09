@@ -1,0 +1,172 @@
+#include "EnemyComponent.h"
+#include "EnemyInputComponent.h"
+#include "BurgerTimeLayers.h"
+
+#ifdef DEBUG_STATES
+#include <DebugRenderer.h>
+#endif // DEBUG_STATES
+
+EnemyComponent::EnemyComponent(dae::GameObject& parent) :
+    BaseComponent{ parent }
+{
+    SetupStateTextures();
+    CreateOverlapEvent(parent);
+}
+
+void EnemyComponent::CreateOverlapEvent(dae::GameObject& parent)
+{
+    if (auto* collider = parent.GetComponent<dae::ColliderComponent>())
+    {
+        collider->SubscribeToBeginOverlap(
+            [this](const dae::ColliderComponent& other)
+            {
+                if ((other.GetLayer() &
+                     static_cast<uint16_t>(CollisionLayer::Enemy)) != 0)
+                    OnHitByEnemy();
+            });
+    }
+}
+
+void EnemyComponent::SetupStateTextures()
+{
+    LoadStateTexture(&m_IdleState, DirectionVec::Down, "MrHotDog.png");
+    LoadStateTexture(&m_IdleState, DirectionVec::Left, "MrHotDog.png");
+    LoadStateTexture(&m_IdleState, DirectionVec::Right, "MrHotDog.png");
+    LoadStateTexture(&m_IdleState, DirectionVec::Up, "MrHotDog.png");
+
+    LoadStateTexture(&m_MoveState, DirectionVec::Down, "MrHotDogF.png");
+    LoadStateTexture(&m_MoveState, DirectionVec::Left, "MrHotDogL.png");
+    LoadStateTexture(&m_MoveState, DirectionVec::Right, "MrHotDogR.png");
+    LoadStateTexture(&m_MoveState, DirectionVec::Up, "MrHotDogB.png");
+
+    LoadStateTexture(&m_AttackState, DirectionVec::Down, "MrHotDogF.png");
+    LoadStateTexture(&m_AttackState, DirectionVec::Left, "MrHotDogL.png");
+    LoadStateTexture(&m_AttackState, DirectionVec::Right, "MrHotDogR.png");
+    LoadStateTexture(&m_AttackState, DirectionVec::Up, "MrHotDogB.png");
+
+    LoadStateTexture(&m_DieState, DirectionVec::Down, "MrHotDogF.png");
+    LoadStateTexture(&m_DieState, DirectionVec::Left, "MrHotDogL.png");
+    LoadStateTexture(&m_DieState, DirectionVec::Right, "MrHotDogR.png");
+    LoadStateTexture(&m_DieState, DirectionVec::Up, "MrHotDogB.png");
+
+    m_pSpriteComponent->SetTexture(m_TexturePath[m_pCurrentState][m_Direction]);
+}
+
+void EnemyComponent::Update()
+{
+    auto& newState = m_pCurrentState->Update(*this);
+    if (&newState != m_pCurrentState)
+    {
+        ChangeState(&newState);
+        UpdateSprite();
+    }
+    UpdateTimers();
+}
+
+void EnemyComponent::UpdateTimers()
+{
+    m_TimeSinceMoved += dae::EngineTime::GetInstance().GetDeltaTime();
+}
+
+auto EnemyComponent::DirectionToEnum(glm::vec2 dir) -> Direction
+{
+    if (dir == DirectionVec::Left)
+        return Direction::Left;
+    if (dir == DirectionVec::Up)
+        return Direction::Up;
+    if (dir == DirectionVec::Right)
+        return Direction::Right;
+    if (dir == DirectionVec::Down)
+        return Direction::Down;
+    return Direction::Down;
+}
+
+void EnemyComponent::HandleInput(EnemyInputKeys input)
+{
+    auto& newState = m_pCurrentState->HandleInput(*this, input);
+    if (&newState != m_pCurrentState)
+    {
+        ChangeState(&newState);
+        UpdateSprite();
+    }
+}
+
+auto EnemyComponent::GetIdleState() -> IdleState& { return m_IdleState; }
+
+auto EnemyComponent::GetMoveState() -> MoveState& { return m_MoveState; }
+
+auto EnemyComponent::GetAttackState() -> AttackState& { return m_AttackState; }
+
+auto EnemyComponent::GetDieState() -> DieState& { return m_DieState; }
+
+void EnemyComponent::OnMove(glm::vec2 direction)
+{
+    bool didExecute{};
+
+    if (direction == DirectionVec::Left)
+        didExecute = m_MoveCommandLeft->TryExecute();
+    else if (direction == DirectionVec::Up)
+        didExecute = m_MoveCommandUp->TryExecute();
+    else if (direction == DirectionVec::Right)
+        didExecute = m_MoveCommandRight->TryExecute();
+    else if (direction == DirectionVec::Down)
+        didExecute = m_MoveCommandDown->TryExecute();
+
+    if (didExecute)
+    {
+        auto oldDir = m_Direction;
+        SetSpriteDirection(direction);
+        if (oldDir != m_Direction)
+            UpdateSprite();
+        m_TimeSinceMoved = 0.f;
+    }
+}
+
+void EnemyComponent::OnHitByEnemy()
+{
+    ChangeState(&m_DieState);
+    UpdateSprite();
+}
+
+void EnemyComponent::OnDeath()
+{
+    GetOwner().GetComponent<dae::LivesComponent>()->LoseLife();
+}
+
+auto EnemyComponent::HasMoved() const -> bool
+{
+    return m_TimeSinceMoved < MOVED_BUFFER;
+}
+
+void EnemyComponent::UpdateSprite()
+{
+    m_pSpriteComponent->Reset();
+    m_pSpriteComponent->SetTexture(m_TexturePath[m_pCurrentState][m_Direction]);
+}
+
+void EnemyComponent::SetSpriteDirection(glm::vec2 directionVec)
+{
+    m_Direction = DirectionToEnum(directionVec);
+}
+
+void EnemyComponent::LoadStateTexture(EnemyState* stateT,
+                                      glm::vec2 directionVec,
+                                      const std::string& texturePath)
+{
+    auto direction = DirectionToEnum(directionVec);
+    m_TexturePath[stateT][direction] = texturePath;
+}
+
+void EnemyComponent::ChangeState(EnemyState* const state)
+{
+    if (m_pCurrentState)
+        m_pCurrentState->Exit(*this);
+    m_pCurrentState = state;
+    m_pCurrentState->Enter(*this);
+
+#ifdef DEBUG_STATES
+#include <typeinfo>
+    dae::DebugRenderer::GetInstance().RenderText(
+        "Enemy state: " + std::string(typeid(*m_pCurrentState).name()));
+#endif // DEBUG_STATES
+}
