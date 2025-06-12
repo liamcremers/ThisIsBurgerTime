@@ -95,7 +95,8 @@ namespace PlayerComp
         float m_TimeSinceMoved{};
 
     protected:
-        void OnNotify(const std::string& eventId) override;
+        void OnNotify(const std::string& eventId,
+                      const std::any& args = std::any{}) override;
 
         void OnDestroy() override {}
     };

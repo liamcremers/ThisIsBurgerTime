@@ -25,6 +25,10 @@
 #include "EnemyComponent.h"
 #include "EnemyInputComponent.h"
 #include "BurgerGroup.h"
+#include "LivesUIComponent.h"
+#include "ScoreUIComponent.h"
+#include "LivesComponent.h"
+#include "ScoreComponent.h"
 
 #include <filesystem>
 #include <memory>
@@ -69,9 +73,8 @@ static void SetupPlayers()
         auto* physics = player->AddComponent<dae::PhysicsComponent>();
         physics->SetUseGravity(false);
 
-        auto* livesComp =
-            player->AddComponent<dae::LivesComponent>(START_LIVES);
-        auto* scoreComp = player->AddComponent<dae::ScoreComponent>();
+        auto* livesComp = player->AddComponent<LivesComponent>(START_LIVES);
+        auto* scoreComp = player->AddComponent<ScoreComponent>();
 
         player->AddComponent<PlayerComponent>();
         player->AddComponent<PlayerInputComponent>(uint8_t{});
@@ -81,12 +84,12 @@ static void SetupPlayers()
 
         // create UI elements
         auto livesUIgo = std::make_unique<dae::GameObject>("LivesUI");
-        livesUIgo->AddComponent<dae::LivesUIComponent>(smallFont, livesComp);
+        livesUIgo->AddComponent<LivesUIComponent>(smallFont, livesComp);
         livesUIgo->SetLocalPosition(LIVES_UI_POS);
         scene.Add(std::move(livesUIgo));
 
         auto scoreUIgo = std::make_unique<dae::GameObject>("scoreUI");
-        scoreUIgo->AddComponent<dae::ScoreUIComponent>(smallFont, scoreComp);
+        scoreUIgo->AddComponent<ScoreUIComponent>(smallFont, scoreComp);
         scoreUIgo->SetLocalPosition(SCORE_UI_POS);
         scene.Add(std::move(scoreUIgo));
     }
@@ -105,7 +108,7 @@ static void SetupPlayers()
         auto* physics = enemy->AddComponent<dae::PhysicsComponent>();
         physics->SetUseGravity(false);
 
-        auto* livesComp = enemy->AddComponent<dae::LivesComponent>(START_LIVES);
+        auto* livesComp = enemy->AddComponent<LivesComponent>(START_LIVES);
 
         enemy->AddComponent<EnemyComp::EnemyComponent>();
         enemy->AddComponent<EnemyInputComponent>(uint8_t{ 1 });
@@ -115,7 +118,7 @@ static void SetupPlayers()
 
         // create UI elements
         auto livesUIgo = std::make_unique<dae::GameObject>("LivesUIEnemy");
-        livesUIgo->AddComponent<dae::LivesUIComponent>(smallFont, livesComp);
+        livesUIgo->AddComponent<LivesUIComponent>(smallFont, livesComp);
         livesUIgo->SetLocalPosition(LIVES_UI_POS +
                                     glm::vec2(0, LIVES_UI_OFFSET_Y));
         scene.Add(std::move(livesUIgo));

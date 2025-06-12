@@ -1,6 +1,7 @@
 #include "EnemyComponent.h"
 #include "EnemyInputComponent.h"
 #include "BurgerTimeLayers.h"
+#include "LivesComponent.h"
 
 #ifdef DEBUG_STATES
 #include <DebugRenderer.h>
@@ -137,8 +138,8 @@ void EnemyComp::EnemyComponent::OnMoveWithBurger(dae::GameObject& burger)
 
 void EnemyComponent::OnDeath()
 {
-    s_DiedSubject.Notify("HotDogDied");
-    GetOwner().GetComponent<dae::LivesComponent>()->LoseLife();
+    s_DiedSubject.Notify("HotDogDied", GetOwner().GetWorldPosition());
+    GetOwner().GetComponent<LivesComponent>()->LoseLife();
 }
 
 auto EnemyComponent::HasMoved() const -> bool

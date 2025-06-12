@@ -2,6 +2,8 @@
 #include "PlayerInputComponent.h"
 #include "BurgerTimeLayers.h"
 #include "EnemyComponent.h"
+#include "ScoreComponent.h"
+#include "LivesComponent.h"
 
 #ifdef DEBUG_STATES
 #include <DebugRenderer.h>
@@ -112,11 +114,16 @@ auto PlayerComponent::DirectionToEnum(glm::vec2 dir) -> Direction
     return Direction::Down;
 }
 
-void PlayerComp::PlayerComponent::OnNotify(const std::string& eventId)
+void PlayerComp::PlayerComponent::OnNotify(
+    const std::string& eventId,
+    [[maybe_unused]] const std::any& args)
 {
     if (eventId == "HotDogDied")
     {
-        GetOwner().GetComponent<dae::ScoreComponent>()->AddScore(100);
+        assert((args.has_value() && args.type() == typeid(glm::vec2)) &&
+               "args do not match correct type or has no value");
+        auto pos = std::any_cast<glm::vec2>(args);
+        GetOwner().GetComponent<ScoreComponent>()->AddScore(100);
     }
 }
 
@@ -169,7 +176,7 @@ void PlayerComponent::OnHitByEnemy()
 
 void PlayerComponent::OnDeath()
 {
-    GetOwner().GetComponent<dae::LivesComponent>()->LoseLife();
+    GetOwner().GetComponent<LivesComponent>()->LoseLife();
 }
 
 auto PlayerComponent::HasMoved() const -> bool
