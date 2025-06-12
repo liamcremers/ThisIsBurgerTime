@@ -1,9 +1,11 @@
 #pragma once
 #include "PlayerState.h"
 #include "GridMoveCommand.h"
+
 #include <SpriteComponent.h>
 #include <GameObject.h>
 #include <BaseComponent.h>
+#include <Observer.h>
 
 #include <memory>
 #include <unordered_map>
@@ -27,25 +29,18 @@ struct DirectionVec
 
 namespace PlayerComp
 {
-    class PlayerComponent : public dae::BaseComponent
+    class PlayerComponent : public dae::BaseComponent, public dae::Observer
     {
-        using playerId = int;
-        using IdleState = PlayerStates::IdleState;
-        using MoveState = PlayerStates::MoveState;
-        using AttackState = PlayerStates::AttackState;
-        using DieState = PlayerStates::DieState;
-        using PlayerState = PlayerStates::PlayerState;
-
     public:
         PlayerComponent(dae::GameObject& parent);
-        virtual ~PlayerComponent() = default;
+        virtual ~PlayerComponent();
         void Update() override;
         void HandleInput(PlayerInputKeys input);
 
-        IdleState& GetIdleState();
-        MoveState& GetMoveState();
-        AttackState& GetAttackState();
-        DieState& GetDieState();
+        PlayerStates::IdleState& GetIdleState();
+        PlayerStates::MoveState& GetMoveState();
+        PlayerStates::AttackState& GetAttackState();
+        PlayerStates::DieState& GetDieState();
 
         void OnMove(glm::vec2 direction);
         void OnHitByEnemy();
@@ -57,11 +52,12 @@ namespace PlayerComp
         void SetupStateTextures();
         void UpdateSprite();
         void SetSpriteDirection(glm::vec2 directionVec);
-        void LoadStateTexture(PlayerState* stateT,
+        void LoadStateTexture(PlayerStates::PlayerState* stateT,
                               glm::vec2 direction,
                               const std::string& texturePath);
-        void ChangeState(PlayerState* const state);
+        void ChangeState(PlayerStates::PlayerState* const state);
         void UpdateTimers();
+        bool IsAlignedWithEnemy(const dae::ColliderComponent& other);
         Direction DirectionToEnum(glm::vec2 direction);
 
         static constexpr auto MOVED_BUFFER{ 0.1f };
@@ -69,16 +65,16 @@ namespace PlayerComp
         static constexpr glm::vec2 SPRITE_SIZE{ 16, 16 };
         static constexpr Direction DEFAULT_DIRECTION{ Direction::Down };
 
-        std::unordered_map<PlayerState*,
+        std::unordered_map<PlayerStates::PlayerState*,
                            std::unordered_map<Direction, std::string>>
             m_TexturePath;
 
-        IdleState m_IdleState{};
-        MoveState m_MoveState{};
-        AttackState m_AttackState{};
-        DieState m_DieState{};
+        PlayerStates::IdleState m_IdleState{};
+        PlayerStates::MoveState m_MoveState{};
+        PlayerStates::AttackState m_AttackState{};
+        PlayerStates::DieState m_DieState{};
 
-        PlayerState* m_pCurrentState{ &m_IdleState };
+        PlayerStates::PlayerState* m_pCurrentState{ &m_IdleState };
         std::unique_ptr<GridMoveCommand> m_MoveCommandLeft{
             std::make_unique<GridMoveCommand>(GetOwner(), DirectionVec::Left)
         };
@@ -91,12 +87,16 @@ namespace PlayerComp
         std::unique_ptr<GridMoveCommand> m_MoveCommandDown{
             std::make_unique<GridMoveCommand>(GetOwner(), DirectionVec::Down)
         };
-
         dae::SpriteComponent* m_pSpriteComponent{
             GetOwner().AddComponent<dae::SpriteComponent>(SCALE, SPRITE_SIZE)
         };
+
         Direction m_Direction{ DEFAULT_DIRECTION };
         float m_TimeSinceMoved{};
-    };
 
+    protected:
+        void OnNotify(const std::string& eventId) override;
+
+        void OnDestroy() override {}
+    };
 }

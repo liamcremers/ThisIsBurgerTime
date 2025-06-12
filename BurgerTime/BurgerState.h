@@ -50,5 +50,6 @@ namespace BurgerStates
 
     private:
         int m_FallAmount{ 1 };
+        bool m_HasFallenOnce{};
     };
 }

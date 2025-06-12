@@ -66,6 +66,8 @@ GridMoveCommand::GridMoveCommand(dae::GameObject& pGameObject,
             glm::vec2(static_cast<float>(m_Direction[0] * m_Speed) * deltaTime,
                       static_cast<float>(m_Direction[1] * m_Speed) * deltaTime);
         m_pCollider->SetHasMoved(true);
+        if (GetGameObject()->GetParent())
+            newPos -= GetGameObject()->GetParent()->GetWorldPosition();
         GetGameObject()->SetLocalPosition(newPos);
         return (newPos != playerPos);
     }

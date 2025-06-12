@@ -1,30 +1,49 @@
 #include "PlayerComponent.h"
 #include "PlayerInputComponent.h"
 #include "BurgerTimeLayers.h"
+#include "EnemyComponent.h"
 
 #ifdef DEBUG_STATES
 #include <DebugRenderer.h>
 #endif // DEBUG_STATES
+
+using namespace PlayerStates;
 
 PlayerComponent::PlayerComponent(dae::GameObject& parent) :
     BaseComponent{ parent }
 {
     SetupStateTextures();
     CreateOverlapEvent(parent);
+    EnemyComponent::GetStaticDiedSubject().AddObserver(this);
+}
+
+PlayerComp::PlayerComponent::~PlayerComponent()
+{
+    EnemyComponent::GetStaticDiedSubject().RemoveObserver(this);
 }
 
 void PlayerComponent::CreateOverlapEvent(dae::GameObject& parent)
 {
     if (auto* collider = parent.GetComponent<dae::ColliderComponent>())
     {
-        collider->SubscribeToBeginOverlap(
+        collider->SetCollisionType(CollisionType::Trigger);
+        collider->SubscribeToOverlap(
             [this](const dae::ColliderComponent& other)
             {
-                if ((other.GetLayer() &
-                     static_cast<uint16_t>(CollisionLayer::Enemy)) != 0)
-                    OnHitByEnemy();
+                if (IsLayerType(other, CollisionLayer::Enemy))
+                {
+                    if (IsAlignedWithEnemy(other))
+                        OnHitByEnemy();
+                }
             });
     }
+}
+
+bool PlayerComp::PlayerComponent::IsAlignedWithEnemy(
+    const dae::ColliderComponent& other)
+{
+    return (std::abs(GetOwner().GetWorldPosition().x -
+                     other.GetWorldPosition().x) < 15.f);
 }
 
 void PlayerComponent::SetupStateTextures()
@@ -91,6 +110,14 @@ auto PlayerComponent::DirectionToEnum(glm::vec2 dir) -> Direction
     if (dir == DirectionVec::Down)
         return Direction::Down;
     return Direction::Down;
+}
+
+void PlayerComp::PlayerComponent::OnNotify(const std::string& eventId)
+{
+    if (eventId == "HotDogDied")
+    {
+        GetOwner().GetComponent<dae::ScoreComponent>()->AddScore(100);
+    }
 }
 
 void PlayerComponent::HandleInput(PlayerInputKeys input)

@@ -46,7 +46,13 @@ auto BurgerStates::WalkedOnState::Update(BurgerPartComponent& part)
 // FALLING STATE
 void BurgerStates::FallingState::Enter(BurgerPartComponent& part)
 {
-    (part.HasEnemyOnTop()) ? m_FallAmount = 3 : m_FallAmount = 1;
+    if (!m_HasFallenOnce)
+    {
+        (part.HasEnemyOnTop()) ? m_FallAmount = 4 : m_FallAmount = 2;
+        m_HasFallenOnce = true;
+    }
+    else
+        (part.HasEnemyOnTop()) ? m_FallAmount = 3 : m_FallAmount = 1;
 
     part.OnFalling();
 }
@@ -59,9 +65,9 @@ auto BurgerStates::FallingState::Update(BurgerPartComponent& part)
 
     if (part.GetBeginOverlaps().contains(CollisionLayer::Floor))
     {
+        m_FallAmount--;
         if (m_FallAmount <= 0)
             return part.GetIdleState();
-        m_FallAmount--;
     }
 
     return *this;

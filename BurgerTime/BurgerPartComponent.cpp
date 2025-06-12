@@ -3,8 +3,10 @@
 #include "BurgerTimeSoundIds.h"
 #include "BurgerGroup.h"
 #include "LevelGrid.h"
+#include "EnemyComponent.h"
 
 #include <GameObject.h>
+#include <BaseComponent.h>
 #include <ColliderComponent.h>
 #include <PhysicsComponent.h>
 #include <ServiceLocator.h>
@@ -43,10 +45,6 @@ void BurgerComp::BurgerPartComponent::Update()
     m_EndOverlaps.clear();
 }
 
-auto IsLayerType = [](const dae::ColliderComponent& other,
-                      CollisionLayer layer) -> bool
-{ return other.GetLayer() & static_cast<uint16_t>(layer); };
-
 void BurgerPartComponent::OnOverlap(const dae::ColliderComponent& other)
 {
     if (IsLayerType(other, CollisionLayer::Player) && IsAligned(other))
@@ -55,27 +53,27 @@ void BurgerPartComponent::OnOverlap(const dae::ColliderComponent& other)
 
 void BurgerPartComponent::OnBeginOverlap(const dae::ColliderComponent& other)
 {
-    if ((other.GetLayer() & static_cast<uint16_t>(CollisionLayer::Floor)) or
-        (other.GetLayer() & static_cast<uint16_t>(CollisionLayer::BurgerPlate)))
+    if (IsLayerType(other, CollisionLayer::Floor) or
+        IsLayerType(other, CollisionLayer::BurgerPlate))
     {
         m_BeginOverlaps.insert(static_cast<CollisionLayer>(other.GetLayer()));
     }
 
     if (IsLayerType(other, CollisionLayer::Enemy))
-        m_pBurgerGroup->EnemyOnBurger();
+        OnEnemyOnBurgerPart(other);
 }
 
 void BurgerComp::BurgerPartComponent::OnEndOverlap(
     const dae::ColliderComponent& other)
 {
-    if ((other.GetLayer() & static_cast<uint16_t>(CollisionLayer::Floor)) or
-        (other.GetLayer() & static_cast<uint16_t>(CollisionLayer::BurgerPlate)))
+    if (IsLayerType(other, CollisionLayer::Floor) or
+        IsLayerType(other, CollisionLayer::BurgerPlate))
     {
         m_EndOverlaps.insert(static_cast<CollisionLayer>(other.GetLayer()));
     }
 
     if (IsLayerType(other, CollisionLayer::Enemy))
-        m_pBurgerGroup->EnemyOffBurger();
+        OnEnemyOffBurgerPart(other);
 }
 
 auto BurgerPartComponent::IsAligned(const dae::ColliderComponent& other) -> bool
@@ -84,7 +82,7 @@ auto BurgerPartComponent::IsAligned(const dae::ColliderComponent& other) -> bool
     const auto& otherPos = other.GetWorldPosition() + otherSize.y / 2.0f;
     const auto& burgerPos = GetOwner().GetWorldPosition();
 
-    return (std::abs(otherPos.x - burgerPos.x) < 0.1f &&
+    return (std::abs(otherPos.x - burgerPos.x) < 6.f &&
             std::abs(otherPos.y - burgerPos.y) < 6.f);
 }
 
@@ -150,9 +148,26 @@ void BurgerComp::BurgerPartComponent::OnIdle()
     Freeze();
 }
 
-void BurgerComp::BurgerPartComponent::OnFalling()
+void BurgerComp::BurgerPartComponent::OnFalling() { Fall(); }
+
+void BurgerComp::BurgerPartComponent::OnEnemyOnBurgerPart(
+    const dae::ColliderComponent& other)
 {
-    Fall();
+    auto EnemyComp =
+        other.GetColliderGameObject().GetComponent<EnemyComp::EnemyComponent>();
+    (m_pCurrentState == &GetFallingState()) ?
+        EnemyComp->OnDieByBurger() :
+        EnemyComp->OnMoveWithBurger(GetOwner());
+    m_pBurgerGroup->EnemyOnBurger(EnemyComp);
+}
+
+void BurgerComp::BurgerPartComponent::OnEnemyOffBurgerPart(
+    const dae::ColliderComponent& other)
+{
+    other.GetColliderGameObject().SetParent(nullptr, true);
+    auto EnemyComp =
+        other.GetColliderGameObject().GetComponent<EnemyComp::EnemyComponent>();
+    m_pBurgerGroup->EnemyOffBurger(EnemyComp);
 }
 
 void BurgerComp::BurgerPartComponent::Fall()

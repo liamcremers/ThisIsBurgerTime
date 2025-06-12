@@ -4,6 +4,7 @@
 #include <SpriteComponent.h>
 #include <GameObject.h>
 #include <BaseComponent.h>
+#include <Observer.h>
 
 #include <memory>
 #include <unordered_map>
@@ -16,7 +17,8 @@ namespace EnemyComp
         Left,
         Right,
         Up,
-        Down
+        Down,
+        None
     };
 
     struct DirectionVec
@@ -25,6 +27,7 @@ namespace EnemyComp
         static constexpr glm::vec2 Right{ 1, 0 };
         static constexpr glm::vec2 Up{ 0, -1 };
         static constexpr glm::vec2 Down{ 0, 1 };
+        static constexpr glm::vec2 None{ 0, 0 };
     };
 
     using EnemyId = int;
@@ -38,23 +41,25 @@ namespace EnemyComp
     {
     public:
         EnemyComponent(dae::GameObject& parent);
-        void CreateOverlapEvent(dae::GameObject& parent);
-        void SetupStateTextures();
         virtual ~EnemyComponent() = default;
         void Update() override;
         void HandleInput(EnemyInputKeys input);
 
+        static dae::Subject& GetStaticDiedSubject();
         IdleState& GetIdleState();
         MoveState& GetMoveState();
         AttackState& GetAttackState();
         DieState& GetDieState();
 
         void OnMove(glm::vec2 direction);
-        void OnHitByEnemy();
+        void OnDieByBurger();
+        void OnMoveWithBurger(dae::GameObject& burger);
         void OnDeath();
         bool HasMoved() const;
 
     private:
+        void CreateOverlapEvent(dae::GameObject& parent);
+        void SetupStateTextures();
         void UpdateSprite();
         void SetSpriteDirection(glm::vec2 directionVec);
         void LoadStateTexture(EnemyState* stateT,

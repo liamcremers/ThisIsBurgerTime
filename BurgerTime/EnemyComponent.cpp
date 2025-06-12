@@ -5,6 +5,7 @@
 #ifdef DEBUG_STATES
 #include <DebugRenderer.h>
 #endif // DEBUG_STATES
+static dae::Subject s_DiedSubject{};
 
 EnemyComponent::EnemyComponent(dae::GameObject& parent) :
     BaseComponent{ parent }
@@ -17,39 +18,33 @@ void EnemyComponent::CreateOverlapEvent(dae::GameObject& parent)
 {
     if (auto* collider = parent.GetComponent<dae::ColliderComponent>())
     {
+        collider->SetCollisionType(CollisionType::Trigger);
         collider->SubscribeToBeginOverlap(
             [this](const dae::ColliderComponent& other)
             {
-                if ((other.GetLayer() &
-                     static_cast<uint16_t>(CollisionLayer::Enemy)) != 0)
-                    OnHitByEnemy();
+                if (IsLayerType(other, CollisionLayer::BurgerPlate))
+                {
+                    ChangeState(&m_DieState);
+                    UpdateSprite();
+                }
             });
     }
 }
 
 void EnemyComponent::SetupStateTextures()
 {
-    LoadStateTexture(&m_IdleState, DirectionVec::Down, "MrHotDog.png");
-    LoadStateTexture(&m_IdleState, DirectionVec::Left, "MrHotDog.png");
-    LoadStateTexture(&m_IdleState, DirectionVec::Right, "MrHotDog.png");
-    LoadStateTexture(&m_IdleState, DirectionVec::Up, "MrHotDog.png");
+    LoadStateTexture(&m_IdleState, DirectionVec::None, "MrHotDog.png");
 
     LoadStateTexture(&m_MoveState, DirectionVec::Down, "MrHotDogF.png");
     LoadStateTexture(&m_MoveState, DirectionVec::Left, "MrHotDogL.png");
     LoadStateTexture(&m_MoveState, DirectionVec::Right, "MrHotDogR.png");
     LoadStateTexture(&m_MoveState, DirectionVec::Up, "MrHotDogB.png");
 
-    LoadStateTexture(&m_AttackState, DirectionVec::Down, "MrHotDogF.png");
-    LoadStateTexture(&m_AttackState, DirectionVec::Left, "MrHotDogL.png");
-    LoadStateTexture(&m_AttackState, DirectionVec::Right, "MrHotDogR.png");
-    LoadStateTexture(&m_AttackState, DirectionVec::Up, "MrHotDogB.png");
+    LoadStateTexture(&m_AttackState, DirectionVec::None, "MrHotDog.png");
 
-    LoadStateTexture(&m_DieState, DirectionVec::Down, "MrHotDogF.png");
-    LoadStateTexture(&m_DieState, DirectionVec::Left, "MrHotDogL.png");
-    LoadStateTexture(&m_DieState, DirectionVec::Right, "MrHotDogR.png");
-    LoadStateTexture(&m_DieState, DirectionVec::Up, "MrHotDogB.png");
+    LoadStateTexture(&m_DieState, DirectionVec::None, "MrHotDogCrushed.png");
 
-    m_pSpriteComponent->SetTexture(m_TexturePath[m_pCurrentState][m_Direction]);
+    UpdateSprite();
 }
 
 void EnemyComponent::Update()
@@ -91,6 +86,11 @@ void EnemyComponent::HandleInput(EnemyInputKeys input)
     }
 }
 
+dae::Subject& EnemyComp::EnemyComponent::GetStaticDiedSubject()
+{
+    return s_DiedSubject;
+}
+
 auto EnemyComponent::GetIdleState() -> IdleState& { return m_IdleState; }
 
 auto EnemyComponent::GetMoveState() -> MoveState& { return m_MoveState; }
@@ -122,14 +122,22 @@ void EnemyComponent::OnMove(glm::vec2 direction)
     }
 }
 
-void EnemyComponent::OnHitByEnemy()
+void EnemyComp::EnemyComponent::OnDieByBurger()
 {
     ChangeState(&m_DieState);
     UpdateSprite();
 }
 
+void EnemyComp::EnemyComponent::OnMoveWithBurger(dae::GameObject& burger)
+{
+    GetOwner().SetParent(&burger, true);
+    ChangeState(&m_IdleState);
+    UpdateSprite();
+}
+
 void EnemyComponent::OnDeath()
 {
+    s_DiedSubject.Notify("HotDogDied");
     GetOwner().GetComponent<dae::LivesComponent>()->LoseLife();
 }
 
@@ -141,7 +149,12 @@ auto EnemyComponent::HasMoved() const -> bool
 void EnemyComponent::UpdateSprite()
 {
     m_pSpriteComponent->Reset();
-    m_pSpriteComponent->SetTexture(m_TexturePath[m_pCurrentState][m_Direction]);
+    if (m_pCurrentState == &m_MoveState)
+        m_pSpriteComponent->SetTexture(
+            m_TexturePath[m_pCurrentState][m_Direction]);
+    else
+        m_pSpriteComponent->SetTexture(
+            m_TexturePath[m_pCurrentState][Direction::None]);
 }
 
 void EnemyComponent::SetSpriteDirection(glm::vec2 directionVec)
@@ -153,7 +166,9 @@ void EnemyComponent::LoadStateTexture(EnemyState* stateT,
                                       glm::vec2 directionVec,
                                       const std::string& texturePath)
 {
-    auto direction = DirectionToEnum(directionVec);
+    auto direction = (stateT == &GetMoveState()) ?
+                         DirectionToEnum(directionVec) :
+                         Direction::None;
     m_TexturePath[stateT][direction] = texturePath;
 }
 

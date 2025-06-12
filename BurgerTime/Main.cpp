@@ -100,15 +100,14 @@ static void SetupPlayers()
         collider->SetCollisionLayer(
             static_cast<uint16_t>(CollisionLayer::Enemy));
         collider->SetCollisionType(CollisionType::Trigger);
-        collider->SetCollisionMask(PLAYER_COLLISION_MASK);
+        collider->SetCollisionMask(ENEMY_COLLISION_MASK);
 
         auto* physics = enemy->AddComponent<dae::PhysicsComponent>();
         physics->SetUseGravity(false);
 
         auto* livesComp = enemy->AddComponent<dae::LivesComponent>(START_LIVES);
-        auto* scoreComp = enemy->AddComponent<dae::ScoreComponent>();
 
-        enemy->AddComponent<EnemyComponent>();
+        enemy->AddComponent<EnemyComp::EnemyComponent>();
         enemy->AddComponent<EnemyInputComponent>(uint8_t{ 1 });
 
         dae::CollisionSystem::GetInstance().RegisterCollider(collider);
@@ -120,12 +119,6 @@ static void SetupPlayers()
         livesUIgo->SetLocalPosition(LIVES_UI_POS +
                                     glm::vec2(0, LIVES_UI_OFFSET_Y));
         scene.Add(std::move(livesUIgo));
-
-        auto scoreUIgo = std::make_unique<dae::GameObject>("scoreUIEnemy");
-        scoreUIgo->AddComponent<dae::ScoreUIComponent>(smallFont, scoreComp);
-        scoreUIgo->SetLocalPosition(SCORE_UI_POS +
-                                    glm::vec2(0, SCORE_UI_OFFSET_Y));
-        scene.Add(std::move(scoreUIgo));
     }
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <ColliderComponent.h>
 
 enum class CollisionLayer
 {
@@ -39,3 +40,7 @@ constexpr uint16_t LADDER_COLLISION_MASK =
 
 constexpr uint16_t BURGER_PLATE_COLLISION_MASK =
     static_cast<uint16_t>(CollisionLayer::BurgerPart);
+
+static constexpr auto IsLayerType = [](const dae::ColliderComponent& other,
+                                       CollisionLayer layer) -> bool
+{ return other.GetLayer() & static_cast<uint16_t>(layer); };

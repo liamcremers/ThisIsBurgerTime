@@ -71,6 +71,6 @@ namespace EnemyStates
 
     private:
         float m_DeathTimer{};
-        const float m_DeathDuration{ 2.0f };
+        const float m_DeathDuration{ 1.0f };
     };
 }

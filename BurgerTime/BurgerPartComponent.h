@@ -21,7 +21,8 @@ namespace BurgerComp
         using BurgerState = BurgerStates::BurgerState;
 
     public:
-        BurgerPartComponent(dae::GameObject& parent, BurgerGroupComponent* burgerGroup);
+        BurgerPartComponent(dae::GameObject& parent,
+                            BurgerGroupComponent* burgerGroup);
         virtual ~BurgerPartComponent() = default;
         void Update() override;
 
@@ -40,6 +41,8 @@ namespace BurgerComp
         void OnWalkedOn();
         void OnIdle();
         void OnFalling();
+        void OnEnemyOnBurgerPart(const dae::ColliderComponent& other);
+        void OnEnemyOffBurgerPart(const dae::ColliderComponent& other);
 
     private:
         void ChangeState(BurgerState* newState);
