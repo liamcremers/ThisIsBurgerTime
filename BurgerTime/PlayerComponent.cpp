@@ -5,6 +5,7 @@
 #include "ScoreComponent.h"
 #include "LivesComponent.h"
 
+#include <EngineTime.h>
 #ifdef DEBUG_STATES
 #include <DebugRenderer.h>
 #endif // DEBUG_STATES
@@ -41,11 +42,12 @@ void PlayerComponent::CreateOverlapEvent(dae::GameObject& parent)
     }
 }
 
-bool PlayerComp::PlayerComponent::IsAlignedWithEnemy(
-    const dae::ColliderComponent& other)
+auto PlayerComp::PlayerComponent::IsAlignedWithEnemy(
+    const dae::ColliderComponent& other) -> bool
 {
-    return (std::abs(GetOwner().GetWorldPosition().x -
-                     other.GetWorldPosition().x) < 15.f);
+    static constexpr float ALIGNED_BUFFER = 15.f;
+    return (std::abs(GetOwner().GetWorldPosition()[0] -
+                     other.GetWorldPosition()[0]) < ALIGNED_BUFFER);
 }
 
 void PlayerComponent::SetupStateTextures()
@@ -118,12 +120,14 @@ void PlayerComp::PlayerComponent::OnNotify(
     const std::string& eventId,
     [[maybe_unused]] const std::any& args)
 {
+    static constexpr int HOT_DOG_DEATH_SCORE = 100;
     if (eventId == "HotDogDied")
     {
         assert((args.has_value() && args.type() == typeid(glm::vec2)) &&
                "args do not match correct type or has no value");
-        auto pos = std::any_cast<glm::vec2>(args);
-        GetOwner().GetComponent<ScoreComponent>()->AddScore(100);
+        [[maybe_unused]] auto pos = std::any_cast<glm::vec2>(args);
+        GetOwner().GetComponent<ScoreComponent>()->AddScore(
+            HOT_DOG_DEATH_SCORE);
     }
 }
 

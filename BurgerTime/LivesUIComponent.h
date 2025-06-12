@@ -12,9 +12,9 @@ class LivesComponent;
 class LivesUIComponent final : public dae::BaseComponent, public dae::Observer
 {
 public:
-    LivesUIComponent(dae::GameObject& parent,
-                     dae::Font& font,
-                     LivesComponent* pLivesComponent);
+    explicit LivesUIComponent(dae::GameObject& parent,
+                              dae::Font& font,
+                              LivesComponent* pLivesComponent);
     ~LivesUIComponent() override;
 
 protected:

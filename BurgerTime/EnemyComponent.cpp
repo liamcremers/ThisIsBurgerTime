@@ -3,9 +3,12 @@
 #include "BurgerTimeLayers.h"
 #include "LivesComponent.h"
 
+#include <EngineTime.h>
 #ifdef DEBUG_STATES
 #include <DebugRenderer.h>
 #endif // DEBUG_STATES
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static dae::Subject s_DiedSubject{};
 
 EnemyComponent::EnemyComponent(dae::GameObject& parent) :
@@ -87,7 +90,7 @@ void EnemyComponent::HandleInput(EnemyInputKeys input)
     }
 }
 
-dae::Subject& EnemyComp::EnemyComponent::GetStaticDiedSubject()
+auto EnemyComp::EnemyComponent::GetStaticDiedSubject() -> dae::Subject&
 {
     return s_DiedSubject;
 }
@@ -136,7 +139,7 @@ void EnemyComp::EnemyComponent::OnMoveWithBurger(dae::GameObject& burger)
     UpdateSprite();
 }
 
-void EnemyComponent::OnDeath()
+void EnemyComponent::OnDeath() const
 {
     s_DiedSubject.Notify("HotDogDied", GetOwner().GetWorldPosition());
     GetOwner().GetComponent<LivesComponent>()->LoseLife();

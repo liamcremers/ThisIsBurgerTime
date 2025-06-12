@@ -5,7 +5,7 @@
 class ScoreComponent final : public dae::BaseComponent
 {
 public:
-    ScoreComponent(dae::GameObject& parent);
+    explicit ScoreComponent(dae::GameObject& parent);
     void AddScore(int addedScore);
     [[nodiscard]] auto GetScoreSubject() -> dae::Subject&;
     [[nodiscard]] auto GetScore() const -> int;

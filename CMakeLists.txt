@@ -46,9 +46,11 @@ target_compile_options(${TARGET_NAME_BURGERTIME} PRIVATE
 
 # Define DEBUG_RENDER for Debug builds
 # DEBUG_SOUND
+#DEBUG_STATES
+#DEBUG_RENDER
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(${TARGET_NAME_MINIGIN} PRIVATE DEBUG_RENDER DEBUG_STATES)
-    target_compile_definitions(${TARGET_NAME_BURGERTIME} PRIVATE DEBUG_RENDER DEBUG_STATES)
+    target_compile_definitions(${TARGET_NAME_MINIGIN} PRIVATE DEBUG_RENDER )
+    target_compile_definitions(${TARGET_NAME_BURGERTIME} PRIVATE DEBUG_RENDER )
 endif ()
 
 if(EMSCRIPTEN)

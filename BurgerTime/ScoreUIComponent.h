@@ -12,9 +12,9 @@ class ScoreComponent;
 class ScoreUIComponent final : public dae::BaseComponent, public dae::Observer
 {
 public:
-    ScoreUIComponent(dae::GameObject& parent,
-                     dae::Font& font,
-                     ScoreComponent* pScoreComp);
+    explicit ScoreUIComponent(dae::GameObject& parent,
+                              dae::Font& font,
+                              ScoreComponent* pScoreComp);
     ~ScoreUIComponent() override;
 
 protected:

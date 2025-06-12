@@ -1,0 +1,25 @@
+#include "FPSComponent.h"
+#include <TextComponent.h>
+#include <EngineTime.h>
+#include <Font.h>
+#include <GameObject.h>
+
+FPSComponent::FPSComponent(dae::GameObject& parent, dae::Font& font) :
+    dae::BaseComponent(parent),
+    m_pTextComponent{ parent.AddComponent<dae::TextComponent>("FPS: ", font) }
+{}
+
+void FPSComponent::Update()
+{
+    static int frameCount = 0;
+    static float elapsedTime = 0.0f;
+    frameCount++;
+    elapsedTime += dae::EngineTime::GetInstance().GetDeltaTime();
+    if (elapsedTime >= 1.0f)
+    {
+        int fps = frameCount / static_cast<int>(elapsedTime);
+        m_pTextComponent->SetText("FPS: " + std::to_string(fps));
+        frameCount = 0;
+        elapsedTime = 0.0f;
+    }
+}

@@ -5,7 +5,7 @@
 class LivesComponent final : public dae::BaseComponent
 {
 public:
-    LivesComponent(dae::GameObject& parent, int lives);
+    explicit LivesComponent(dae::GameObject& parent, int lives);
     void LoseLife();
     [[nodiscard]] auto GetLivesSubject() -> dae::Subject&;
     [[nodiscard]] auto GetLives() const -> int;

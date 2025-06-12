@@ -32,7 +32,7 @@ namespace PlayerComp
     class PlayerComponent : public dae::BaseComponent, public dae::Observer
     {
     public:
-        PlayerComponent(dae::GameObject& parent);
+        explicit PlayerComponent(dae::GameObject& parent);
         virtual ~PlayerComponent();
         void Update() override;
         void HandleInput(PlayerInputKeys input);

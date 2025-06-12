@@ -1,6 +1,7 @@
 #include "PlayerState.h"
 #include "PlayerComponent.h"
 
+#include <EngineTime.h>
 #include <GameObject.h>
 #include <BaseComponent.h>
 #include <glm.hpp>

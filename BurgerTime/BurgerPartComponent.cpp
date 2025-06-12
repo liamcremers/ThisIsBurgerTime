@@ -7,8 +7,6 @@
 
 #include <GameObject.h>
 #include <BaseComponent.h>
-#include <ColliderComponent.h>
-#include <PhysicsComponent.h>
 #include <ServiceLocator.h>
 
 using namespace BurgerComp;
@@ -16,10 +14,10 @@ using namespace BurgerComp;
 BurgerPartComponent::BurgerPartComponent(dae::GameObject& parent,
                                          BurgerGroupComponent* burgerGroup) :
     BaseComponent{ parent },
+    m_pPhysics{ GetOwner().GetComponent<dae::PhysicsComponent>() },
+    m_pCollider{ GetOwner().GetComponent<dae::ColliderComponent>() },
     m_pBurgerGroup{ burgerGroup }
 {
-    m_pPhysics = GetOwner().GetComponent<dae::PhysicsComponent>();
-    m_pCollider = GetOwner().GetComponent<dae::ColliderComponent>();
     assert((m_pPhysics && m_pCollider) &&
            "BurgerPartComponent requires a PhysicsComponent and a "
            "ColliderComponent");
@@ -78,12 +76,14 @@ void BurgerComp::BurgerPartComponent::OnEndOverlap(
 
 auto BurgerPartComponent::IsAligned(const dae::ColliderComponent& other) -> bool
 {
+    static constexpr float ALIGNED_DISTANCE = 6.f;
+    static constexpr float HALF = 2.0f;
     const auto& otherSize = other.GetSize();
-    const auto& otherPos = other.GetWorldPosition() + otherSize.y / 2.0f;
+    const auto& otherPos = other.GetWorldPosition() + otherSize[1] / HALF;
     const auto& burgerPos = GetOwner().GetWorldPosition();
 
-    return (std::abs(otherPos.x - burgerPos.x) < 6.f &&
-            std::abs(otherPos.y - burgerPos.y) < 6.f);
+    return (std::abs(otherPos[0] - burgerPos[0]) < ALIGNED_DISTANCE &&
+            std::abs(otherPos[1] - burgerPos[1]) < ALIGNED_DISTANCE);
 }
 
 auto BurgerPartComponent::GetIdleState() -> IdleState& { return m_IdleState; }
@@ -98,7 +98,7 @@ auto BurgerPartComponent::GetFallingState() -> FallingState&
     return m_FallingState;
 }
 
-bool BurgerComp::BurgerPartComponent::HasAllPartsWalkedOn() const
+auto BurgerComp::BurgerPartComponent::HasAllPartsWalkedOn() const -> bool
 {
     return m_pBurgerGroup->IsFullyWalkedOn();
 }
@@ -132,8 +132,8 @@ auto BurgerComp::BurgerPartComponent::GetBurgerGroup() -> BurgerGroupComponent*
 
 void BurgerComp::BurgerPartComponent::GoDownOnePixel()
 {
-    auto& pos = GetOwner().GetWorldPosition();
-    GetOwner().SetLocalPosition({ pos.x, pos.y + 1.0f });
+    const auto& pos = GetOwner().GetWorldPosition();
+    GetOwner().SetLocalPosition({ pos[0], (pos[1] + 1.0f) });
 }
 
 void BurgerComp::BurgerPartComponent::OnWalkedOn()
@@ -153,7 +153,7 @@ void BurgerComp::BurgerPartComponent::OnFalling() { Fall(); }
 void BurgerComp::BurgerPartComponent::OnEnemyOnBurgerPart(
     const dae::ColliderComponent& other)
 {
-    auto EnemyComp =
+    auto* EnemyComp =
         other.GetColliderGameObject().GetComponent<EnemyComp::EnemyComponent>();
     (m_pCurrentState == &GetFallingState()) ?
         EnemyComp->OnDieByBurger() :
@@ -165,7 +165,7 @@ void BurgerComp::BurgerPartComponent::OnEnemyOffBurgerPart(
     const dae::ColliderComponent& other)
 {
     other.GetColliderGameObject().SetParent(nullptr, true);
-    auto EnemyComp =
+    auto* EnemyComp =
         other.GetColliderGameObject().GetComponent<EnemyComp::EnemyComponent>();
     m_pBurgerGroup->EnemyOffBurger(EnemyComp);
 }

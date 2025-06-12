@@ -22,7 +22,7 @@ class PlayerInputComponent final : public dae::BaseComponent
     static constexpr unsigned int XINPUT_GAMEPAD_X = 0x4000;
 #pragma endregion
 public:
-    PlayerInputComponent(dae::GameObject& parent, unsigned long idx);
+    explicit PlayerInputComponent(dae::GameObject& parent, unsigned long idx);
     virtual ~PlayerInputComponent();
     const dae::Controller* GetController() const;
 

@@ -1,5 +1,7 @@
 #pragma once
 #include "BurgerState.h"
+#include <ColliderComponent.h>
+#include <PhysicsComponent.h>
 #include <BaseComponent.h>
 #include <set>
 
@@ -21,8 +23,8 @@ namespace BurgerComp
         using BurgerState = BurgerStates::BurgerState;
 
     public:
-        BurgerPartComponent(dae::GameObject& parent,
-                            BurgerGroupComponent* burgerGroup);
+        explicit BurgerPartComponent(dae::GameObject& parent,
+                                     BurgerGroupComponent* burgerGroup);
         virtual ~BurgerPartComponent() = default;
         void Update() override;
 

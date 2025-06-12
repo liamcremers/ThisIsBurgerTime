@@ -40,7 +40,7 @@ namespace EnemyComp
     class EnemyComponent : public dae::BaseComponent
     {
     public:
-        EnemyComponent(dae::GameObject& parent);
+        explicit EnemyComponent(dae::GameObject& parent);
         virtual ~EnemyComponent() = default;
         void Update() override;
         void HandleInput(EnemyInputKeys input);
@@ -54,7 +54,7 @@ namespace EnemyComp
         void OnMove(glm::vec2 direction);
         void OnDieByBurger();
         void OnMoveWithBurger(dae::GameObject& burger);
-        void OnDeath();
+        void OnDeath() const;
         bool HasMoved() const;
 
     private:

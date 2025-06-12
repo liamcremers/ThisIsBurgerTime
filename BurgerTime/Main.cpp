@@ -16,6 +16,7 @@
 #include <ServiceLocator.h>
 #include <SoundSystem.h>
 
+#include "FPSComponent.h"
 #include "BurgerTimeLayers.h"
 #include "LevelGrid.h"
 #include "BurgerPartComponent.h"
@@ -131,7 +132,7 @@ static void SetupFPSScene()
     auto& fpsFont = dae::ResourceManager::GetInstance().LoadFont(
         "Lingua.otf", SMALL_FONT_SIZE);
     auto fps = std::make_unique<dae::GameObject>("fps");
-    fps->AddComponent<dae::FPSComponent>(fpsFont);
+    fps->AddComponent<FPSComponent>(fpsFont);
     fps->SetLocalPosition(FPS_POS);
     FPSScene.Add(std::move(fps));
 }
@@ -291,7 +292,7 @@ static void CreateBurgerPlateStack(dae::Scene& scene,
         rendererCompTL->Scale(2);
         hasScaledTextureTL = true;
     }
-    auto col =
+    auto* col =
         goTL->AddComponent<dae::ColliderComponent>(glm::vec2{ G_SIZE, G_SIZE });
     col->SetCollisionLayer(static_cast<uint16_t>(CollisionLayer::BurgerPlate));
     col->SetCollisionMask(BURGER_PLATE_COLLISION_MASK);
@@ -310,7 +311,7 @@ static void CreateBurgerPlateStack(dae::Scene& scene,
         rendererCompML->Scale(2);
         hasScaledTextureML = true;
     }
-    auto colML =
+    auto* colML =
         goML->AddComponent<dae::ColliderComponent>(glm::vec2{ G_SIZE, G_SIZE });
     colML->SetCollisionLayer(
         static_cast<uint16_t>(CollisionLayer::BurgerPlate));
@@ -333,7 +334,7 @@ static void CreateBurgerPlateStack(dae::Scene& scene,
             rendererCompM->Scale(2);
             hasScaledTextureM = true;
         }
-        auto colM = goM->AddComponent<dae::ColliderComponent>(
+        auto* colM = goM->AddComponent<dae::ColliderComponent>(
             glm::vec2{ G_SIZE, G_SIZE });
         colM->SetCollisionLayer(
             static_cast<uint16_t>(CollisionLayer::BurgerPlate));
@@ -355,7 +356,7 @@ static void CreateBurgerPlateStack(dae::Scene& scene,
         rendererCompMR->Scale(2);
         hasScaledTextureMR = true;
     }
-    auto colMR =
+    auto* colMR =
         goMR->AddComponent<dae::ColliderComponent>(glm::vec2{ G_SIZE, G_SIZE });
     colMR->SetCollisionLayer(
         static_cast<uint16_t>(CollisionLayer::BurgerPlate));
@@ -375,7 +376,7 @@ static void CreateBurgerPlateStack(dae::Scene& scene,
         rendererCompTR->Scale(2);
         hasScaledTextureTR = true;
     }
-    auto colTR =
+    auto* colTR =
         goTR->AddComponent<dae::ColliderComponent>(glm::vec2{ G_SIZE, G_SIZE });
     colTR->SetCollisionLayer(
         static_cast<uint16_t>(CollisionLayer::BurgerPlate));

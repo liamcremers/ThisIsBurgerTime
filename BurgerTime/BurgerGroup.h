@@ -10,7 +10,7 @@ namespace EnemyComp
 class BurgerGroupComponent : public dae::BaseComponent
 {
 public:
-    BurgerGroupComponent(dae::GameObject& parent);
+    explicit BurgerGroupComponent(dae::GameObject& parent);
     void IncrementWalkedOnCounter();
     void EnemyOnBurger(EnemyComp::EnemyComponent* pEnemy);
     void EnemyOffBurger(EnemyComp::EnemyComponent* pEnemy);

@@ -22,7 +22,7 @@ class EnemyInputComponent final : public dae::BaseComponent
     static constexpr unsigned int XINPUT_GAMEPAD_X = 0x4000;
 #pragma endregion
 public:
-    EnemyInputComponent(dae::GameObject& parent, unsigned long idx);
+    explicit EnemyInputComponent(dae::GameObject& parent, unsigned long idx);
     virtual ~EnemyInputComponent();
     const dae::Controller* GetController() const;
 
