@@ -9,17 +9,17 @@
 using namespace PlayerComp;
 using namespace PlayerStates;
 
-static constexpr auto InputToDirection(PlayerInputKeys input) -> glm::vec2
+static constexpr auto InputToDirection(InputKey input) -> glm::vec2
 {
     switch (input)
     {
-    case PlayerInputKeys::MoveLeft:
+    case InputKey::MoveLeft:
         return DirectionVec::Left;
-    case PlayerInputKeys::MoveRight:
+    case InputKey::MoveRight:
         return DirectionVec::Right;
-    case PlayerInputKeys::MoveUp:
+    case InputKey::MoveUp:
         return DirectionVec::Up;
-    case PlayerInputKeys::MoveDown:
+    case InputKey::MoveDown:
         return DirectionVec::Down;
     default:
         return {};
@@ -33,23 +33,19 @@ void IdleState::Exit(PlayerComponent&) {}
 
 auto IdleState::Update(PlayerComponent&) -> PlayerState& { return *this; }
 
-auto IdleState::HandleInput(PlayerComponent& player, PlayerInputKeys& input)
+auto IdleState::HandleInput(PlayerComponent& player, InputKey& input)
     -> PlayerState&
 {
     switch (input)
     {
-    case PlayerInputKeys::MoveLeft:
-    case PlayerInputKeys::MoveRight:
-    case PlayerInputKeys::MoveUp:
-    case PlayerInputKeys::MoveDown:
+    case InputKey::MoveLeft:
+    case InputKey::MoveRight:
+    case InputKey::MoveUp:
+    case InputKey::MoveDown:
         player.OnMove(InputToDirection(input));
         return player.GetMoveState();
-    case PlayerInputKeys::Attack:
+    case InputKey::Attack:
         return player.GetAttackState();
-#ifdef _DEBUG
-    case PlayerInputKeys::Die:
-        return player.GetDieState();
-#endif // _DEBUG
     default:
         return *this;
     };
@@ -68,23 +64,19 @@ auto MoveState::Update(PlayerComponent& player) -> PlayerState&
     return player.GetIdleState();
 }
 
-auto MoveState::HandleInput(PlayerComponent& player, PlayerInputKeys& input)
+auto MoveState::HandleInput(PlayerComponent& player, InputKey& input)
     -> PlayerState&
 {
     switch (input)
     {
-    case PlayerInputKeys::MoveUp:
-    case PlayerInputKeys::MoveDown:
-    case PlayerInputKeys::MoveLeft:
-    case PlayerInputKeys::MoveRight:
+    case InputKey::MoveUp:
+    case InputKey::MoveDown:
+    case InputKey::MoveLeft:
+    case InputKey::MoveRight:
         player.OnMove(InputToDirection(input));
         return *this;
-    case PlayerInputKeys::Attack:
+    case InputKey::Attack:
         return player.GetAttackState();
-#ifdef _DEBUG
-    case PlayerInputKeys::Die:
-        return player.GetDieState();
-#endif // _DEBUG
     default:
         return *this;
     }
@@ -103,8 +95,7 @@ auto AttackState::Update(PlayerComponent& player) -> PlayerState&
     return *this;
 }
 
-auto AttackState::HandleInput(PlayerComponent&, PlayerInputKeys&)
-    -> PlayerState&
+auto AttackState::HandleInput(PlayerComponent&, InputKey&) -> PlayerState&
 {
     return *this;
 }
@@ -126,7 +117,7 @@ auto DieState::Update(PlayerComponent& player) -> PlayerState&
     return *this;
 }
 
-auto DieState::HandleInput(PlayerComponent&, PlayerInputKeys&) -> PlayerState&
+auto DieState::HandleInput(PlayerComponent&, InputKey&) -> PlayerState&
 {
     return *this;
 }

@@ -11,13 +11,13 @@ BurgerGroupComponent::BurgerGroupComponent(dae::GameObject& parent) :
 
 void BurgerGroupComponent::IncrementWalkedOnCounter() { ++m_WalkedOnCount; }
 
-void BurgerGroupComponent::EnemyOnBurger(EnemyComp::EnemyComponent* pEnemy)
+void BurgerGroupComponent::EnemyOnBurger(EnemyComponent* pEnemy)
 {
     m_HasEnemyOnBurger = true;
     m_pEnemiesOnBurger.emplace_back(pEnemy);
 }
 
-void BurgerGroupComponent::EnemyOffBurger(EnemyComp::EnemyComponent* pEnemy)
+void BurgerGroupComponent::EnemyOffBurger(EnemyComponent* pEnemy)
 {
     std::erase_if(m_pEnemiesOnBurger,
                   [pEnemy](const auto& enemy) { return enemy == pEnemy; });

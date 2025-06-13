@@ -1,5 +1,6 @@
 #pragma once
-#include "PlayerInputKeys.h"
+#include "IControllable.h"
+#include "Direction.h"
 #include <glm.hpp>
 
 namespace PlayerComp
@@ -19,7 +20,7 @@ namespace PlayerStates
         virtual void Exit(PlayerComponent&) = 0;
         virtual PlayerState& Update(PlayerComponent& player) = 0;
         virtual PlayerState& HandleInput(PlayerComponent& player,
-                                         PlayerInputKeys& input) = 0;
+                                         InputKey& input) = 0;
     };
 
     class IdleState : public PlayerState
@@ -30,7 +31,7 @@ namespace PlayerStates
         void Exit(PlayerComponent&) override;
         PlayerState& Update(PlayerComponent& player) override;
         PlayerState& HandleInput(PlayerComponent& player,
-                                 PlayerInputKeys& input) override;
+                                 InputKey& input) override;
     };
 
     class MoveState : public PlayerState
@@ -41,7 +42,7 @@ namespace PlayerStates
         void Exit(PlayerComponent&) override;
         PlayerState& Update(PlayerComponent& player) override;
         PlayerState& HandleInput(PlayerComponent& player,
-                                 PlayerInputKeys& input) override;
+                                 InputKey& input) override;
     };
 
     class AttackState : public PlayerState
@@ -52,7 +53,7 @@ namespace PlayerStates
         void Exit(PlayerComponent&) override;
         PlayerState& Update(PlayerComponent& player) override;
         PlayerState& HandleInput(PlayerComponent& player,
-                                 PlayerInputKeys& input) override;
+                                 InputKey& input) override;
 
     private:
         float m_AttackTimer{};
@@ -66,8 +67,7 @@ namespace PlayerStates
         void Enter(PlayerComponent&) override;
         void Exit(PlayerComponent&) override;
         PlayerState& Update(PlayerComponent& player) override;
-        PlayerState& HandleInput(PlayerComponent& player,
-                                 PlayerInputKeys&) override;
+        PlayerState& HandleInput(PlayerComponent& player, InputKey&) override;
 
     private:
         float m_DeathTimer{};

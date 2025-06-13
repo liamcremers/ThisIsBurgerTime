@@ -7,7 +7,6 @@
 
 #ifdef DEBUG_RENDER
 #include <DebugRenderer.h>
-#include "PlayerInputComponent.h"
 #endif // DEBUG_RENDER
 
 GridMoveCommand::GridMoveCommand(dae::GameObject& pGameObject,

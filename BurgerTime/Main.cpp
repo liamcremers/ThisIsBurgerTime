@@ -22,14 +22,13 @@
 #include "BurgerPartComponent.h"
 #include "BurgerTimeSoundIds.h"
 #include "PlayerComponent.h"
-#include "PlayerInputComponent.h"
 #include "EnemyComponent.h"
-#include "EnemyInputComponent.h"
 #include "BurgerGroup.h"
 #include "LivesUIComponent.h"
 #include "ScoreUIComponent.h"
 #include "LivesComponent.h"
 #include "ScoreComponent.h"
+#include "InputComponent.h"
 
 #include <filesystem>
 #include <memory>
@@ -77,8 +76,9 @@ static void SetupPlayers()
         auto* livesComp = player->AddComponent<LivesComponent>(START_LIVES);
         auto* scoreComp = player->AddComponent<ScoreComponent>();
 
-        player->AddComponent<PlayerComponent>();
-        player->AddComponent<PlayerInputComponent>(uint8_t{});
+        auto* pPlayerComp = player->AddComponent<PlayerComponent>();
+        player->AddComponent<InputComponent>(uint16_t{}, pPlayerComp);
+        //player->AddComponent<PlayerInputComponent>(uint8_t{});
 
         dae::CollisionSystem::GetInstance().RegisterCollider(collider);
         scene.Add(std::move(player));
@@ -111,8 +111,8 @@ static void SetupPlayers()
 
         auto* livesComp = enemy->AddComponent<LivesComponent>(START_LIVES);
 
-        enemy->AddComponent<EnemyComp::EnemyComponent>();
-        enemy->AddComponent<EnemyInputComponent>(uint8_t{ 1 });
+        auto* pEnemyComp = enemy->AddComponent<EnemyComponent>();
+        enemy->AddComponent<InputComponent>(uint8_t{ 1 }, pEnemyComp);
 
         dae::CollisionSystem::GetInstance().RegisterCollider(collider);
         scene.Add(std::move(enemy));

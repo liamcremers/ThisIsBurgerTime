@@ -1,5 +1,5 @@
 #include "PlayerComponent.h"
-#include "PlayerInputComponent.h"
+#include "InputComponent.h"
 #include "BurgerTimeLayers.h"
 #include "EnemyComponent.h"
 #include "ScoreComponent.h"
@@ -131,7 +131,7 @@ void PlayerComp::PlayerComponent::OnNotify(
     }
 }
 
-void PlayerComponent::HandleInput(PlayerInputKeys input)
+void PlayerComponent::HandleInput(InputKey input)
 {
     auto& newState = m_pCurrentState->HandleInput(*this, input);
     if (&newState != m_pCurrentState)

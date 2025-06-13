@@ -1,6 +1,7 @@
 #pragma once
 #include "PlayerState.h"
 #include "GridMoveCommand.h"
+#include "IControllable.h"
 
 #include <SpriteComponent.h>
 #include <GameObject.h>
@@ -11,31 +12,18 @@
 #include <unordered_map>
 #include <glm.hpp>
 
-enum class Direction
-{
-    Left,
-    Right,
-    Up,
-    Down
-};
-
-struct DirectionVec
-{
-    static constexpr glm::vec2 Left{ -1, 0 };
-    static constexpr glm::vec2 Right{ 1, 0 };
-    static constexpr glm::vec2 Up{ 0, -1 };
-    static constexpr glm::vec2 Down{ 0, 1 };
-};
-
 namespace PlayerComp
 {
-    class PlayerComponent : public dae::BaseComponent, public dae::Observer
+    class PlayerComponent :
+        public dae::BaseComponent,
+        public dae::Observer,
+        public IControllable
     {
     public:
         explicit PlayerComponent(dae::GameObject& parent);
         virtual ~PlayerComponent();
         void Update() override;
-        void HandleInput(PlayerInputKeys input);
+        void HandleInput(InputKey input);
 
         PlayerStates::IdleState& GetIdleState();
         PlayerStates::MoveState& GetMoveState();

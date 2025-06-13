@@ -6,20 +6,19 @@
 #include <BaseComponent.h>
 #include <glm.hpp>
 
-using namespace EnemyComp;
 using namespace EnemyStates;
 
-static constexpr auto InputToDirection(EnemyInputKeys input) -> glm::vec2
+static constexpr auto InputToDirection(InputKey input) -> glm::vec2
 {
     switch (input)
     {
-    case EnemyInputKeys::MoveLeft:
+    case InputKey::MoveLeft:
         return DirectionVec::Left;
-    case EnemyInputKeys::MoveRight:
+    case InputKey::MoveRight:
         return DirectionVec::Right;
-    case EnemyInputKeys::MoveUp:
+    case InputKey::MoveUp:
         return DirectionVec::Up;
-    case EnemyInputKeys::MoveDown:
+    case InputKey::MoveDown:
         return DirectionVec::Down;
     default:
         return {};
@@ -33,23 +32,17 @@ void IdleState::Exit(EnemyComponent&) {}
 
 auto IdleState::Update(EnemyComponent&) -> EnemyState& { return *this; }
 
-auto IdleState::HandleInput(EnemyComponent& enemy, EnemyInputKeys& input)
+auto IdleState::HandleInput(EnemyComponent& enemy, InputKey& input)
     -> EnemyState&
 {
     switch (input)
     {
-    case EnemyInputKeys::MoveLeft:
-    case EnemyInputKeys::MoveRight:
-    case EnemyInputKeys::MoveUp:
-    case EnemyInputKeys::MoveDown:
+    case InputKey::MoveLeft:
+    case InputKey::MoveRight:
+    case InputKey::MoveUp:
+    case InputKey::MoveDown:
         enemy.OnMove(InputToDirection(input));
         return enemy.GetMoveState();
-#ifdef _DEBUG
-    case EnemyInputKeys::Attack:
-        return enemy.GetAttackState();
-    case EnemyInputKeys::Die:
-        return enemy.GetDieState();
-#endif // _DEBUG
     default:
         return *this;
     };
@@ -68,23 +61,17 @@ auto MoveState::Update(EnemyComponent& enemy) -> EnemyState&
     return enemy.GetIdleState();
 }
 
-auto MoveState::HandleInput(EnemyComponent& enemy, EnemyInputKeys& input)
+auto MoveState::HandleInput(EnemyComponent& enemy, InputKey& input)
     -> EnemyState&
 {
     switch (input)
     {
-    case EnemyInputKeys::MoveUp:
-    case EnemyInputKeys::MoveDown:
-    case EnemyInputKeys::MoveLeft:
-    case EnemyInputKeys::MoveRight:
+    case InputKey::MoveUp:
+    case InputKey::MoveDown:
+    case InputKey::MoveLeft:
+    case InputKey::MoveRight:
         enemy.OnMove(InputToDirection(input));
         return *this;
-#ifdef _DEBUG
-    case EnemyInputKeys::Attack:
-        return enemy.GetAttackState();
-    case EnemyInputKeys::Die:
-        return enemy.GetDieState();
-#endif // _DEBUG
     default:
         return *this;
     }
@@ -103,7 +90,7 @@ auto AttackState::Update(EnemyComponent& enemy) -> EnemyState&
     return *this;
 }
 
-auto AttackState::HandleInput(EnemyComponent&, EnemyInputKeys&) -> EnemyState&
+auto AttackState::HandleInput(EnemyComponent&, InputKey&) -> EnemyState&
 {
     return *this;
 }
@@ -125,7 +112,7 @@ auto DieState::Update(EnemyComponent& enemy) -> EnemyState&
     return *this;
 }
 
-auto DieState::HandleInput(EnemyComponent&, EnemyInputKeys&) -> EnemyState&
+auto DieState::HandleInput(EnemyComponent&, InputKey&) -> EnemyState&
 {
     return *this;
 }

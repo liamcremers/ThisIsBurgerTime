@@ -1,5 +1,4 @@
 #include "EnemyComponent.h"
-#include "EnemyInputComponent.h"
 #include "BurgerTimeLayers.h"
 #include "LivesComponent.h"
 
@@ -10,6 +9,8 @@
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static dae::Subject s_DiedSubject{};
+
+using namespace EnemyStates;
 
 EnemyComponent::EnemyComponent(dae::GameObject& parent) :
     BaseComponent{ parent }
@@ -80,7 +81,7 @@ auto EnemyComponent::DirectionToEnum(glm::vec2 dir) -> Direction
     return Direction::Down;
 }
 
-void EnemyComponent::HandleInput(EnemyInputKeys input)
+void EnemyComponent::HandleInput(InputKey input)
 {
     auto& newState = m_pCurrentState->HandleInput(*this, input);
     if (&newState != m_pCurrentState)
@@ -90,7 +91,7 @@ void EnemyComponent::HandleInput(EnemyInputKeys input)
     }
 }
 
-auto EnemyComp::EnemyComponent::GetStaticDiedSubject() -> dae::Subject&
+auto EnemyComponent::GetStaticDiedSubject() -> dae::Subject&
 {
     return s_DiedSubject;
 }
@@ -126,13 +127,13 @@ void EnemyComponent::OnMove(glm::vec2 direction)
     }
 }
 
-void EnemyComp::EnemyComponent::OnDieByBurger()
+void EnemyComponent::OnDieByBurger()
 {
     ChangeState(&m_DieState);
     UpdateSprite();
 }
 
-void EnemyComp::EnemyComponent::OnMoveWithBurger(dae::GameObject& burger)
+void EnemyComponent::OnMoveWithBurger(dae::GameObject& burger)
 {
     GetOwner().SetParent(&burger, true);
     ChangeState(&m_IdleState);
