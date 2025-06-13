@@ -1,7 +1,7 @@
 #include "BurgerPartComponent.h"
 #include "BurgerTimeLayers.h"
 #include "BurgerTimeSoundIds.h"
-#include "BurgerGroup.h"
+#include "BurgerGroupComponent.h"
 #include "LevelGrid.h"
 #include "EnemyComponent.h"
 

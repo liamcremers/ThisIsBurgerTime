@@ -23,7 +23,7 @@
 #include "BurgerTimeSoundIds.h"
 #include "PlayerComponent.h"
 #include "EnemyComponent.h"
-#include "BurgerGroup.h"
+#include "BurgerGroupComponent.h"
 #include "LivesUIComponent.h"
 #include "ScoreUIComponent.h"
 #include "LivesComponent.h"
@@ -223,7 +223,8 @@ static void CreateLadder(dae::Scene& scene,
             }
         }
 
-        goL->SetLocalPosition(startPos + glm::vec2(0, i * G_SIZE));
+        goL->SetLocalPosition(startPos +
+                              glm::vec2(0, static_cast<int>(i) * G_SIZE));
 
         // Create right ladder piece
         auto goR = std::make_unique<dae::GameObject>(baseName + "R" +
@@ -250,7 +251,8 @@ static void CreateLadder(dae::Scene& scene,
         }
 
         // Position the right ladder piece next to the left piece
-        goR->SetLocalPosition(startPos + glm::vec2(G_SIZE, i * G_SIZE));
+        goR->SetLocalPosition(startPos +
+                              glm::vec2(G_SIZE, static_cast<int>(i) * G_SIZE));
 
         auto* colliderL = goL->AddComponent<dae::ColliderComponent>(
             glm::vec2{ G_SIZE, G_SIZE });
@@ -341,7 +343,8 @@ static void CreateBurgerPlateStack(dae::Scene& scene,
         colM->SetCollisionMask(BURGER_PLATE_COLLISION_MASK);
         colM->SetCollisionType(CollisionType::Trigger);
         goM->AddComponent<dae::PhysicsComponent>()->SetUseGravity(false);
-        goM->SetLocalPosition(startPos + glm::vec2((i + 1) * G_SIZE, G_SIZE));
+        goM->SetLocalPosition(
+            startPos + glm::vec2((static_cast<int>(i) + 1) * G_SIZE, G_SIZE));
         dae::CollisionSystem::GetInstance().RegisterCollider(colM);
         scene.Add(std::move(goM));
     }
@@ -413,7 +416,8 @@ static void CreateBurgerPart(dae::Scene& scene,
         collider->SetCollisionType(CollisionType::Trigger);
         go->AddComponent<dae::PhysicsComponent>()->SetUseGravity(false);
         go->AddComponent<BurgerPartComponent>(burgerGroup);
-        go->SetLocalPosition(startPos + glm::vec2(i * G_SIZE, 0));
+        go->SetLocalPosition(startPos +
+                             glm::vec2(static_cast<float>(i) * G_SIZE, 0.f));
 
         dae::ServiceLocator::GetInstance().GetSoundSystem().Load(
             SoundIds::BurgerStep, "Sound/BurgerStep.wav");

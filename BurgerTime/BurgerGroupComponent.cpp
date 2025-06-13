@@ -1,4 +1,4 @@
-#include "BurgerGroup.h"
+#include "BurgerGroupComponent.h"
 #include "EnemyComponent.h"
 #include <algorithm>
 #include <ranges>

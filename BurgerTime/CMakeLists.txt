@@ -9,12 +9,51 @@ else()
     set(TARGET_NAME_MINIGIN Minigin)
 endif()
 
-# Automatically gather all .cpp and .h files in the ${TARGET_NAME} folder
-file(GLOB BURGERTIME_SOURCES CONFIGURE_DEPENDS "*.cpp")
-file(GLOB BURGERTIME_HEADERS CONFIGURE_DEPENDS "*.h")
+file(GLOB ALL_CPP CONFIGURE_DEPENDS "*.cpp")
+file(GLOB ALL_H   CONFIGURE_DEPENDS "*.h")
 
-# Add executable using the gathered files
-add_executable(${TARGET_NAME} ${BURGERTIME_SOURCES} "BurgerTimeLayers.h" )
+file(GLOB COMPONENT_CPP CONFIGURE_DEPENDS "*Component.cpp")
+file(GLOB COMMAND_CPP   CONFIGURE_DEPENDS "*Command.cpp")
+file(GLOB PLAYER_CPP    CONFIGURE_DEPENDS "Player*.cpp")
+file(GLOB ENEMY_CPP     CONFIGURE_DEPENDS "Enemy*.cpp")
+file(GLOB BURGER_CPP    CONFIGURE_DEPENDS "Burger*.cpp")
+
+source_group("Components" FILES ${COMPONENT_CPP})
+source_group("Commands"   FILES ${COMMAND_CPP})
+source_group("Player"     FILES ${PLAYER_CPP})
+source_group("Enemy"      FILES ${ENEMY_CPP})
+source_group("Burger"     FILES ${BURGER_CPP})
+
+set(GROUPED_CPP
+    ${COMPONENT_CPP}
+    ${COMMAND_CPP}
+    ${PLAYER_CPP}
+    ${ENEMY_CPP}
+    ${BURGER_CPP}
+)
+
+set(GROUPED_H)
+foreach(SRC ${GROUPED_CPP})
+    string(REPLACE ".cpp" ".h" HEADER ${SRC})
+    if(EXISTS ${HEADER})
+        list(APPEND GROUPED_H ${HEADER})
+    endif()
+endforeach()
+
+set(OTHER_CPP ${ALL_CPP})
+set(OTHER_H   ${ALL_H})
+
+list(REMOVE_ITEM OTHER_CPP ${GROUPED_CPP})
+list(REMOVE_ITEM OTHER_H   ${GROUPED_H})
+
+source_group("_Other" FILES ${OTHER_CPP} ${OTHER_H})
+
+add_executable(${TARGET_NAME}
+    ${GROUPED_CPP}
+    ${OTHER_CPP}
+    ${OTHER_H}
+)
+
 
 # Link with the Minigin library
 target_link_libraries(${TARGET_NAME} PRIVATE ${TARGET_NAME_MINIGIN})
