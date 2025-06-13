@@ -19,7 +19,7 @@ class InputComponent : public dae::BaseComponent
     static constexpr unsigned int GAMEPAD_DPAD_D = 0x0002;
     static constexpr unsigned int GAMEPAD_DPAD_L = 0x0004;
     static constexpr unsigned int GAMEPAD_DPAD_R = 0x0008;
-    static constexpr unsigned int XINPUT_GAMEPAD_A = 0x1000;
+    static constexpr unsigned int GAMEPAD_A = 0x1000;
     static constexpr auto PRESSED = dae::ButtonState::Pressed;
     static constexpr auto MOVE_UP = InputKey::MoveUp;
     static constexpr auto MOVE_DOWN = InputKey::MoveDown;
@@ -31,7 +31,8 @@ public:
     explicit InputComponent(dae::GameObject& parent,
                             unsigned long idx,
                             IControllable* controllable);
-    ~InputComponent() override = default;
+    ~InputComponent() override;
+    const dae::Controller* GetController() const;
 
 private:
     void SetUpKeyboardControls(unsigned long idx);

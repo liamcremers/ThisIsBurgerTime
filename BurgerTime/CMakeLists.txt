@@ -54,7 +54,6 @@ add_executable(${TARGET_NAME}
     ${OTHER_H}
 )
 
-
 # Link with the Minigin library
 target_link_libraries(${TARGET_NAME} PRIVATE ${TARGET_NAME_MINIGIN})
 get_target_property(BURGERTIME_DLLS ${TARGET_NAME_MINIGIN} RUNTIME_DLLS)

@@ -16,6 +16,7 @@
 #include <ServiceLocator.h>
 #include <SoundSystem.h>
 
+#include "InputComponent.h"
 #include "FPSComponent.h"
 #include "BurgerTimeLayers.h"
 #include "LevelGrid.h"
@@ -28,7 +29,6 @@
 #include "ScoreUIComponent.h"
 #include "LivesComponent.h"
 #include "ScoreComponent.h"
-#include "InputComponent.h"
 
 #include <filesystem>
 #include <memory>
@@ -78,7 +78,6 @@ static void SetupPlayers()
 
         auto* pPlayerComp = player->AddComponent<PlayerComponent>();
         player->AddComponent<InputComponent>(uint16_t{}, pPlayerComp);
-        //player->AddComponent<PlayerInputComponent>(uint8_t{});
 
         dae::CollisionSystem::GetInstance().RegisterCollider(collider);
         scene.Add(std::move(player));
