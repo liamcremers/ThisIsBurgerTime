@@ -34,5 +34,4 @@ class IControllable
 public:
     virtual ~IControllable() = default;
     virtual void HandleInput(InputKey input) = 0;
-    virtual bool Move(glm::vec2 direction) = 0;
 };

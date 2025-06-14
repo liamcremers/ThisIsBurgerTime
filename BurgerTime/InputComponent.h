@@ -2,6 +2,7 @@
 #include "IControllable.h"
 #include "InputCommand.h"
 
+#include <EngineInputComponent.h>
 #include <Controller.h>
 #include <BaseComponent.h>
 #include <memory>
@@ -13,7 +14,7 @@ namespace dae
     class GameObject;
 }
 
-class InputComponent : public dae::BaseComponent
+class InputComponent : public dae::EngineInputComponent
 {
     static constexpr unsigned int GAMEPAD_DPAD_U = 0x0001;
     static constexpr unsigned int GAMEPAD_DPAD_D = 0x0002;
@@ -35,9 +36,16 @@ public:
     const dae::Controller* GetController() const;
 
 private:
-    void SetUpKeyboardControls(unsigned long idx);
+    void SetUpKeyboardControls();
+    void SetUpGamePadControls();
+    void RemoveGamePadControls();
 
+    unsigned long m_Index;
     std::unique_ptr<dae::Controller> m_pController;
     std::unordered_map<InputKey, std::unique_ptr<InputCommand>> m_Commands;
     IControllable* m_pControllable;
+
+protected:
+    void RegisterCommands() override;
+    void UnregisterCommands() override;
 };

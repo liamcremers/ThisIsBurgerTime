@@ -22,7 +22,6 @@ public:
     virtual ~PlayerComponent();
     void Update() override;
     void HandleInput(InputKey input) override;
-    bool Move(glm::vec2 direction) override;
 
     PlayerStates::IdleState& GetIdleState();
     PlayerStates::MoveState& GetMoveState();
@@ -33,6 +32,7 @@ public:
     void Die();
     bool HasMoved() const;
     auto GetPosition() const -> glm::vec2;
+    bool Move(glm::vec2 direction);
 
 private:
     void CreateOverlapEvent(dae::GameObject& parent);

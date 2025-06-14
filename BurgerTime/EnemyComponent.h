@@ -16,7 +16,7 @@ public:
     explicit EnemyComponent(dae::GameObject& parent);
     virtual ~EnemyComponent() = default;
     void Update() override;
-    bool Move(glm::vec2 direction) override;
+    bool Move(glm::vec2 direction) ;
     void HandleInput(InputKey input) override;
 
     static dae::Subject& GetStaticDiedSubject();

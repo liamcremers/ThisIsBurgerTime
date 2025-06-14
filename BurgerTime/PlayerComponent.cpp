@@ -174,9 +174,8 @@ auto PlayerComponent::Move(glm::vec2 direction) -> bool
 
 void PlayerComponent::OnHitByEnemy()
 {
-    //TODO FIX
-    //ChangeState(&m_DieState);
-    //UpdateSprite();
+    ChangeState(&m_DieState);
+    UpdateSprite();
 }
 
 void PlayerComponent::Die()

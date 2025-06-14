@@ -30,6 +30,8 @@
 #include "LivesComponent.h"
 #include "ScoreComponent.h"
 #include "AIControllerComponent.h"
+#include "GameMode.h"
+#include "MenuComponent.h"
 
 #include <filesystem>
 #include <memory>
@@ -53,9 +55,130 @@ static constexpr glm::ivec2 GRID_OFFSET = { 16, 10 };
 static constexpr glm::vec2 PLAYER_START_POS = { WINDOW_WIDTH / 2,
                                                 WINDOW_HEIGHT / 2 + 106 };
 
-static void SetupPlayers()
+static void SetupSinglePlayer()
 {
-    auto& scene = dae::SceneManager::GetInstance().CreateScene("PlayerScene");
+    auto& scene = dae::SceneManager::GetInstance().CreateScene("SinglePlayer");
+    auto& smallFont = dae::ResourceManager::GetInstance().LoadFont(
+        "Lingua.otf", SMALL_FONT_SIZE);
+    PlayerComponent* pPlayerComp{};
+    {
+        glm::vec2 playerPos = { PLAYER_START_POS[0] - OFFSET,
+                                PLAYER_START_POS[1] };
+        auto player = std::make_unique<dae::GameObject>("player");
+        player->SetLocalPosition(playerPos);
+
+        auto* collider = player->AddComponent<dae::ColliderComponent>(
+            glm::vec2{ 2 * G_SIZE, 2 * G_SIZE });
+        collider->SetCollisionLayer(
+            static_cast<uint16_t>(CollisionLayer::Player));
+        collider->SetCollisionType(CollisionType::Trigger);
+        collider->SetCollisionMask(PLAYER_COLLISION_MASK);
+
+        auto* physics = player->AddComponent<dae::PhysicsComponent>();
+        physics->SetUseGravity(false);
+
+        auto* livesComp = player->AddComponent<LivesComponent>(START_LIVES);
+        auto* scoreComp = player->AddComponent<ScoreComponent>();
+
+        pPlayerComp = player->AddComponent<PlayerComponent>();
+        player->AddComponent<InputComponent>(uint16_t{}, pPlayerComp);
+
+        dae::CollisionSystem::GetInstance().RegisterCollider(collider);
+        scene.Add(std::move(player));
+
+        // create UI elements
+        auto livesUIgo = std::make_unique<dae::GameObject>("LivesUI");
+        livesUIgo->AddComponent<LivesUIComponent>(smallFont, livesComp);
+        livesUIgo->SetLocalPosition(LIVES_UI_POS);
+        scene.Add(std::move(livesUIgo));
+
+        auto scoreUIgo = std::make_unique<dae::GameObject>("scoreUI");
+        scoreUIgo->AddComponent<ScoreUIComponent>(smallFont, scoreComp);
+        scoreUIgo->SetLocalPosition(SCORE_UI_POS);
+        scene.Add(std::move(scoreUIgo));
+    }
+    dae::SceneManager::GetInstance().DeactivateScene("SinglePlayer");
+}
+
+static void SetupTwoPlayer()
+{
+    auto& scene = dae::SceneManager::GetInstance().CreateScene("TwoPlayer");
+    auto& smallFont = dae::ResourceManager::GetInstance().LoadFont(
+        "Lingua.otf", SMALL_FONT_SIZE);
+    PlayerComponent* pPlayerCompP1{};
+    PlayerComponent* pPlayerCompP2{};
+    {
+        glm::vec2 playerPos = { PLAYER_START_POS[0] - OFFSET,
+                                PLAYER_START_POS[1] };
+        auto player = std::make_unique<dae::GameObject>("player");
+        player->SetLocalPosition(playerPos);
+
+        auto* collider = player->AddComponent<dae::ColliderComponent>(
+            glm::vec2{ 2 * G_SIZE, 2 * G_SIZE });
+        collider->SetCollisionLayer(
+            static_cast<uint16_t>(CollisionLayer::Player));
+        collider->SetCollisionType(CollisionType::Trigger);
+        collider->SetCollisionMask(PLAYER_COLLISION_MASK);
+
+        auto* physics = player->AddComponent<dae::PhysicsComponent>();
+        physics->SetUseGravity(false);
+
+        auto* livesComp = player->AddComponent<LivesComponent>(START_LIVES);
+        auto* scoreComp = player->AddComponent<ScoreComponent>();
+
+        pPlayerCompP1 = player->AddComponent<PlayerComponent>();
+        player->AddComponent<InputComponent>(uint16_t{}, pPlayerCompP1);
+
+        dae::CollisionSystem::GetInstance().RegisterCollider(collider);
+        scene.Add(std::move(player));
+
+        // create UI elements
+        auto livesUIgo = std::make_unique<dae::GameObject>("LivesUI");
+        livesUIgo->AddComponent<LivesUIComponent>(smallFont, livesComp);
+        livesUIgo->SetLocalPosition(LIVES_UI_POS);
+        scene.Add(std::move(livesUIgo));
+
+        auto scoreUIgo = std::make_unique<dae::GameObject>("scoreUI");
+        scoreUIgo->AddComponent<ScoreUIComponent>(smallFont, scoreComp);
+        scoreUIgo->SetLocalPosition(SCORE_UI_POS);
+        scene.Add(std::move(scoreUIgo));
+    }
+    {
+        glm::vec2 playerPos = { PLAYER_START_POS[0], PLAYER_START_POS[1] };
+        auto player = std::make_unique<dae::GameObject>("player");
+        player->SetLocalPosition(playerPos);
+
+        auto* collider = player->AddComponent<dae::ColliderComponent>(
+            glm::vec2{ 2 * G_SIZE, 2 * G_SIZE });
+        collider->SetCollisionLayer(
+            static_cast<uint16_t>(CollisionLayer::Player));
+        collider->SetCollisionType(CollisionType::Trigger);
+        collider->SetCollisionMask(PLAYER_COLLISION_MASK);
+
+        auto* physics = player->AddComponent<dae::PhysicsComponent>();
+        physics->SetUseGravity(false);
+
+        auto* livesComp = player->AddComponent<LivesComponent>(START_LIVES);
+
+        pPlayerCompP2 = player->AddComponent<PlayerComponent>();
+        player->AddComponent<InputComponent>(int16_t{ 1 }, pPlayerCompP2);
+
+        dae::CollisionSystem::GetInstance().RegisterCollider(collider);
+        scene.Add(std::move(player));
+
+        // create UI elements
+        auto livesUIgo = std::make_unique<dae::GameObject>("LivesUIP2");
+        livesUIgo->AddComponent<LivesUIComponent>(smallFont, livesComp);
+        livesUIgo->SetLocalPosition(LIVES_UI_POS +
+                                    glm::vec2(0, LIVES_UI_OFFSET_Y));
+        scene.Add(std::move(livesUIgo));
+    }
+    dae::SceneManager::GetInstance().DeactivateScene("TwoPlayer");
+}
+
+static void SetupVSMode()
+{
+    auto& scene = dae::SceneManager::GetInstance().CreateScene("VSMode");
     auto& smallFont = dae::ResourceManager::GetInstance().LoadFont(
         "Lingua.otf", SMALL_FONT_SIZE);
     PlayerComponent* pPlayerComp{};
@@ -114,7 +237,6 @@ static void SetupPlayers()
 
         auto* pEnemyComp = enemy->AddComponent<EnemyComponent>();
         enemy->AddComponent<InputComponent>(int16_t{ 1 }, pEnemyComp);
-        enemy->AddComponent<AIControllerComponent>(pEnemyComp, pPlayerComp);
 
         dae::CollisionSystem::GetInstance().RegisterCollider(collider);
         scene.Add(std::move(enemy));
@@ -126,6 +248,7 @@ static void SetupPlayers()
                                     glm::vec2(0, LIVES_UI_OFFSET_Y));
         scene.Add(std::move(livesUIgo));
     }
+    dae::SceneManager::GetInstance().DeactivateScene("VSMode");
 }
 
 static void SetupFPSScene()
@@ -137,6 +260,7 @@ static void SetupFPSScene()
     fps->AddComponent<FPSComponent>(fpsFont);
     fps->SetLocalPosition(FPS_POS);
     FPSScene.Add(std::move(fps));
+    dae::SceneManager::GetInstance().DeactivateScene("FPS");
 }
 
 static void CreateFloorPlane(dae::Scene& scene,
@@ -619,12 +743,29 @@ static void SetupLevel0()
     soundSystem.Play(SoundIds::Bgm, BGM_VOlUME, true);
 #pragma endregion
     LevelGrid::GetInstance().InitializeLevelGrid(level0Scene, GRID_OFFSET);
+    dae::SceneManager::GetInstance().DeactivateScene("Level0");
+}
+
+static void SetupMenuScene()
+{
+    auto& menuScene = dae::SceneManager::GetInstance().CreateScene("Menu");
+    dae::SceneManager::GetInstance().ActivateScene("Menu");
+
+    auto menuSelector = std::make_unique<dae::GameObject>("MenuSelector");
+    auto* renderer = menuSelector->AddComponent<dae::RenderComponent>();
+    auto menuComp = menuSelector->AddComponent<MenuComponent>();
+    menuComp->SetRenderer(renderer);
+    menuSelector->AddComponent<InputComponent>(0, menuComp);
+    menuScene.Add(std::move(menuSelector));
 }
 
 static void load()
 {
+    SetupMenuScene();
     SetupLevel0();
-    SetupPlayers();
+    SetupSinglePlayer();
+    SetupTwoPlayer();
+    SetupVSMode();
     SetupFPSScene();
 }
 
