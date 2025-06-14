@@ -104,7 +104,7 @@ auto EnemyComponent::GetAttackState() -> AttackState& { return m_AttackState; }
 
 auto EnemyComponent::GetDieState() -> DieState& { return m_DieState; }
 
-void EnemyComponent::OnMove(glm::vec2 direction)
+auto EnemyComponent::Move(glm::vec2 direction) -> bool
 {
     bool didExecute{};
 
@@ -125,22 +125,23 @@ void EnemyComponent::OnMove(glm::vec2 direction)
             UpdateSprite();
         m_TimeSinceMoved = 0.f;
     }
+    return didExecute;
 }
 
-void EnemyComponent::OnDieByBurger()
+void EnemyComponent::DieByBurger()
 {
     ChangeState(&m_DieState);
     UpdateSprite();
 }
 
-void EnemyComponent::OnMoveWithBurger(dae::GameObject& burger)
+void EnemyComponent::MoveWithBurger(dae::GameObject& burger)
 {
     GetOwner().SetParent(&burger, true);
     ChangeState(&m_IdleState);
     UpdateSprite();
 }
 
-void EnemyComponent::OnDeath() const
+void EnemyComponent::Die() const
 {
     s_DiedSubject.Notify("HotDogDied", GetOwner().GetWorldPosition());
     GetOwner().GetComponent<LivesComponent>()->LoseLife();

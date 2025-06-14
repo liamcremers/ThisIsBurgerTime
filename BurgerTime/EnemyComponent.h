@@ -16,7 +16,8 @@ public:
     explicit EnemyComponent(dae::GameObject& parent);
     virtual ~EnemyComponent() = default;
     void Update() override;
-    void HandleInput(InputKey input);
+    bool Move(glm::vec2 direction) override;
+    void HandleInput(InputKey input) override;
 
     static dae::Subject& GetStaticDiedSubject();
     EnemyStates::IdleState& GetIdleState();
@@ -24,10 +25,9 @@ public:
     EnemyStates::AttackState& GetAttackState();
     EnemyStates::DieState& GetDieState();
 
-    void OnMove(glm::vec2 direction);
-    void OnDieByBurger();
-    void OnMoveWithBurger(dae::GameObject& burger);
-    void OnDeath() const;
+    void DieByBurger();
+    void MoveWithBurger(dae::GameObject& burger);
+    void Die() const;
     bool HasMoved() const;
 
 private:

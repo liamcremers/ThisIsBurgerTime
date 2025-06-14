@@ -154,8 +154,8 @@ void BurgerPartComponent::OnEnemyOnBurgerPart(
     auto* EnemyComp =
         other.GetColliderGameObject().GetComponent<EnemyComponent>();
     (m_pCurrentState == &GetFallingState()) ?
-        EnemyComp->OnDieByBurger() :
-        EnemyComp->OnMoveWithBurger(GetOwner());
+        EnemyComp->DieByBurger() :
+        EnemyComp->MoveWithBurger(GetOwner());
     m_pBurgerGroup->EnemyOnBurger(EnemyComp);
 }
 

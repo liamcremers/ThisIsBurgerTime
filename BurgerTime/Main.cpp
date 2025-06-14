@@ -29,6 +29,7 @@
 #include "ScoreUIComponent.h"
 #include "LivesComponent.h"
 #include "ScoreComponent.h"
+#include "AIControllerComponent.h"
 
 #include <filesystem>
 #include <memory>
@@ -57,6 +58,7 @@ static void SetupPlayers()
     auto& scene = dae::SceneManager::GetInstance().CreateScene("PlayerScene");
     auto& smallFont = dae::ResourceManager::GetInstance().LoadFont(
         "Lingua.otf", SMALL_FONT_SIZE);
+    PlayerComponent* pPlayerComp{};
     {
         glm::vec2 playerPos = { PLAYER_START_POS[0] - OFFSET,
                                 PLAYER_START_POS[1] };
@@ -76,7 +78,7 @@ static void SetupPlayers()
         auto* livesComp = player->AddComponent<LivesComponent>(START_LIVES);
         auto* scoreComp = player->AddComponent<ScoreComponent>();
 
-        auto* pPlayerComp = player->AddComponent<PlayerComponent>();
+        pPlayerComp = player->AddComponent<PlayerComponent>();
         player->AddComponent<InputComponent>(uint16_t{}, pPlayerComp);
 
         dae::CollisionSystem::GetInstance().RegisterCollider(collider);
@@ -111,7 +113,8 @@ static void SetupPlayers()
         auto* livesComp = enemy->AddComponent<LivesComponent>(START_LIVES);
 
         auto* pEnemyComp = enemy->AddComponent<EnemyComponent>();
-        enemy->AddComponent<InputComponent>(uint8_t{ 1 }, pEnemyComp);
+        enemy->AddComponent<InputComponent>(int16_t{ 1 }, pEnemyComp);
+        enemy->AddComponent<AIControllerComponent>(pEnemyComp, pPlayerComp);
 
         dae::CollisionSystem::GetInstance().RegisterCollider(collider);
         scene.Add(std::move(enemy));

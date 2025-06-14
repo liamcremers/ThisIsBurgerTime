@@ -6,7 +6,6 @@
 #include <BaseComponent.h>
 #include <glm.hpp>
 
-using namespace PlayerComp;
 using namespace PlayerStates;
 
 static constexpr auto InputToDirection(InputKey input) -> glm::vec2
@@ -42,7 +41,7 @@ auto IdleState::HandleInput(PlayerComponent& player, InputKey& input)
     case InputKey::MoveRight:
     case InputKey::MoveUp:
     case InputKey::MoveDown:
-        player.OnMove(InputToDirection(input));
+        player.Move(InputToDirection(input));
         return player.GetMoveState();
     case InputKey::Attack:
         return player.GetAttackState();
@@ -73,7 +72,7 @@ auto MoveState::HandleInput(PlayerComponent& player, InputKey& input)
     case InputKey::MoveDown:
     case InputKey::MoveLeft:
     case InputKey::MoveRight:
-        player.OnMove(InputToDirection(input));
+        player.Move(InputToDirection(input));
         return *this;
     case InputKey::Attack:
         return player.GetAttackState();
@@ -111,7 +110,7 @@ auto DieState::Update(PlayerComponent& player) -> PlayerState&
 
     if (m_DeathTimer >= m_DeathDuration)
     {
-        player.OnDeath();
+        player.Die();
         return player.GetIdleState();
     }
     return *this;

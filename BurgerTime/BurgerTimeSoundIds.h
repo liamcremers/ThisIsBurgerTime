@@ -1,3 +1,4 @@
+#pragma once
 #include <SoundSystem.h>
 
 enum SoundIds : dae::SoundId

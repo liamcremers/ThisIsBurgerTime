@@ -1,6 +1,8 @@
 #include "LevelGrid.h"
-#include <ranges>
 #include <algorithm>
+#include <vector>
+#include <ranges>
+#include <set>
 
 void LevelGrid::InitializeLevelGrid(const dae::Scene& scene,
                                     glm::ivec2 startPos)
@@ -81,6 +83,55 @@ auto LevelGrid::GetCellType(const int gridX, const int gridY) const -> CellTypes
 {
     return (glm::vec2{ gridPos[0] * GRID_SIZE, gridPos[1] * GRID_SIZE } +
             glm::vec2{ m_StartOffset });
+}
+
+[[nodiscard]]
+auto LevelGrid::GetLaddersInReach(const glm::ivec2& pos)
+    -> std::vector<LadderInfo>
+{
+    const int y = pos.y;
+    std::vector<LadderInfo> ladderSegments;
+
+    auto find_vertical_segment = [&](int x, int start_y)
+    {
+        if (!GetCellType(x, start_y).contains(ECellType::Ladder))
+            return;
+
+        int top = start_y;
+        while (top > 0 && GetCellType(x, top - 1).contains(ECellType::Ladder))
+            --top;
+
+        int bottom = start_y;
+        while (bottom < GRID_HEIGHT - 1 &&
+               GetCellType(x, bottom + 1).contains(ECellType::Ladder))
+            ++bottom;
+
+        ladderSegments.emplace_back(
+            glm::ivec2{ x, top - 1 }, glm::ivec2{ x, bottom }, start_y < y);
+    };
+
+    auto check_adjacent_column = [&](int dx)
+    {
+        int x = pos.x + dx;
+        while (x >= 0 && x < GRID_WIDTH &&
+               GetCellType(x, y).contains(ECellType::Floor))
+        {
+            if (GetCellType(x + 1, y + 1).contains(ECellType::Ladder) or
+                GetCellType(x + 1, y - 1).contains(ECellType::Ladder))
+            {
+                if (GetCellType(x, y + 1).contains(ECellType::Ladder))
+                    find_vertical_segment(x, y + 1);
+                if (GetCellType(x, y - 1).contains(ECellType::Ladder))
+                    find_vertical_segment(x, y - 1);
+            }
+            x = x + dx;
+        }
+    };
+
+    check_adjacent_column(-1);
+    check_adjacent_column(1);
+
+    return ladderSegments;
 }
 
 #ifdef DEBUG_RENDER

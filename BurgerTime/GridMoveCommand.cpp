@@ -41,14 +41,13 @@ GridMoveCommand::GridMoveCommand(dae::GameObject& pGameObject,
     glm::ivec2 targetGridPos =
         gridPos + glm::ivec2(m_Direction[0], m_Direction[1]);
 
-    bool walked = IsPositionedForWalking(worldPos, gridPos, targetGridPos);
-
-    bool climbed = IsPositionedForClimbing(worldPos, gridPos, targetGridPos);
-
-    if (walked)
-        m_GridMoveSubject.Notify("Walked");
-    if (climbed)
-        m_GridMoveSubject.Notify("Climbed");
+    bool walked = (m_Direction[0] != 0) ?
+                      IsPositionedForWalking(worldPos, gridPos, targetGridPos) :
+                      false;
+    bool climbed =
+        (m_Direction[1] != 0) ?
+            IsPositionedForClimbing(worldPos, gridPos, targetGridPos) :
+            false;
 
     if (walked or climbed)
     {
@@ -74,81 +73,79 @@ GridMoveCommand::GridMoveCommand(dae::GameObject& pGameObject,
     return false;
 }
 
-void GridMoveCommand::Execute()
-{
-    if (!m_CanMove)
-        return;
+//void GridMoveCommand::Execute()
+//{
+//    if (!m_CanMove)
+//        return;
+//
+//    static constexpr auto HALF_SIZE_FACTOR = 0.5f;
+//
+//    auto& levelGrid = LevelGrid::GetInstance();
+//    const auto& playerPos = GetGameObject()->GetWorldPosition();
+//    auto playerSize = m_pCollider->GetSize();
+//    auto halfPlayerSize = playerSize * HALF_SIZE_FACTOR;
+//
+//    glm::vec2 worldPos =
+//        playerPos + glm::vec2{ halfPlayerSize[0], playerSize[1] };
+//    glm::ivec2 gridPos = levelGrid.WorldToGrid(worldPos);
+//    glm::ivec2 targetGridPos =
+//        gridPos + glm::ivec2(m_Direction[0], m_Direction[1]);
+//
+//    bool walked = (m_Direction[0] == 0) ?
+//                      IsPositionedForWalking(worldPos, gridPos, targetGridPos) :
+//                      false;
+//    bool climbed =
+//        (m_Direction[1] == 0) ?
+//            IsPositionedForClimbing(worldPos, gridPos, targetGridPos) :
+//            false;
+//
+//    if (walked or climbed)
+//    {
+//        glm::vec2 currentPos = playerPos;
+//
+//        if (m_Direction[0] != 0)
+//            currentPos[1] =
+//                levelGrid.GridToWorld(targetGridPos)[1] - playerSize[1];
+//        else if (m_Direction[1] != 0)
+//            currentPos[0] =
+//                levelGrid.GridToWorld(targetGridPos)[0] - (halfPlayerSize[0]);
+//        float deltaTime = dae::EngineTime::GetInstance().GetDeltaTime();
+//        glm::vec2 newPos =
+//            currentPos +
+//            glm::vec2(static_cast<float>(m_Direction[0] * m_Speed) * deltaTime,
+//                      static_cast<float>(m_Direction[1] * m_Speed) * deltaTime);
+//        m_pCollider->SetHasMoved(true);
+//        GetGameObject()->SetLocalPosition(newPos);
+//    }
+//}
 
-    static constexpr auto HALF_SIZE_FACTOR = 0.5f;
-
-    auto& levelGrid = LevelGrid::GetInstance();
-    const auto& playerPos = GetGameObject()->GetWorldPosition();
-    auto playerSize = m_pCollider->GetSize();
-    auto halfPlayerSize = playerSize * HALF_SIZE_FACTOR;
-
-    glm::vec2 worldPos =
-        playerPos + glm::vec2{ halfPlayerSize[0], playerSize[1] };
-    glm::ivec2 gridPos = levelGrid.WorldToGrid(worldPos);
-    glm::ivec2 targetGridPos =
-        gridPos + glm::ivec2(m_Direction[0], m_Direction[1]);
-
-    bool walked = IsPositionedForWalking(worldPos, gridPos, targetGridPos);
-
-    bool climbed = IsPositionedForClimbing(worldPos, gridPos, targetGridPos);
-
-    if (walked)
-        m_GridMoveSubject.Notify("Walked");
-    if (climbed)
-        m_GridMoveSubject.Notify("Climbed");
-
-    if (walked or climbed)
-    {
-        glm::vec2 currentPos = playerPos;
-
-        if (m_Direction[0] != 0)
-            currentPos[1] =
-                levelGrid.GridToWorld(targetGridPos)[1] - playerSize[1];
-        else if (m_Direction[1] != 0)
-            currentPos[0] =
-                levelGrid.GridToWorld(targetGridPos)[0] - (halfPlayerSize[0]);
-        float deltaTime = dae::EngineTime::GetInstance().GetDeltaTime();
-        glm::vec2 newPos =
-            currentPos +
-            glm::vec2(static_cast<float>(m_Direction[0] * m_Speed) * deltaTime,
-                      static_cast<float>(m_Direction[1] * m_Speed) * deltaTime);
-        m_pCollider->SetHasMoved(true);
-        GetGameObject()->SetLocalPosition(newPos);
-    }
-}
-
-void GridMoveCommand::Undo()
-{
-    if (!m_CanMove)
-        return;
-
-    if (auto* physics = GetGameObject()->GetComponent<dae::PhysicsComponent>())
-    {
-        auto velocity = physics->GetVelocity();
-        if (m_Direction[0] != 0)
-            velocity[0] = 0;
-        if (m_Direction[1] != 0)
-            velocity[1] = 0;
-        physics->SetVelocity(velocity);
-    }
-}
+//void GridMoveCommand::Undo()
+//{
+//    if (!m_CanMove)
+//        return;
+//
+//    if (auto* physics = GetGameObject()->GetComponent<dae::PhysicsComponent>())
+//    {
+//        auto velocity = physics->GetVelocity();
+//        if (m_Direction[0] != 0)
+//            velocity[0] = 0;
+//        if (m_Direction[1] != 0)
+//            velocity[1] = 0;
+//        physics->SetVelocity(velocity);
+//    }
+//}
 
 void GridMoveCommand::SetSpeed(int speed) { m_Speed = speed; }
 
 void GridMoveCommand::SetCanMove(bool canMove) { m_CanMove = canMove; }
 
-auto GridMoveCommand::IsPositionedForClimbing(const glm::vec2& playerPos,
-                                              glm::ivec2& playerGridPos,
-                                              glm::ivec2& targetGridPos) -> bool
+[[nodiscard]]
+inline auto GridMoveCommand::IsPositionedForClimbing(const glm::vec2& playerPos,
+                                                     glm::ivec2& playerGridPos,
+                                                     glm::ivec2& targetGridPos)
+    -> bool
 {
     auto& levelGrid = LevelGrid::GetInstance();
-
-    if (m_Direction[1] == 0)
-        return false;
 
     // Adjust target grid position based on horizontal alignment
     glm::vec2 cellWorldPos = levelGrid.GridToWorld(playerGridPos);
@@ -194,14 +191,13 @@ auto GridMoveCommand::IsPositionedForClimbing(const glm::vec2& playerPos,
     return isCurrentStair or isTargetStair;
 }
 
-auto GridMoveCommand::IsPositionedForWalking(const glm::vec2& playerPos,
-                                             glm::ivec2& playerGridPos,
-                                             glm::ivec2& targetGridPos) -> bool
+[[nodiscard]]
+inline auto GridMoveCommand::IsPositionedForWalking(const glm::vec2& playerPos,
+                                                    glm::ivec2& playerGridPos,
+                                                    glm::ivec2& targetGridPos)
+    -> bool
 {
     auto& levelGrid = LevelGrid::GetInstance();
-
-    if (m_Direction[0] == 0)
-        return false;
 
     // Adjust target grid position on player position
     float yOffset = playerPos[1] - levelGrid.GridToWorld(playerGridPos)[1];
@@ -228,8 +224,9 @@ auto GridMoveCommand::IsPositionedForWalking(const glm::vec2& playerPos,
     return IsFloor({ targetCell });
 }
 
-auto GridMoveCommand::IsLadder(std::initializer_list<CellTypes> cellTypeList)
-    -> bool
+[[nodiscard]]
+inline auto GridMoveCommand::IsLadder(
+    std::initializer_list<CellTypes> cellTypeList) -> bool
 {
     return std::ranges::all_of(
         cellTypeList,
@@ -237,8 +234,9 @@ auto GridMoveCommand::IsLadder(std::initializer_list<CellTypes> cellTypeList)
         { return cellTypes.contains(ECellType::Ladder); });
 }
 
-auto GridMoveCommand::IsFloor(std::initializer_list<CellTypes> cellTypeList)
-    -> bool
+[[nodiscard]]
+inline auto GridMoveCommand::IsFloor(
+    std::initializer_list<CellTypes> cellTypeList) -> bool
 {
     return std::ranges::all_of(
         cellTypeList,

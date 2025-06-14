@@ -3,12 +3,7 @@
 #include "Direction.h"
 #include <glm.hpp>
 
-namespace PlayerComp
-{
-    class PlayerComponent;
-}
-
-using PlayerComponent = PlayerComp::PlayerComponent;
+class PlayerComponent;
 
 namespace PlayerStates
 {

@@ -27,7 +27,7 @@ void BurgerGroupComponent::EnemyOffBurger(EnemyComponent* pEnemy)
 void BurgerGroupComponent::Reset()
 {
     m_WalkedOnCount = 0;
-    std::ranges::for_each(m_pEnemiesOnBurger, &EnemyComponent::OnDieByBurger);
+    std::ranges::for_each(m_pEnemiesOnBurger, &EnemyComponent::DieByBurger);
 }
 
 [[nodiscard]]

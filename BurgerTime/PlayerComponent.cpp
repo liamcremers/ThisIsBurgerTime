@@ -20,7 +20,7 @@ PlayerComponent::PlayerComponent(dae::GameObject& parent) :
     EnemyComponent::GetStaticDiedSubject().AddObserver(this);
 }
 
-PlayerComp::PlayerComponent::~PlayerComponent()
+PlayerComponent::~PlayerComponent()
 {
     EnemyComponent::GetStaticDiedSubject().RemoveObserver(this);
 }
@@ -42,8 +42,8 @@ void PlayerComponent::CreateOverlapEvent(dae::GameObject& parent)
     }
 }
 
-auto PlayerComp::PlayerComponent::IsAlignedWithEnemy(
-    const dae::ColliderComponent& other) -> bool
+auto PlayerComponent::IsAlignedWithEnemy(const dae::ColliderComponent& other)
+    -> bool
 {
     static constexpr float ALIGNED_BUFFER = 15.f;
     return (std::abs(GetOwner().GetWorldPosition()[0] -
@@ -116,9 +116,8 @@ auto PlayerComponent::DirectionToEnum(glm::vec2 dir) -> Direction
     return Direction::Down;
 }
 
-void PlayerComp::PlayerComponent::OnNotify(
-    const std::string& eventId,
-    [[maybe_unused]] const std::any& args)
+void PlayerComponent::OnNotify(const std::string& eventId,
+                               [[maybe_unused]] const std::any& args)
 {
     static constexpr int HOT_DOG_DEATH_SCORE = 100;
     if (eventId == "HotDogDied")
@@ -149,7 +148,7 @@ auto PlayerComponent::GetAttackState() -> AttackState& { return m_AttackState; }
 
 auto PlayerComponent::GetDieState() -> DieState& { return m_DieState; }
 
-void PlayerComponent::OnMove(glm::vec2 direction)
+auto PlayerComponent::Move(glm::vec2 direction) -> bool
 {
     bool didExecute{};
 
@@ -170,15 +169,17 @@ void PlayerComponent::OnMove(glm::vec2 direction)
             UpdateSprite();
         m_TimeSinceMoved = 0.f;
     }
+    return didExecute;
 }
 
 void PlayerComponent::OnHitByEnemy()
 {
-    ChangeState(&m_DieState);
-    UpdateSprite();
+    //TODO FIX
+    //ChangeState(&m_DieState);
+    //UpdateSprite();
 }
 
-void PlayerComponent::OnDeath()
+void PlayerComponent::Die()
 {
     GetOwner().GetComponent<LivesComponent>()->LoseLife();
 }
@@ -186,6 +187,11 @@ void PlayerComponent::OnDeath()
 auto PlayerComponent::HasMoved() const -> bool
 {
     return m_TimeSinceMoved < MOVED_BUFFER;
+}
+
+auto PlayerComponent::GetPosition() const -> glm::vec2
+{
+    return GetOwner().GetWorldPosition();
 }
 
 void PlayerComponent::UpdateSprite()

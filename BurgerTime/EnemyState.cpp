@@ -41,8 +41,12 @@ auto IdleState::HandleInput(EnemyComponent& enemy, InputKey& input)
     case InputKey::MoveRight:
     case InputKey::MoveUp:
     case InputKey::MoveDown:
-        enemy.OnMove(InputToDirection(input));
-        return enemy.GetMoveState();
+    {
+        if (enemy.Move(InputToDirection(input)))
+            return enemy.GetMoveState();
+        else
+            return enemy.GetIdleState();
+    }
     default:
         return *this;
     };
@@ -70,8 +74,12 @@ auto MoveState::HandleInput(EnemyComponent& enemy, InputKey& input)
     case InputKey::MoveDown:
     case InputKey::MoveLeft:
     case InputKey::MoveRight:
-        enemy.OnMove(InputToDirection(input));
-        return *this;
+    {
+        if (enemy.Move(InputToDirection(input)))
+            return enemy.GetMoveState();
+        else
+            return enemy.GetIdleState();
+    }
     default:
         return *this;
     }
@@ -106,7 +114,7 @@ auto DieState::Update(EnemyComponent& enemy) -> EnemyState&
 
     if (m_DeathTimer >= m_DeathDuration)
     {
-        enemy.OnDeath();
+        enemy.Die();
         return enemy.GetIdleState();
     }
     return *this;

@@ -10,6 +10,7 @@
 #include <Scene.h>
 #include <unordered_set>
 #include <array>
+#include <set>
 
 enum class ECellType
 {
@@ -19,6 +20,23 @@ enum class ECellType
     Food,
     BurgerPlate
 };
+
+struct LadderInfo
+{
+    LadderInfo() = default;
+
+    LadderInfo(glm::ivec2 top, glm::ivec2 bottom, bool isUp) :
+        top{ top },
+        bottom{ bottom },
+        isUp{ isUp }
+    {}
+
+    glm::ivec2 top{};
+    glm::ivec2 bottom{};
+    bool isUp{};
+    bool operator==(const LadderInfo&) const = default;
+};
+
 using CellTypes = std::unordered_set<ECellType>;
 
 class LevelGrid : public dae::Singleton<LevelGrid>
@@ -40,6 +58,8 @@ public:
     auto WorldToGrid(const glm::vec2& worldPos) const -> glm::ivec2;
     [[nodiscard]]
     auto GridToWorld(const glm::ivec2& gridPos) const -> glm::vec2;
+    [[nodiscard]]
+    auto GetLaddersInReach(const glm::ivec2& pos) -> std::vector<LadderInfo>;
 
 #ifdef DEBUG_RENDER
     void DrawCurrentCell(int gridX, int gridY) const;

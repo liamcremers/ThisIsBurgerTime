@@ -19,7 +19,7 @@ const struct DirectionVec
     static constexpr glm::vec2 None{ 0, 0 };
 };
 
-static constexpr glm::vec2 FromEnum(Direction dir)
+static constexpr glm::vec2 DirectionVecFromEnum(Direction dir)
 {
     switch (dir)
     {
@@ -36,7 +36,7 @@ static constexpr glm::vec2 FromEnum(Direction dir)
     }
 }
 
-static constexpr Direction FromVec(const glm::vec2& vec)
+static constexpr Direction DirectionEnumFromVec(const glm::vec2& vec)
 {
     if (vec == DirectionVec::Left)
         return Direction::Left;
